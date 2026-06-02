@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Barebones User model for auth, expand or remove as necessary
+model User {
+  id       String @id @default(cuid())
+  username String @db.VarChar(32) @unique
+  hash     String
+  createdAt DateTime @default(now())
+}
+
+// Session model for persistence of sessions
+model Session {
+  id        String   @id @default(cuid())
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}

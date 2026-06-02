@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %>
+
+  <body>
+    <%- include('../partials/header') %>
+      <div>Login</div>
+      <%- include("../partials/errors.ejs") %>
+        <form action="/login" method="post">
+          <input type="text" name="username" minlength="2" maxlength="32">
+          <input type="password" name="password" minlength="12" maxlength="72">
+          <button type="submit">Login</button>
+        </form>
+        <%- include('../partials/footer') %>
+  </body>
+
+</html>
