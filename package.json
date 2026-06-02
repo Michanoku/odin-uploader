@@ -1,18 +1,18 @@
 {
-  "name": "express-template",
+  "name": "odin-uploader",
   "version": "1.0.0",
-  "description": "Node Express Template For Coding Practice",
+  "description": "The Odin Project File Uploader Project",
   "keywords": [
     "Node",
     "Express"
   ],
-  "homepage": "https://github.com/Michanoku/node-express-template#readme",
+  "homepage": "https://github.com/Michanoku/odin-uploader#readme",
   "bugs": {
-    "url": "https://github.com/Michanoku/node-express-template/issues"
+    "url": "https://github.com/Michanoku/odin-uploader/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Michanoku/node-express-template.git"
+    "url": "git+https://github.com/Michanoku/odin-uploader.git"
   },
   "license": "MIT",
   "author": "Michanoku",

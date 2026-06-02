@@ -10,7 +10,7 @@ datasource db {
 // Barebones User model for auth, expand or remove as necessary
 model User {
   id        String   @id @default(cuid())
-  username  String   @unique
+  username  String   @unique @db.VarChar(32)
   hash      String
   createdAt DateTime @default(now())
 }
