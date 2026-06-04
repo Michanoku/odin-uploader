@@ -1,5 +1,5 @@
 const getUpload = (req, res) => {
-  res.render("upload", { title: "Upload" });
+  res.render("files/upload", { title: "Upload" });
 };
 
 const postUpload = (req, res) => {

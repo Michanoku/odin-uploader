@@ -6,7 +6,7 @@ const upload = multer({ dest: "uploads/" });
 
 import * as fileController from "../controllers/fileController.js";
 
-router.get("/upload", isAuth, fileController.postUpload);
-router.post("/upload", isAuth, upload.single("file"), fileController.getUpload);
+router.get("/upload", isAuth, fileController.getUpload);
+router.post("/upload", isAuth, upload.single("file"), fileController.postUpload);
 
 export default router;

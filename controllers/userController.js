@@ -5,7 +5,7 @@ import { ResultWithContextImpl } from "express-validator/lib/chain/index.js";
 import { body, validationResult, matchedData } from "express-validator";
 
 const validateRegister = [
-  body("name")
+  body("username")
     .trim()
     .notEmpty()
     .withMessage("Username is required.")
@@ -74,10 +74,10 @@ const postRegister = [
         errors: errors.array(),
       });
     }
-    const { name, password } = matchedData(req);
+    const { username, password } = matchedData(req);
     const hash = generateHash(password);
 
-    const newUser = await db.createUser(name, hash);
+    const newUser = await db.createUser(username, hash);
     req.login(newUser, (err) => {
       if (err) {
         return next(err);
