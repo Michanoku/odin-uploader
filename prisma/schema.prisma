@@ -7,13 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// Barebones User model for auth, expand or remove as necessary
-model User {
-  id       String @id @default(cuid())
-  username String @db.VarChar(32) @unique
-  hash     String
-  createdAt DateTime @default(now())
-}
 
 // Session model for persistence of sessions
 model Session {
@@ -23,4 +16,25 @@ model Session {
   expiresAt DateTime
 
   @@index([expiresAt])
+}
+
+// User model
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique @db.VarChar(32)
+  hash      String
+  createdAt DateTime @default(now())
+  files     File[]
+}
+
+// Files belonging to users
+model File {
+  id           String @id @default(cuid())
+  originalname String
+  mimetype     String
+  filename     String
+  path         String
+  size         Int
+  owner        User   @relation(fields: [ownerId], references: [id])
+  ownerId      String
 }
