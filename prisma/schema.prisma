@@ -33,14 +33,15 @@ model File {
   originalname String
   mimetype     String
   filename     String
-  path         String
   size         Int
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  folder       Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId     String
-  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId      String
+  folder       Folder?  @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId     String?
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+
+  @@index([userId])
 }
 
 model Folder {
@@ -52,6 +53,10 @@ model Folder {
   parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children  Folder[] @relation("FolderHierarchy")
   files     File[]
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  isShared    Boolean  @default(false)
+
+  @@unique([userId, parentId, name])
+  @@index([userId])
 }
