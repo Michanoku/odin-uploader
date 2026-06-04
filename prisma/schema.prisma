@@ -7,7 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 // Session model for persistence of sessions
 model Session {
   id        String   @id @default(cuid())
@@ -25,16 +24,34 @@ model User {
   hash      String
   createdAt DateTime @default(now())
   files     File[]
+  folders   Folder[]
 }
 
 // Files belonging to users
 model File {
-  id           String @id @default(cuid())
+  id           String   @id @default(cuid())
   originalname String
   mimetype     String
   filename     String
   path         String
   size         Int
-  owner        User   @relation(fields: [ownerId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  folder       Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId     String
+  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId      String
+}
+
+model Folder {
+  id        String   @id @default(cuid())
+  name      String
+  parentId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Folder[] @relation("FolderHierarchy")
+  files     File[]
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
 }
