@@ -1,7 +1,7 @@
 import passport from "passport";
 import { generateHash } from "../lib/passwordUtils.js";
 import * as db from "../db/userQueries.js";
-import { ResultWithContextImpl } from "express-validator/lib/chain";
+import { ResultWithContextImpl } from "express-validator/lib/chain/index.js";
 import { body, validationResult, matchedData } from "express-validator";
 
 const validateRegister = [
@@ -34,7 +34,7 @@ const validateRegister = [
 ];
 
 const validateLogin = [
-  body("email").trim().notEmpty().withMessage("Email is required."),
+  body("username").trim().notEmpty().withMessage("Username is required."),
   body("password").trim().notEmpty().withMessage("Password is required."),
 ];
 
