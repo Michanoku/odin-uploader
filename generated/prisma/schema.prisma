@@ -7,14 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// Barebones User model for auth, expand or remove as necessary
-model User {
-  id        String   @id @default(cuid())
-  username  String   @unique @db.VarChar(32)
-  hash      String
-  createdAt DateTime @default(now())
-}
-
 // Session model for persistence of sessions
 model Session {
   id        String   @id @default(cuid())
@@ -23,4 +15,48 @@ model Session {
   expiresAt DateTime
 
   @@index([expiresAt])
+}
+
+// User model
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique @db.VarChar(32)
+  hash      String
+  createdAt DateTime @default(now())
+  files     File[]
+  folders   Folder[]
+}
+
+// Files belonging to users
+model File {
+  id           String   @id @default(cuid())
+  originalname String
+  mimetype     String
+  filename     String
+  size         Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  folder       Folder?  @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId     String?
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+
+  @@index([userId])
+}
+
+model Folder {
+  id        String   @id @default(cuid())
+  name      String
+  parentId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Folder[] @relation("FolderHierarchy")
+  files     File[]
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  isShared  Boolean  @default(false)
+
+  @@unique([userId, parentId, name])
+  @@index([userId])
 }

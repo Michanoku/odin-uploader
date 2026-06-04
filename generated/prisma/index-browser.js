@@ -120,6 +120,13 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.SessionScalarFieldEnum = {
+  id: 'id',
+  sid: 'sid',
+  data: 'data',
+  expiresAt: 'expiresAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   username: 'username',
@@ -127,11 +134,26 @@ exports.Prisma.UserScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
-exports.Prisma.SessionScalarFieldEnum = {
+exports.Prisma.FileScalarFieldEnum = {
   id: 'id',
-  sid: 'sid',
-  data: 'data',
-  expiresAt: 'expiresAt'
+  originalname: 'originalname',
+  mimetype: 'mimetype',
+  filename: 'filename',
+  size: 'size',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  folderId: 'folderId',
+  userId: 'userId'
+};
+
+exports.Prisma.FolderScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  parentId: 'parentId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  isShared: 'isShared'
 };
 
 exports.Prisma.SortOrder = {
@@ -144,10 +166,17 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
+  Session: 'Session',
   User: 'User',
-  Session: 'Session'
+  File: 'File',
+  Folder: 'Folder'
 };
 
 /**

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %>
+
+    <body>
+        <%- include('../partials/header') %>
+            <div>Browse</div>
+            <% folders.forEach((folder) => { %>
+                <a href="browser/folder/<%= folder.id%>"><%= folder.name %></a>
+           <%  }) %>
+          <% files.forEach((file) => { %>
+                <a href="#"><%= folder.name %></a>
+           <%  }) %>
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" />
+                <input type="hidden" name="currentFolder" />
+                <button type="submit">Upload</button>
+            </form>
+            <form action="/createFolder" method="post">
+                <input type="text" name="newFolderName" />
+                <input type="hidden" name="currentFolder" />
+                <button type="submit">Create New Folder</button>
+            </form>
+            <%- include('../partials/footer') %>
+    </body>
+
+</html>
