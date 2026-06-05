@@ -33,6 +33,11 @@ export type File = $Result.DefaultSelection<Prisma.$FilePayload>
  * 
  */
 export type Folder = $Result.DefaultSelection<Prisma.$FolderPayload>
+/**
+ * Model SharedFolder
+ * 
+ */
+export type SharedFolder = $Result.DefaultSelection<Prisma.$SharedFolderPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -194,6 +199,16 @@ export class PrismaClient<
     * ```
     */
   get folder(): Prisma.FolderDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.sharedFolder`: Exposes CRUD operations for the **SharedFolder** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SharedFolders
+    * const sharedFolders = await prisma.sharedFolder.findMany()
+    * ```
+    */
+  get sharedFolder(): Prisma.SharedFolderDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -631,7 +646,8 @@ export namespace Prisma {
     Session: 'Session',
     User: 'User',
     File: 'File',
-    Folder: 'Folder'
+    Folder: 'Folder',
+    SharedFolder: 'SharedFolder'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -647,7 +663,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "session" | "user" | "file" | "folder"
+      modelProps: "session" | "user" | "file" | "folder" | "sharedFolder"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -947,6 +963,80 @@ export namespace Prisma {
           }
         }
       }
+      SharedFolder: {
+        payload: Prisma.$SharedFolderPayload<ExtArgs>
+        fields: Prisma.SharedFolderFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SharedFolderFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SharedFolderFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload>
+          }
+          findFirst: {
+            args: Prisma.SharedFolderFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SharedFolderFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload>
+          }
+          findMany: {
+            args: Prisma.SharedFolderFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload>[]
+          }
+          create: {
+            args: Prisma.SharedFolderCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload>
+          }
+          createMany: {
+            args: Prisma.SharedFolderCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SharedFolderCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload>[]
+          }
+          delete: {
+            args: Prisma.SharedFolderDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload>
+          }
+          update: {
+            args: Prisma.SharedFolderUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload>
+          }
+          deleteMany: {
+            args: Prisma.SharedFolderDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SharedFolderUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SharedFolderUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload>[]
+          }
+          upsert: {
+            args: Prisma.SharedFolderUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedFolderPayload>
+          }
+          aggregate: {
+            args: Prisma.SharedFolderAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSharedFolder>
+          }
+          groupBy: {
+            args: Prisma.SharedFolderGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SharedFolderGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SharedFolderCountArgs<ExtArgs>
+            result: $Utils.Optional<SharedFolderCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1059,6 +1149,7 @@ export namespace Prisma {
     user?: UserOmit
     file?: FileOmit
     folder?: FolderOmit
+    sharedFolder?: SharedFolderOmit
   }
 
   /* Types for Logging */
@@ -4488,7 +4579,6 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     userId: string | null
-    isShared: boolean | null
   }
 
   export type FolderMaxAggregateOutputType = {
@@ -4498,7 +4588,6 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     userId: string | null
-    isShared: boolean | null
   }
 
   export type FolderCountAggregateOutputType = {
@@ -4508,7 +4597,6 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     userId: number
-    isShared: number
     _all: number
   }
 
@@ -4520,7 +4608,6 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     userId?: true
-    isShared?: true
   }
 
   export type FolderMaxAggregateInputType = {
@@ -4530,7 +4617,6 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     userId?: true
-    isShared?: true
   }
 
   export type FolderCountAggregateInputType = {
@@ -4540,7 +4626,6 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     userId?: true
-    isShared?: true
     _all?: true
   }
 
@@ -4623,7 +4708,6 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     userId: string
-    isShared: boolean
     _count: FolderCountAggregateOutputType | null
     _min: FolderMinAggregateOutputType | null
     _max: FolderMaxAggregateOutputType | null
@@ -4650,11 +4734,11 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
-    isShared?: boolean
     parent?: boolean | Folder$parentArgs<ExtArgs>
     children?: boolean | Folder$childrenArgs<ExtArgs>
     files?: boolean | Folder$filesArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    sharedFolder?: boolean | Folder$sharedFolderArgs<ExtArgs>
     _count?: boolean | FolderCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["folder"]>
 
@@ -4665,7 +4749,6 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
-    isShared?: boolean
     parent?: boolean | Folder$parentArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["folder"]>
@@ -4677,7 +4760,6 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
-    isShared?: boolean
     parent?: boolean | Folder$parentArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["folder"]>
@@ -4689,15 +4771,15 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
-    isShared?: boolean
   }
 
-  export type FolderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "parentId" | "createdAt" | "updatedAt" | "userId" | "isShared", ExtArgs["result"]["folder"]>
+  export type FolderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "parentId" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["folder"]>
   export type FolderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     parent?: boolean | Folder$parentArgs<ExtArgs>
     children?: boolean | Folder$childrenArgs<ExtArgs>
     files?: boolean | Folder$filesArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    sharedFolder?: boolean | Folder$sharedFolderArgs<ExtArgs>
     _count?: boolean | FolderCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type FolderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4716,6 +4798,7 @@ export namespace Prisma {
       children: Prisma.$FolderPayload<ExtArgs>[]
       files: Prisma.$FilePayload<ExtArgs>[]
       user: Prisma.$UserPayload<ExtArgs>
+      sharedFolder: Prisma.$SharedFolderPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4724,7 +4807,6 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
       userId: string
-      isShared: boolean
     }, ExtArgs["result"]["folder"]>
     composites: {}
   }
@@ -5123,6 +5205,7 @@ export namespace Prisma {
     children<T extends Folder$childrenArgs<ExtArgs> = {}>(args?: Subset<T, Folder$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     files<T extends Folder$filesArgs<ExtArgs> = {}>(args?: Subset<T, Folder$filesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    sharedFolder<T extends Folder$sharedFolderArgs<ExtArgs> = {}>(args?: Subset<T, Folder$sharedFolderArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5158,7 +5241,6 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Folder", 'DateTime'>
     readonly updatedAt: FieldRef<"Folder", 'DateTime'>
     readonly userId: FieldRef<"Folder", 'String'>
-    readonly isShared: FieldRef<"Folder", 'Boolean'>
   }
     
 
@@ -5627,6 +5709,25 @@ export namespace Prisma {
   }
 
   /**
+   * Folder.sharedFolder
+   */
+  export type Folder$sharedFolderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    where?: SharedFolderWhereInput
+  }
+
+  /**
    * Folder without action
    */
   export type FolderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5642,6 +5743,1056 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: FolderInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SharedFolder
+   */
+
+  export type AggregateSharedFolder = {
+    _count: SharedFolderCountAggregateOutputType | null
+    _min: SharedFolderMinAggregateOutputType | null
+    _max: SharedFolderMaxAggregateOutputType | null
+  }
+
+  export type SharedFolderMinAggregateOutputType = {
+    id: string | null
+    folderId: string | null
+    createdAt: Date | null
+    expiresAt: Date | null
+  }
+
+  export type SharedFolderMaxAggregateOutputType = {
+    id: string | null
+    folderId: string | null
+    createdAt: Date | null
+    expiresAt: Date | null
+  }
+
+  export type SharedFolderCountAggregateOutputType = {
+    id: number
+    folderId: number
+    createdAt: number
+    expiresAt: number
+    _all: number
+  }
+
+
+  export type SharedFolderMinAggregateInputType = {
+    id?: true
+    folderId?: true
+    createdAt?: true
+    expiresAt?: true
+  }
+
+  export type SharedFolderMaxAggregateInputType = {
+    id?: true
+    folderId?: true
+    createdAt?: true
+    expiresAt?: true
+  }
+
+  export type SharedFolderCountAggregateInputType = {
+    id?: true
+    folderId?: true
+    createdAt?: true
+    expiresAt?: true
+    _all?: true
+  }
+
+  export type SharedFolderAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SharedFolder to aggregate.
+     */
+    where?: SharedFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SharedFolders to fetch.
+     */
+    orderBy?: SharedFolderOrderByWithRelationInput | SharedFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SharedFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SharedFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SharedFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SharedFolders
+    **/
+    _count?: true | SharedFolderCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SharedFolderMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SharedFolderMaxAggregateInputType
+  }
+
+  export type GetSharedFolderAggregateType<T extends SharedFolderAggregateArgs> = {
+        [P in keyof T & keyof AggregateSharedFolder]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSharedFolder[P]>
+      : GetScalarType<T[P], AggregateSharedFolder[P]>
+  }
+
+
+
+
+  export type SharedFolderGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SharedFolderWhereInput
+    orderBy?: SharedFolderOrderByWithAggregationInput | SharedFolderOrderByWithAggregationInput[]
+    by: SharedFolderScalarFieldEnum[] | SharedFolderScalarFieldEnum
+    having?: SharedFolderScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SharedFolderCountAggregateInputType | true
+    _min?: SharedFolderMinAggregateInputType
+    _max?: SharedFolderMaxAggregateInputType
+  }
+
+  export type SharedFolderGroupByOutputType = {
+    id: string
+    folderId: string
+    createdAt: Date
+    expiresAt: Date
+    _count: SharedFolderCountAggregateOutputType | null
+    _min: SharedFolderMinAggregateOutputType | null
+    _max: SharedFolderMaxAggregateOutputType | null
+  }
+
+  type GetSharedFolderGroupByPayload<T extends SharedFolderGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SharedFolderGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SharedFolderGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SharedFolderGroupByOutputType[P]>
+            : GetScalarType<T[P], SharedFolderGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SharedFolderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    folderId?: boolean
+    createdAt?: boolean
+    expiresAt?: boolean
+    folder?: boolean | FolderDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sharedFolder"]>
+
+  export type SharedFolderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    folderId?: boolean
+    createdAt?: boolean
+    expiresAt?: boolean
+    folder?: boolean | FolderDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sharedFolder"]>
+
+  export type SharedFolderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    folderId?: boolean
+    createdAt?: boolean
+    expiresAt?: boolean
+    folder?: boolean | FolderDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sharedFolder"]>
+
+  export type SharedFolderSelectScalar = {
+    id?: boolean
+    folderId?: boolean
+    createdAt?: boolean
+    expiresAt?: boolean
+  }
+
+  export type SharedFolderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "folderId" | "createdAt" | "expiresAt", ExtArgs["result"]["sharedFolder"]>
+  export type SharedFolderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    folder?: boolean | FolderDefaultArgs<ExtArgs>
+  }
+  export type SharedFolderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    folder?: boolean | FolderDefaultArgs<ExtArgs>
+  }
+  export type SharedFolderIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    folder?: boolean | FolderDefaultArgs<ExtArgs>
+  }
+
+  export type $SharedFolderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SharedFolder"
+    objects: {
+      folder: Prisma.$FolderPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      folderId: string
+      createdAt: Date
+      expiresAt: Date
+    }, ExtArgs["result"]["sharedFolder"]>
+    composites: {}
+  }
+
+  type SharedFolderGetPayload<S extends boolean | null | undefined | SharedFolderDefaultArgs> = $Result.GetResult<Prisma.$SharedFolderPayload, S>
+
+  type SharedFolderCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SharedFolderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SharedFolderCountAggregateInputType | true
+    }
+
+  export interface SharedFolderDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SharedFolder'], meta: { name: 'SharedFolder' } }
+    /**
+     * Find zero or one SharedFolder that matches the filter.
+     * @param {SharedFolderFindUniqueArgs} args - Arguments to find a SharedFolder
+     * @example
+     * // Get one SharedFolder
+     * const sharedFolder = await prisma.sharedFolder.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SharedFolderFindUniqueArgs>(args: SelectSubset<T, SharedFolderFindUniqueArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SharedFolder that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SharedFolderFindUniqueOrThrowArgs} args - Arguments to find a SharedFolder
+     * @example
+     * // Get one SharedFolder
+     * const sharedFolder = await prisma.sharedFolder.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SharedFolderFindUniqueOrThrowArgs>(args: SelectSubset<T, SharedFolderFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SharedFolder that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedFolderFindFirstArgs} args - Arguments to find a SharedFolder
+     * @example
+     * // Get one SharedFolder
+     * const sharedFolder = await prisma.sharedFolder.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SharedFolderFindFirstArgs>(args?: SelectSubset<T, SharedFolderFindFirstArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SharedFolder that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedFolderFindFirstOrThrowArgs} args - Arguments to find a SharedFolder
+     * @example
+     * // Get one SharedFolder
+     * const sharedFolder = await prisma.sharedFolder.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SharedFolderFindFirstOrThrowArgs>(args?: SelectSubset<T, SharedFolderFindFirstOrThrowArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SharedFolders that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedFolderFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SharedFolders
+     * const sharedFolders = await prisma.sharedFolder.findMany()
+     * 
+     * // Get first 10 SharedFolders
+     * const sharedFolders = await prisma.sharedFolder.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const sharedFolderWithIdOnly = await prisma.sharedFolder.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SharedFolderFindManyArgs>(args?: SelectSubset<T, SharedFolderFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SharedFolder.
+     * @param {SharedFolderCreateArgs} args - Arguments to create a SharedFolder.
+     * @example
+     * // Create one SharedFolder
+     * const SharedFolder = await prisma.sharedFolder.create({
+     *   data: {
+     *     // ... data to create a SharedFolder
+     *   }
+     * })
+     * 
+     */
+    create<T extends SharedFolderCreateArgs>(args: SelectSubset<T, SharedFolderCreateArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SharedFolders.
+     * @param {SharedFolderCreateManyArgs} args - Arguments to create many SharedFolders.
+     * @example
+     * // Create many SharedFolders
+     * const sharedFolder = await prisma.sharedFolder.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SharedFolderCreateManyArgs>(args?: SelectSubset<T, SharedFolderCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SharedFolders and returns the data saved in the database.
+     * @param {SharedFolderCreateManyAndReturnArgs} args - Arguments to create many SharedFolders.
+     * @example
+     * // Create many SharedFolders
+     * const sharedFolder = await prisma.sharedFolder.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SharedFolders and only return the `id`
+     * const sharedFolderWithIdOnly = await prisma.sharedFolder.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SharedFolderCreateManyAndReturnArgs>(args?: SelectSubset<T, SharedFolderCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SharedFolder.
+     * @param {SharedFolderDeleteArgs} args - Arguments to delete one SharedFolder.
+     * @example
+     * // Delete one SharedFolder
+     * const SharedFolder = await prisma.sharedFolder.delete({
+     *   where: {
+     *     // ... filter to delete one SharedFolder
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SharedFolderDeleteArgs>(args: SelectSubset<T, SharedFolderDeleteArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SharedFolder.
+     * @param {SharedFolderUpdateArgs} args - Arguments to update one SharedFolder.
+     * @example
+     * // Update one SharedFolder
+     * const sharedFolder = await prisma.sharedFolder.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SharedFolderUpdateArgs>(args: SelectSubset<T, SharedFolderUpdateArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SharedFolders.
+     * @param {SharedFolderDeleteManyArgs} args - Arguments to filter SharedFolders to delete.
+     * @example
+     * // Delete a few SharedFolders
+     * const { count } = await prisma.sharedFolder.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SharedFolderDeleteManyArgs>(args?: SelectSubset<T, SharedFolderDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SharedFolders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedFolderUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SharedFolders
+     * const sharedFolder = await prisma.sharedFolder.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SharedFolderUpdateManyArgs>(args: SelectSubset<T, SharedFolderUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SharedFolders and returns the data updated in the database.
+     * @param {SharedFolderUpdateManyAndReturnArgs} args - Arguments to update many SharedFolders.
+     * @example
+     * // Update many SharedFolders
+     * const sharedFolder = await prisma.sharedFolder.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SharedFolders and only return the `id`
+     * const sharedFolderWithIdOnly = await prisma.sharedFolder.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SharedFolderUpdateManyAndReturnArgs>(args: SelectSubset<T, SharedFolderUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SharedFolder.
+     * @param {SharedFolderUpsertArgs} args - Arguments to update or create a SharedFolder.
+     * @example
+     * // Update or create a SharedFolder
+     * const sharedFolder = await prisma.sharedFolder.upsert({
+     *   create: {
+     *     // ... data to create a SharedFolder
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SharedFolder we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SharedFolderUpsertArgs>(args: SelectSubset<T, SharedFolderUpsertArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SharedFolders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedFolderCountArgs} args - Arguments to filter SharedFolders to count.
+     * @example
+     * // Count the number of SharedFolders
+     * const count = await prisma.sharedFolder.count({
+     *   where: {
+     *     // ... the filter for the SharedFolders we want to count
+     *   }
+     * })
+    **/
+    count<T extends SharedFolderCountArgs>(
+      args?: Subset<T, SharedFolderCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SharedFolderCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SharedFolder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedFolderAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SharedFolderAggregateArgs>(args: Subset<T, SharedFolderAggregateArgs>): Prisma.PrismaPromise<GetSharedFolderAggregateType<T>>
+
+    /**
+     * Group by SharedFolder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedFolderGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SharedFolderGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SharedFolderGroupByArgs['orderBy'] }
+        : { orderBy?: SharedFolderGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SharedFolderGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSharedFolderGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SharedFolder model
+   */
+  readonly fields: SharedFolderFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SharedFolder.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SharedFolderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    folder<T extends FolderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FolderDefaultArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SharedFolder model
+   */
+  interface SharedFolderFieldRefs {
+    readonly id: FieldRef<"SharedFolder", 'String'>
+    readonly folderId: FieldRef<"SharedFolder", 'String'>
+    readonly createdAt: FieldRef<"SharedFolder", 'DateTime'>
+    readonly expiresAt: FieldRef<"SharedFolder", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SharedFolder findUnique
+   */
+  export type SharedFolderFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedFolder to fetch.
+     */
+    where: SharedFolderWhereUniqueInput
+  }
+
+  /**
+   * SharedFolder findUniqueOrThrow
+   */
+  export type SharedFolderFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedFolder to fetch.
+     */
+    where: SharedFolderWhereUniqueInput
+  }
+
+  /**
+   * SharedFolder findFirst
+   */
+  export type SharedFolderFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedFolder to fetch.
+     */
+    where?: SharedFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SharedFolders to fetch.
+     */
+    orderBy?: SharedFolderOrderByWithRelationInput | SharedFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SharedFolders.
+     */
+    cursor?: SharedFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SharedFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SharedFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SharedFolders.
+     */
+    distinct?: SharedFolderScalarFieldEnum | SharedFolderScalarFieldEnum[]
+  }
+
+  /**
+   * SharedFolder findFirstOrThrow
+   */
+  export type SharedFolderFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedFolder to fetch.
+     */
+    where?: SharedFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SharedFolders to fetch.
+     */
+    orderBy?: SharedFolderOrderByWithRelationInput | SharedFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SharedFolders.
+     */
+    cursor?: SharedFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SharedFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SharedFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SharedFolders.
+     */
+    distinct?: SharedFolderScalarFieldEnum | SharedFolderScalarFieldEnum[]
+  }
+
+  /**
+   * SharedFolder findMany
+   */
+  export type SharedFolderFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedFolders to fetch.
+     */
+    where?: SharedFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SharedFolders to fetch.
+     */
+    orderBy?: SharedFolderOrderByWithRelationInput | SharedFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SharedFolders.
+     */
+    cursor?: SharedFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SharedFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SharedFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SharedFolders.
+     */
+    distinct?: SharedFolderScalarFieldEnum | SharedFolderScalarFieldEnum[]
+  }
+
+  /**
+   * SharedFolder create
+   */
+  export type SharedFolderCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SharedFolder.
+     */
+    data: XOR<SharedFolderCreateInput, SharedFolderUncheckedCreateInput>
+  }
+
+  /**
+   * SharedFolder createMany
+   */
+  export type SharedFolderCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SharedFolders.
+     */
+    data: SharedFolderCreateManyInput | SharedFolderCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SharedFolder createManyAndReturn
+   */
+  export type SharedFolderCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * The data used to create many SharedFolders.
+     */
+    data: SharedFolderCreateManyInput | SharedFolderCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SharedFolder update
+   */
+  export type SharedFolderUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SharedFolder.
+     */
+    data: XOR<SharedFolderUpdateInput, SharedFolderUncheckedUpdateInput>
+    /**
+     * Choose, which SharedFolder to update.
+     */
+    where: SharedFolderWhereUniqueInput
+  }
+
+  /**
+   * SharedFolder updateMany
+   */
+  export type SharedFolderUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SharedFolders.
+     */
+    data: XOR<SharedFolderUpdateManyMutationInput, SharedFolderUncheckedUpdateManyInput>
+    /**
+     * Filter which SharedFolders to update
+     */
+    where?: SharedFolderWhereInput
+    /**
+     * Limit how many SharedFolders to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SharedFolder updateManyAndReturn
+   */
+  export type SharedFolderUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * The data used to update SharedFolders.
+     */
+    data: XOR<SharedFolderUpdateManyMutationInput, SharedFolderUncheckedUpdateManyInput>
+    /**
+     * Filter which SharedFolders to update
+     */
+    where?: SharedFolderWhereInput
+    /**
+     * Limit how many SharedFolders to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SharedFolder upsert
+   */
+  export type SharedFolderUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SharedFolder to update in case it exists.
+     */
+    where: SharedFolderWhereUniqueInput
+    /**
+     * In case the SharedFolder found by the `where` argument doesn't exist, create a new SharedFolder with this data.
+     */
+    create: XOR<SharedFolderCreateInput, SharedFolderUncheckedCreateInput>
+    /**
+     * In case the SharedFolder was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SharedFolderUpdateInput, SharedFolderUncheckedUpdateInput>
+  }
+
+  /**
+   * SharedFolder delete
+   */
+  export type SharedFolderDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
+    /**
+     * Filter which SharedFolder to delete.
+     */
+    where: SharedFolderWhereUniqueInput
+  }
+
+  /**
+   * SharedFolder deleteMany
+   */
+  export type SharedFolderDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SharedFolders to delete
+     */
+    where?: SharedFolderWhereInput
+    /**
+     * Limit how many SharedFolders to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SharedFolder without action
+   */
+  export type SharedFolderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedFolder
+     */
+    select?: SharedFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedFolder
+     */
+    omit?: SharedFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedFolderInclude<ExtArgs> | null
   }
 
 
@@ -5700,11 +6851,20 @@ export namespace Prisma {
     parentId: 'parentId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    userId: 'userId',
-    isShared: 'isShared'
+    userId: 'userId'
   };
 
   export type FolderScalarFieldEnum = (typeof FolderScalarFieldEnum)[keyof typeof FolderScalarFieldEnum]
+
+
+  export const SharedFolderScalarFieldEnum: {
+    id: 'id',
+    folderId: 'folderId',
+    createdAt: 'createdAt',
+    expiresAt: 'expiresAt'
+  };
+
+  export type SharedFolderScalarFieldEnum = (typeof SharedFolderScalarFieldEnum)[keyof typeof SharedFolderScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -5775,13 +6935,6 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -5992,11 +7145,11 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Folder"> | Date | string
     updatedAt?: DateTimeFilter<"Folder"> | Date | string
     userId?: StringFilter<"Folder"> | string
-    isShared?: BoolFilter<"Folder"> | boolean
     parent?: XOR<FolderNullableScalarRelationFilter, FolderWhereInput> | null
     children?: FolderListRelationFilter
     files?: FileListRelationFilter
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    sharedFolder?: XOR<SharedFolderNullableScalarRelationFilter, SharedFolderWhereInput> | null
   }
 
   export type FolderOrderByWithRelationInput = {
@@ -6006,11 +7159,11 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
-    isShared?: SortOrder
     parent?: FolderOrderByWithRelationInput
     children?: FolderOrderByRelationAggregateInput
     files?: FileOrderByRelationAggregateInput
     user?: UserOrderByWithRelationInput
+    sharedFolder?: SharedFolderOrderByWithRelationInput
   }
 
   export type FolderWhereUniqueInput = Prisma.AtLeast<{
@@ -6024,11 +7177,11 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Folder"> | Date | string
     updatedAt?: DateTimeFilter<"Folder"> | Date | string
     userId?: StringFilter<"Folder"> | string
-    isShared?: BoolFilter<"Folder"> | boolean
     parent?: XOR<FolderNullableScalarRelationFilter, FolderWhereInput> | null
     children?: FolderListRelationFilter
     files?: FileListRelationFilter
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    sharedFolder?: XOR<SharedFolderNullableScalarRelationFilter, SharedFolderWhereInput> | null
   }, "id" | "userId_parentId_name">
 
   export type FolderOrderByWithAggregationInput = {
@@ -6038,7 +7191,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
-    isShared?: SortOrder
     _count?: FolderCountOrderByAggregateInput
     _max?: FolderMaxOrderByAggregateInput
     _min?: FolderMinOrderByAggregateInput
@@ -6054,7 +7206,56 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Folder"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Folder"> | Date | string
     userId?: StringWithAggregatesFilter<"Folder"> | string
-    isShared?: BoolWithAggregatesFilter<"Folder"> | boolean
+  }
+
+  export type SharedFolderWhereInput = {
+    AND?: SharedFolderWhereInput | SharedFolderWhereInput[]
+    OR?: SharedFolderWhereInput[]
+    NOT?: SharedFolderWhereInput | SharedFolderWhereInput[]
+    id?: StringFilter<"SharedFolder"> | string
+    folderId?: StringFilter<"SharedFolder"> | string
+    createdAt?: DateTimeFilter<"SharedFolder"> | Date | string
+    expiresAt?: DateTimeFilter<"SharedFolder"> | Date | string
+    folder?: XOR<FolderScalarRelationFilter, FolderWhereInput>
+  }
+
+  export type SharedFolderOrderByWithRelationInput = {
+    id?: SortOrder
+    folderId?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
+    folder?: FolderOrderByWithRelationInput
+  }
+
+  export type SharedFolderWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    folderId?: string
+    AND?: SharedFolderWhereInput | SharedFolderWhereInput[]
+    OR?: SharedFolderWhereInput[]
+    NOT?: SharedFolderWhereInput | SharedFolderWhereInput[]
+    createdAt?: DateTimeFilter<"SharedFolder"> | Date | string
+    expiresAt?: DateTimeFilter<"SharedFolder"> | Date | string
+    folder?: XOR<FolderScalarRelationFilter, FolderWhereInput>
+  }, "id" | "folderId">
+
+  export type SharedFolderOrderByWithAggregationInput = {
+    id?: SortOrder
+    folderId?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
+    _count?: SharedFolderCountOrderByAggregateInput
+    _max?: SharedFolderMaxOrderByAggregateInput
+    _min?: SharedFolderMinOrderByAggregateInput
+  }
+
+  export type SharedFolderScalarWhereWithAggregatesInput = {
+    AND?: SharedFolderScalarWhereWithAggregatesInput | SharedFolderScalarWhereWithAggregatesInput[]
+    OR?: SharedFolderScalarWhereWithAggregatesInput[]
+    NOT?: SharedFolderScalarWhereWithAggregatesInput | SharedFolderScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SharedFolder"> | string
+    folderId?: StringWithAggregatesFilter<"SharedFolder"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SharedFolder"> | Date | string
+    expiresAt?: DateTimeWithAggregatesFilter<"SharedFolder"> | Date | string
   }
 
   export type SessionCreateInput = {
@@ -6250,11 +7451,11 @@ export namespace Prisma {
     name: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    isShared?: boolean
     parent?: FolderCreateNestedOneWithoutChildrenInput
     children?: FolderCreateNestedManyWithoutParentInput
     files?: FileCreateNestedManyWithoutFolderInput
     user: UserCreateNestedOneWithoutFoldersInput
+    sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
   export type FolderUncheckedCreateInput = {
@@ -6264,9 +7465,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
-    isShared?: boolean
     children?: FolderUncheckedCreateNestedManyWithoutParentInput
     files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
   }
 
   export type FolderUpdateInput = {
@@ -6274,11 +7475,11 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     parent?: FolderUpdateOneWithoutChildrenNestedInput
     children?: FolderUpdateManyWithoutParentNestedInput
     files?: FileUpdateManyWithoutFolderNestedInput
     user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
   }
 
   export type FolderUncheckedUpdateInput = {
@@ -6288,9 +7489,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     children?: FolderUncheckedUpdateManyWithoutParentNestedInput
     files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
   }
 
   export type FolderCreateManyInput = {
@@ -6300,7 +7501,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
-    isShared?: boolean
   }
 
   export type FolderUpdateManyMutationInput = {
@@ -6308,7 +7508,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type FolderUncheckedUpdateManyInput = {
@@ -6318,7 +7517,54 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type SharedFolderCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    folder: FolderCreateNestedOneWithoutSharedFolderInput
+  }
+
+  export type SharedFolderUncheckedCreateInput = {
+    id?: string
+    folderId: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+  }
+
+  export type SharedFolderUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folder?: FolderUpdateOneRequiredWithoutSharedFolderNestedInput
+  }
+
+  export type SharedFolderUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    folderId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SharedFolderCreateManyInput = {
+    id?: string
+    folderId: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+  }
+
+  export type SharedFolderUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SharedFolderUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    folderId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -6560,9 +7806,9 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
+  export type SharedFolderNullableScalarRelationFilter = {
+    is?: SharedFolderWhereInput | null
+    isNot?: SharedFolderWhereInput | null
   }
 
   export type FolderUserIdParentIdNameCompoundUniqueInput = {
@@ -6578,7 +7824,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
-    isShared?: SortOrder
   }
 
   export type FolderMaxOrderByAggregateInput = {
@@ -6588,7 +7833,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
-    isShared?: SortOrder
   }
 
   export type FolderMinOrderByAggregateInput = {
@@ -6598,15 +7842,32 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
-    isShared?: SortOrder
   }
 
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
+  export type FolderScalarRelationFilter = {
+    is?: FolderWhereInput
+    isNot?: FolderWhereInput
+  }
+
+  export type SharedFolderCountOrderByAggregateInput = {
+    id?: SortOrder
+    folderId?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type SharedFolderMaxOrderByAggregateInput = {
+    id?: SortOrder
+    folderId?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type SharedFolderMinOrderByAggregateInput = {
+    id?: SortOrder
+    folderId?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -6769,6 +8030,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type SharedFolderCreateNestedOneWithoutFolderInput = {
+    create?: XOR<SharedFolderCreateWithoutFolderInput, SharedFolderUncheckedCreateWithoutFolderInput>
+    connectOrCreate?: SharedFolderCreateOrConnectWithoutFolderInput
+    connect?: SharedFolderWhereUniqueInput
+  }
+
   export type FolderUncheckedCreateNestedManyWithoutParentInput = {
     create?: XOR<FolderCreateWithoutParentInput, FolderUncheckedCreateWithoutParentInput> | FolderCreateWithoutParentInput[] | FolderUncheckedCreateWithoutParentInput[]
     connectOrCreate?: FolderCreateOrConnectWithoutParentInput | FolderCreateOrConnectWithoutParentInput[]
@@ -6783,8 +8050,10 @@ export namespace Prisma {
     connect?: FileWhereUniqueInput | FileWhereUniqueInput[]
   }
 
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
+  export type SharedFolderUncheckedCreateNestedOneWithoutFolderInput = {
+    create?: XOR<SharedFolderCreateWithoutFolderInput, SharedFolderUncheckedCreateWithoutFolderInput>
+    connectOrCreate?: SharedFolderCreateOrConnectWithoutFolderInput
+    connect?: SharedFolderWhereUniqueInput
   }
 
   export type FolderUpdateOneWithoutChildrenNestedInput = {
@@ -6833,6 +8102,16 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFoldersInput, UserUpdateWithoutFoldersInput>, UserUncheckedUpdateWithoutFoldersInput>
   }
 
+  export type SharedFolderUpdateOneWithoutFolderNestedInput = {
+    create?: XOR<SharedFolderCreateWithoutFolderInput, SharedFolderUncheckedCreateWithoutFolderInput>
+    connectOrCreate?: SharedFolderCreateOrConnectWithoutFolderInput
+    upsert?: SharedFolderUpsertWithoutFolderInput
+    disconnect?: SharedFolderWhereInput | boolean
+    delete?: SharedFolderWhereInput | boolean
+    connect?: SharedFolderWhereUniqueInput
+    update?: XOR<XOR<SharedFolderUpdateToOneWithWhereWithoutFolderInput, SharedFolderUpdateWithoutFolderInput>, SharedFolderUncheckedUpdateWithoutFolderInput>
+  }
+
   export type FolderUncheckedUpdateManyWithoutParentNestedInput = {
     create?: XOR<FolderCreateWithoutParentInput, FolderUncheckedCreateWithoutParentInput> | FolderCreateWithoutParentInput[] | FolderUncheckedCreateWithoutParentInput[]
     connectOrCreate?: FolderCreateOrConnectWithoutParentInput | FolderCreateOrConnectWithoutParentInput[]
@@ -6859,6 +8138,30 @@ export namespace Prisma {
     update?: FileUpdateWithWhereUniqueWithoutFolderInput | FileUpdateWithWhereUniqueWithoutFolderInput[]
     updateMany?: FileUpdateManyWithWhereWithoutFolderInput | FileUpdateManyWithWhereWithoutFolderInput[]
     deleteMany?: FileScalarWhereInput | FileScalarWhereInput[]
+  }
+
+  export type SharedFolderUncheckedUpdateOneWithoutFolderNestedInput = {
+    create?: XOR<SharedFolderCreateWithoutFolderInput, SharedFolderUncheckedCreateWithoutFolderInput>
+    connectOrCreate?: SharedFolderCreateOrConnectWithoutFolderInput
+    upsert?: SharedFolderUpsertWithoutFolderInput
+    disconnect?: SharedFolderWhereInput | boolean
+    delete?: SharedFolderWhereInput | boolean
+    connect?: SharedFolderWhereUniqueInput
+    update?: XOR<XOR<SharedFolderUpdateToOneWithWhereWithoutFolderInput, SharedFolderUpdateWithoutFolderInput>, SharedFolderUncheckedUpdateWithoutFolderInput>
+  }
+
+  export type FolderCreateNestedOneWithoutSharedFolderInput = {
+    create?: XOR<FolderCreateWithoutSharedFolderInput, FolderUncheckedCreateWithoutSharedFolderInput>
+    connectOrCreate?: FolderCreateOrConnectWithoutSharedFolderInput
+    connect?: FolderWhereUniqueInput
+  }
+
+  export type FolderUpdateOneRequiredWithoutSharedFolderNestedInput = {
+    create?: XOR<FolderCreateWithoutSharedFolderInput, FolderUncheckedCreateWithoutSharedFolderInput>
+    connectOrCreate?: FolderCreateOrConnectWithoutSharedFolderInput
+    upsert?: FolderUpsertWithoutSharedFolderInput
+    connect?: FolderWhereUniqueInput
+    update?: XOR<XOR<FolderUpdateToOneWithWhereWithoutSharedFolderInput, FolderUpdateWithoutSharedFolderInput>, FolderUncheckedUpdateWithoutSharedFolderInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -6997,19 +8300,6 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
   export type FileCreateWithoutUserInput = {
     id?: string
     originalname: string
@@ -7047,10 +8337,10 @@ export namespace Prisma {
     name: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    isShared?: boolean
     parent?: FolderCreateNestedOneWithoutChildrenInput
     children?: FolderCreateNestedManyWithoutParentInput
     files?: FileCreateNestedManyWithoutFolderInput
+    sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
   export type FolderUncheckedCreateWithoutUserInput = {
@@ -7059,9 +8349,9 @@ export namespace Prisma {
     parentId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    isShared?: boolean
     children?: FolderUncheckedCreateNestedManyWithoutParentInput
     files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
   }
 
   export type FolderCreateOrConnectWithoutUserInput = {
@@ -7131,7 +8421,6 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Folder"> | Date | string
     updatedAt?: DateTimeFilter<"Folder"> | Date | string
     userId?: StringFilter<"Folder"> | string
-    isShared?: BoolFilter<"Folder"> | boolean
   }
 
   export type FolderCreateWithoutFilesInput = {
@@ -7139,10 +8428,10 @@ export namespace Prisma {
     name: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    isShared?: boolean
     parent?: FolderCreateNestedOneWithoutChildrenInput
     children?: FolderCreateNestedManyWithoutParentInput
     user: UserCreateNestedOneWithoutFoldersInput
+    sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
   export type FolderUncheckedCreateWithoutFilesInput = {
@@ -7152,8 +8441,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
-    isShared?: boolean
     children?: FolderUncheckedCreateNestedManyWithoutParentInput
+    sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
   }
 
   export type FolderCreateOrConnectWithoutFilesInput = {
@@ -7198,10 +8487,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     parent?: FolderUpdateOneWithoutChildrenNestedInput
     children?: FolderUpdateManyWithoutParentNestedInput
     user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
   }
 
   export type FolderUncheckedUpdateWithoutFilesInput = {
@@ -7211,8 +8500,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     children?: FolderUncheckedUpdateManyWithoutParentNestedInput
+    sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
   }
 
   export type UserUpsertWithoutFilesInput = {
@@ -7247,10 +8536,10 @@ export namespace Prisma {
     name: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    isShared?: boolean
     parent?: FolderCreateNestedOneWithoutChildrenInput
     files?: FileCreateNestedManyWithoutFolderInput
     user: UserCreateNestedOneWithoutFoldersInput
+    sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
   export type FolderUncheckedCreateWithoutChildrenInput = {
@@ -7260,8 +8549,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
-    isShared?: boolean
     files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
   }
 
   export type FolderCreateOrConnectWithoutChildrenInput = {
@@ -7274,10 +8563,10 @@ export namespace Prisma {
     name: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    isShared?: boolean
     children?: FolderCreateNestedManyWithoutParentInput
     files?: FileCreateNestedManyWithoutFolderInput
     user: UserCreateNestedOneWithoutFoldersInput
+    sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
   export type FolderUncheckedCreateWithoutParentInput = {
@@ -7286,9 +8575,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
-    isShared?: boolean
     children?: FolderUncheckedCreateNestedManyWithoutParentInput
     files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
   }
 
   export type FolderCreateOrConnectWithoutParentInput = {
@@ -7354,6 +8643,23 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutFoldersInput, UserUncheckedCreateWithoutFoldersInput>
   }
 
+  export type SharedFolderCreateWithoutFolderInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+  }
+
+  export type SharedFolderUncheckedCreateWithoutFolderInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+  }
+
+  export type SharedFolderCreateOrConnectWithoutFolderInput = {
+    where: SharedFolderWhereUniqueInput
+    create: XOR<SharedFolderCreateWithoutFolderInput, SharedFolderUncheckedCreateWithoutFolderInput>
+  }
+
   export type FolderUpsertWithoutChildrenInput = {
     update: XOR<FolderUpdateWithoutChildrenInput, FolderUncheckedUpdateWithoutChildrenInput>
     create: XOR<FolderCreateWithoutChildrenInput, FolderUncheckedCreateWithoutChildrenInput>
@@ -7370,10 +8676,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     parent?: FolderUpdateOneWithoutChildrenNestedInput
     files?: FileUpdateManyWithoutFolderNestedInput
     user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
   }
 
   export type FolderUncheckedUpdateWithoutChildrenInput = {
@@ -7383,8 +8689,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
   }
 
   export type FolderUpsertWithWhereUniqueWithoutParentInput = {
@@ -7446,6 +8752,89 @@ export namespace Prisma {
     files?: FileUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type SharedFolderUpsertWithoutFolderInput = {
+    update: XOR<SharedFolderUpdateWithoutFolderInput, SharedFolderUncheckedUpdateWithoutFolderInput>
+    create: XOR<SharedFolderCreateWithoutFolderInput, SharedFolderUncheckedCreateWithoutFolderInput>
+    where?: SharedFolderWhereInput
+  }
+
+  export type SharedFolderUpdateToOneWithWhereWithoutFolderInput = {
+    where?: SharedFolderWhereInput
+    data: XOR<SharedFolderUpdateWithoutFolderInput, SharedFolderUncheckedUpdateWithoutFolderInput>
+  }
+
+  export type SharedFolderUpdateWithoutFolderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SharedFolderUncheckedUpdateWithoutFolderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FolderCreateWithoutSharedFolderInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    parent?: FolderCreateNestedOneWithoutChildrenInput
+    children?: FolderCreateNestedManyWithoutParentInput
+    files?: FileCreateNestedManyWithoutFolderInput
+    user: UserCreateNestedOneWithoutFoldersInput
+  }
+
+  export type FolderUncheckedCreateWithoutSharedFolderInput = {
+    id?: string
+    name: string
+    parentId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    children?: FolderUncheckedCreateNestedManyWithoutParentInput
+    files?: FileUncheckedCreateNestedManyWithoutFolderInput
+  }
+
+  export type FolderCreateOrConnectWithoutSharedFolderInput = {
+    where: FolderWhereUniqueInput
+    create: XOR<FolderCreateWithoutSharedFolderInput, FolderUncheckedCreateWithoutSharedFolderInput>
+  }
+
+  export type FolderUpsertWithoutSharedFolderInput = {
+    update: XOR<FolderUpdateWithoutSharedFolderInput, FolderUncheckedUpdateWithoutSharedFolderInput>
+    create: XOR<FolderCreateWithoutSharedFolderInput, FolderUncheckedCreateWithoutSharedFolderInput>
+    where?: FolderWhereInput
+  }
+
+  export type FolderUpdateToOneWithWhereWithoutSharedFolderInput = {
+    where?: FolderWhereInput
+    data: XOR<FolderUpdateWithoutSharedFolderInput, FolderUncheckedUpdateWithoutSharedFolderInput>
+  }
+
+  export type FolderUpdateWithoutSharedFolderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    parent?: FolderUpdateOneWithoutChildrenNestedInput
+    children?: FolderUpdateManyWithoutParentNestedInput
+    files?: FileUpdateManyWithoutFolderNestedInput
+    user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+  }
+
+  export type FolderUncheckedUpdateWithoutSharedFolderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    children?: FolderUncheckedUpdateManyWithoutParentNestedInput
+    files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+  }
+
   export type FileCreateManyUserInput = {
     id?: string
     originalname: string
@@ -7463,7 +8852,6 @@ export namespace Prisma {
     parentId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    isShared?: boolean
   }
 
   export type FileUpdateWithoutUserInput = {
@@ -7504,10 +8892,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     parent?: FolderUpdateOneWithoutChildrenNestedInput
     children?: FolderUpdateManyWithoutParentNestedInput
     files?: FileUpdateManyWithoutFolderNestedInput
+    sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
   }
 
   export type FolderUncheckedUpdateWithoutUserInput = {
@@ -7516,9 +8904,9 @@ export namespace Prisma {
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     children?: FolderUncheckedUpdateManyWithoutParentNestedInput
     files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
   }
 
   export type FolderUncheckedUpdateManyWithoutUserInput = {
@@ -7527,7 +8915,6 @@ export namespace Prisma {
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type FolderCreateManyParentInput = {
@@ -7536,7 +8923,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
-    isShared?: boolean
   }
 
   export type FileCreateManyFolderInput = {
@@ -7555,10 +8941,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     children?: FolderUpdateManyWithoutParentNestedInput
     files?: FileUpdateManyWithoutFolderNestedInput
     user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
   }
 
   export type FolderUncheckedUpdateWithoutParentInput = {
@@ -7567,9 +8953,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
     children?: FolderUncheckedUpdateManyWithoutParentNestedInput
     files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
   }
 
   export type FolderUncheckedUpdateManyWithoutParentInput = {
@@ -7578,7 +8964,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
-    isShared?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type FileUpdateWithoutFolderInput = {

@@ -108,4 +108,4 @@ const getVerifiedSharedFolder = async (folderId) => {
   return sharedFolder;
 }
 
-export { getFolder, getFolderContents, getRootContents, createFile, createFolder, updateFolder, createFolderTree, getVerifiedSharedFolder };
+export { getFolder, getFolderContents, getRootContents, createFile, createFolder, updateFolder, deleteFolder, createFolderTree, getVerifiedSharedFolder };

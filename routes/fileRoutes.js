@@ -12,8 +12,8 @@ router.get("/browser/folder/:folderId", isAuth, isOwner, fileController.getFolde
 router.get("/shared/:sharedFolderId", isAuth, isShared, fileController.getShared);
 router.get("/shared/:sharedFolderId/folder/:folderId", isAuth, isShared, fileController.getShared);
 router.post("/createFolder", isAuth, fileController.createFolder);
-router.post("/renameFolder", isAuth, isOwner, fileController.createFolder);
-router.post("/moveFolder", isAuth, isOwner, fileController.createFolder);
-router.post("/deleteFolder", isAuth, isOwner, fileController.createFolder);
+router.post("/renameFolder", isAuth, isOwner, fileController.renameFolder);
+router.post("/moveFolder", isAuth, isOwner, fileController.moveFolder);
+router.post("/deleteFolder", isAuth, isOwner, fileController.deleteFolder);
 
 export default router;

@@ -45,18 +45,26 @@ model File {
 }
 
 model Folder {
-  id        String   @id @default(cuid())
-  name      String
-  parentId  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children  Folder[] @relation("FolderHierarchy")
-  files     File[]
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  isShared  Boolean  @default(false)
+  id           String        @id @default(cuid())
+  name         String
+  parentId     String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  parent       Folder?       @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children     Folder[]      @relation("FolderHierarchy")
+  files        File[]
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  sharedFolder SharedFolder?
 
   @@unique([userId, parentId, name])
   @@index([userId])
+}
+
+model SharedFolder {
+  id        String   @id @default(cuid())
+  folder    Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId  String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }

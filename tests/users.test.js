@@ -9,7 +9,7 @@ describe("Authentication", () => {
       .post("/register")
       .type("form")
       .send({
-        name: "testuser",
+        username: "testuser",
         password: "supersecurepassword",
         confirmation: "supersecurepassword",
       });

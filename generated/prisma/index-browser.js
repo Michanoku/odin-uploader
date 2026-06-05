@@ -152,8 +152,14 @@ exports.Prisma.FolderScalarFieldEnum = {
   parentId: 'parentId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  userId: 'userId',
-  isShared: 'isShared'
+  userId: 'userId'
+};
+
+exports.Prisma.SharedFolderScalarFieldEnum = {
+  id: 'id',
+  folderId: 'folderId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -176,7 +182,8 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   User: 'User',
   File: 'File',
-  Folder: 'Folder'
+  Folder: 'Folder',
+  SharedFolder: 'SharedFolder'
 };
 
 /**

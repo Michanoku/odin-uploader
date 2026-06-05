@@ -38,45 +38,6 @@ const createFolder = async (req, res) => {
   }
 };
 
-const renameFolder = async (req, res) => {
-  const folderId = req.body.folderId;
-  try {
-    const updatedfolderData = {
-      name: req.body.updatedFolderName,
-    };
-    const updatedFolder = await db.renameFolder(folderId, updatedfolderData);
-    res.json({ success: true, folder: updatedFolder });
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
-  }
-};
-
-const moveFolder = async (req, res) => {
-  const folderId = req.body.folderId;
-  try {
-    const updatedfolderData = {
-      parentId: req.body.updatedParentId,
-    };
-    const updatedFolder = await db.renameFolder(folderId, updatedfolderData);
-    res.json({ success: true, folder: updatedFolder });
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
-  }
-};
-
-const deleteFolder = async (req, res) => {
-  const folderId = req.body.folderId;
-  try {
-    const deletedFolder = await db.deleteFolder(folderId);
-    res.json({ success: true, folder: deletedFolder });
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
-  }
-};
-
 const getFolder = async (req, res, next) => {
   const folder = req.folder ?? null;
   const folderId = folder?.id ?? null;
@@ -111,6 +72,45 @@ const getFolder = async (req, res, next) => {
   }
 };
 
+const renameFolder = async (req, res) => {
+  const folderId = req.body.folderId;
+  try {
+    const updatedfolderData = {
+      name: req.body.updatedFolderName,
+    };
+    const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
+    res.json({ success: true, folder: updatedFolder });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
+};
+
+const moveFolder = async (req, res) => {
+  const folderId = req.body.folderId;
+  try {
+    const updatedfolderData = {
+      parentId: req.body.updatedParentId,
+    };
+    const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
+    res.json({ success: true, folder: updatedFolder });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
+};
+
+const deleteFolder = async (req, res) => {
+  const folderId = req.body.folderId;
+  try {
+    const deletedFolder = await db.deleteFolder(folderId);
+    res.json({ success: true, folder: deletedFolder });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
+};
+
 const getShared = async (req, res) => {
   const sharedFolder = req.sharedFolder;
   const folderId = req.params.folderId ?? req.sharedFolder.folderId;
@@ -137,4 +137,12 @@ const getShared = async (req, res) => {
 
 // TODO: Rename folder, delete folder, move folder, download folder, open file, rename file, delete file, move file, download file
 
-export { uploadFile, createFolder, getFolder, renameFolder, moveFolder, deleteFolder };
+export {
+  uploadFile,
+  createFolder,
+  getFolder,
+  renameFolder,
+  moveFolder,
+  deleteFolder,
+  getShared,
+};
