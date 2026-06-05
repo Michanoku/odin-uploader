@@ -48,17 +48,19 @@ const getBrowser = async (req, res) => {
   if (folderId) {
     folder = await db.getFolder(folderId);
 
-    if (folder) {
+    if (folder && folder.userId === req.user.id) {
       const [contentsResult, treeResult] = await Promise.all([
-        db.getFolderContents(folderId, req.user.id),
+        db.getFolderContents(folderId),
         db.createFolderTree(folderId),
       ]);
 
       contents = contentsResult;
       tree = treeResult;
+    } else {
+      res.redirect("/notfound") //TODO
     }
   } else {
-    contents = await db.getFolderContents(null, req.user.id);
+    contents = await db.getRootContents(req.user.id);
   }
 
   const context = {
@@ -68,10 +70,34 @@ const getBrowser = async (req, res) => {
     tree,
     folderId,
     parentId: folder?.parentId ?? null,
-    exists: folderId ? !!folder : true,
   };
 
   res.render("files/browser", context);
+};
+
+const getShared = async (req, res) => {
+  const sharedFolder = req.sharedFolder;
+  const folderId = req.params.folderId ?? req.sharedFolder.folderId;
+
+  const folder = await db.getSharedFolder(folderId);
+  const parentId = folderId === sharedFolder ? null : folder.parentId;
+
+  const [contents, tree] = await Promise.all([
+    db.getFolderContents(folderId),
+    db.createFolderTree(folderId, sharedFolder.folderId),
+  ]);
+
+
+  const context = {
+    title: "Shared folder",
+    folders: contents.folders,
+    files: contents.files,
+    tree,
+    folderId,
+    parentId: parentId,
+  };
+
+  res.render("files/shared", context);
 };
 
 // TODO: Rename folder, delete folder, move folder, download folder, open file, rename file, delete file, move file, download file

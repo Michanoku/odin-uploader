@@ -1,16 +1,14 @@
 import { prisma } from '../lib/prisma.js';
 
-const getFolderContents = async (folderId, userId) => {
+const getFolderContents = async (folderId) => {
   const [folders, files] = await Promise.all([
     prisma.folder.findMany({
       where: {
-        userId: userId,
         parentId: folderId,
       },
     }),
     prisma.file.findMany({
       where: {
-        userId: userId,
         folderId: folderId,
       },
     }),
@@ -18,6 +16,26 @@ const getFolderContents = async (folderId, userId) => {
 
   return { folders, files };
 };
+
+const getRootContents = async (userId) => {
+  const [folders, files] = await Promise.all([
+    prisma.folder.findMany({
+      where: {
+        parentId: null,
+        userId: userId,
+      },
+    }),
+    prisma.file.findMany({
+      where: {
+        folderId: null,
+        userId: userId,
+      },
+    }),
+  ]);
+
+  return { folders, files };
+};
+
 const getFolder = async (folderId, userId) => {
   const folder = await prisma.folder.findFirst({
     where: {
@@ -42,7 +60,7 @@ const createFolder = async (folderData) => {
   return folder;
 };
 
-const createFolderTree = async (folderId) => {
+const createFolderTree = async (folderId, rootId = null) => {
   const tree = [];
   let currentId = folderId;
   do {
@@ -53,6 +71,7 @@ const createFolderTree = async (folderId) => {
     });
     if (!folder) break;
     tree.push({ id: folder.id, name: folder.name });
+    if (rootId && rootId === currentId) break;
     currentId = folder.parentId;
   } while (currentId !== null);
   return tree.reverse();
@@ -70,4 +89,4 @@ const getVerifiedSharedFolder = async (folderId) => {
   return sharedFolder;
 }
 
-export { getFolder, getFolderContents, createFile, createFolder, createFolderTree, getVerifiedSharedFolder };
+export { getFolder, getFolderContents, getRootContents, createFile, createFolder, createFolderTree, getVerifiedSharedFolder };
