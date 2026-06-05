@@ -39,20 +39,39 @@ const createFolder = async (req, res) => {
 };
 
 const getBrowser = async (req, res) => {
-  const folderId = req.params.folderId || null;
-  const folder = folderId ? await db.getFolder(folderId) : null;
-  // TODO if folderId exists but folder does not:
-  const folderContents = (folderId && !folder) ? [] : await db.getFolderContents(folderId, req.user.id);
-  const folderTree = folderId ? await db.createFolderTree(folderId) : [];
-  console.log(folder);
-  res.render("files/browser", {
+  const folderId = req.params.folderId ?? null;
+
+  let folder = null;
+  let contents = { folders: [], files: [] };
+  let tree = [];
+
+  if (folderId) {
+    folder = await db.getFolder(folderId);
+
+    if (folder) {
+      const [contentsResult, treeResult] = await Promise.all([
+        db.getFolderContents(folderId, req.user.id),
+        db.createFolderTree(folderId),
+      ]);
+
+      contents = contentsResult;
+      tree = treeResult;
+    }
+  } else {
+    contents = await db.getFolderContents(null, req.user.id);
+  }
+
+  const context = {
     title: "Browser",
-    folders: folderContents.folders,
-    files: folderContents.files,
-    tree: folderTree,
-    folderId: folderId,
-    parentId: folder ? folder.parentId : null,
-  });
+    folders: contents.folders,
+    files: contents.files,
+    tree,
+    folderId,
+    parentId: folder?.parentId ?? null,
+    exists: folderId ? !!folder : true,
+  };
+
+  res.render("files/browser", context);
 };
 
 export { uploadFile, getBrowser, createFolder };
