@@ -20,7 +20,26 @@ const uploadFile = async (req, res, next) => {
   }
 };
 
+const getFile = async (req, res, next) => {
+  const file = req.file;
+  // TODO
+};
 
+const renameFile = async (req, res) => {
+  // TODO
+};
+
+const moveFile = async (req, res) => {
+  // TODO
+};
+
+const deleteFile = async (req, res) => {
+ // TODO
+};
+
+const shareFile = async (req, res) => {
+  // TODO
+};
 
 // TODO: open file, rename file, delete file, move file, download file
 

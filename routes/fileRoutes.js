@@ -3,6 +3,7 @@ const router = express.Router();
 import {
   isAuth,
   isFolderOwner,
+  isFileOwner,
   isSharedFolder,
 } from "../lib/authMiddleware.js";
 import multer from "multer";
@@ -16,5 +17,9 @@ router.post(
   upload.single("file"),
   fileController.uploadFile
 );
+router.post("/renameFile", isAuth, isFileOwner, folderController.renameFolder);
+router.post("/moveFile", isAuth, isFileOwner, folderController.moveFolder);
+router.post("/deleteFile", isAuth, isFileOwner, folderController.deleteFolder);
+router.post("/shareFile", isAuth, isFileOwner, folderController.shareFolder);
 
 export default router;
