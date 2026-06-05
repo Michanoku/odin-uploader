@@ -137,8 +137,7 @@ describe("Folder Ownership", () => {
 
     const response = await user2.get(`/browser/folder/${folderId}`);
 
-    expect(response.status).toBe(302);
-    expect(response.headers.location).toBe("/notfound");
+    expect(response.status).toBe(404);
   });
 });
 
@@ -170,6 +169,5 @@ test("user cannot rename another user's folder", async () => {
     updatedFolderName: "Hacked",
   });
 
-  expect(response.status).toBe(302);
-  expect(response.headers.location).toBe("/notfound");
+  expect(response.status).toBe(404);
 });
