@@ -5,20 +5,33 @@
     <body>
         <%- include('../partials/header') %>
             <div>Browse</div>
+            <a href="/browser">Home</a>
+            <% tree.forEach((folder, index, tree) => { %>
+                >
+                <a href="/browser/folder/<%= folder.id %>"><%= folder.name %></a>
+
+           <%  }) %>
+           <hr>
+           <div>Folder Contents</div>
+            <% if (parentId) { %>
+           <a href="/browser/folder/<%= parentId %>">UP</a>
+           <% } else if (tree.length > 0) { %>
+                <a href="/browser">UP</a>
+            <% } %>
             <% folders.forEach((folder) => { %>
-                <a href="browser/folder/<%= folder.id%>"><%= folder.name %></a>
+                <a href="/browser/folder/<%= folder.id %>"><%= folder.name %></a>
            <%  }) %>
           <% files.forEach((file) => { %>
                 <a href="#"><%= folder.name %></a>
            <%  }) %>
             <form action="/upload" method="post" enctype="multipart/form-data">
                 <input type="file" name="file" />
-                <input type="hidden" name="currentFolder" />
+                <input type="hidden" name="currentFolder" value="<%= folderId %>"/>
                 <button type="submit">Upload</button>
             </form>
             <form action="/createFolder" method="post">
                 <input type="text" name="newFolderName" />
-                <input type="hidden" name="currentFolder" />
+                <input type="hidden" name="currentFolder" value="<%= folderId %>" />
                 <button type="submit">Create New Folder</button>
             </form>
             <%- include('../partials/footer') %>

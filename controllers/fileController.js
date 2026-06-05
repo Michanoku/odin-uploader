@@ -40,12 +40,18 @@ const createFolder = async (req, res) => {
 
 const getBrowser = async (req, res) => {
   const folderId = req.params.folderId || null;
-  const folder = await db.getFolder(folderId, req.user.id);
-
+  const folder = folderId ? await db.getFolder(folderId) : null;
+  // TODO if folderId exists but folder does not:
+  const folderContents = (folderId && !folder) ? [] : await db.getFolderContents(folderId, req.user.id);
+  const folderTree = folderId ? await db.createFolderTree(folderId) : [];
+  console.log(folder);
   res.render("files/browser", {
     title: "Browser",
-    folders: folder.folders,
-    files: folder.files,
+    folders: folderContents.folders,
+    files: folderContents.files,
+    tree: folderTree,
+    folderId: folderId,
+    parentId: folder ? folder.parentId : null,
   });
 };
 
