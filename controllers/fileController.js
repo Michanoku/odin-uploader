@@ -38,17 +38,53 @@ const createFolder = async (req, res) => {
   }
 };
 
-const getBrowser = async (req, res) => {
-  const folderId = req.params.folderId ?? null;
+const renameFolder = async (req, res) => {
+  const folderId = req.body.folderId;
+  try {
+    const updatedfolderData = {
+      name: req.body.updatedFolderName,
+    };
+    const updatedFolder = await db.renameFolder(folderId, updatedfolderData);
+    res.json({ success: true, folder: updatedFolder });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
+};
 
-  let folder = null;
+const moveFolder = async (req, res) => {
+  const folderId = req.body.folderId;
+  try {
+    const updatedfolderData = {
+      parentId: req.body.updatedParentId,
+    };
+    const updatedFolder = await db.renameFolder(folderId, updatedfolderData);
+    res.json({ success: true, folder: updatedFolder });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
+};
+
+const deleteFolder = async (req, res) => {
+  const folderId = req.body.folderId;
+  try {
+    const deletedFolder = await db.deleteFolder(folderId);
+    res.json({ success: true, folder: deletedFolder });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
+};
+
+const getFolder = async (req, res, next) => {
+  const folder = req.folder ?? null;
+  const folderId = folder?.id ?? null;
   let contents = { folders: [], files: [] };
   let tree = [];
 
-  if (folderId) {
-    folder = await db.getFolder(folderId);
-
-    if (folder && folder.userId === req.user.id) {
+  try {
+    if (folder) {
       const [contentsResult, treeResult] = await Promise.all([
         db.getFolderContents(folderId),
         db.createFolderTree(folderId),
@@ -57,22 +93,22 @@ const getBrowser = async (req, res) => {
       contents = contentsResult;
       tree = treeResult;
     } else {
-      res.redirect("/notfound") //TODO
+      contents = await db.getRootContents(req.user.id);
     }
-  } else {
-    contents = await db.getRootContents(req.user.id);
+
+    const context = {
+      title: "Browser",
+      folders: contents.folders,
+      files: contents.files,
+      tree,
+      folderId,
+      parentId: folder?.parentId ?? null,
+    };
+
+    res.render("files/browser", context);
+  } catch (err) {
+    return next(err);
   }
-
-  const context = {
-    title: "Browser",
-    folders: contents.folders,
-    files: contents.files,
-    tree,
-    folderId,
-    parentId: folder?.parentId ?? null,
-  };
-
-  res.render("files/browser", context);
 };
 
 const getShared = async (req, res) => {
@@ -86,7 +122,6 @@ const getShared = async (req, res) => {
     db.getFolderContents(folderId),
     db.createFolderTree(folderId, sharedFolder.folderId),
   ]);
-
 
   const context = {
     title: "Shared folder",
@@ -102,4 +137,4 @@ const getShared = async (req, res) => {
 
 // TODO: Rename folder, delete folder, move folder, download folder, open file, rename file, delete file, move file, download file
 
-export { uploadFile, getBrowser, createFolder };
+export { uploadFile, createFolder, getFolder, renameFolder, moveFolder, deleteFolder };

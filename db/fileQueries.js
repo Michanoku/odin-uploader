@@ -36,16 +36,6 @@ const getRootContents = async (userId) => {
   return { folders, files };
 };
 
-const getFolder = async (folderId, userId) => {
-  const folder = await prisma.folder.findFirst({
-    where: {
-      id: folderId,
-      userId: userId,
-    },
-  });
-  return folder;
-};
-
 const createFile = async (fileData) => {
   const file = await prisma.file.create({
     data: fileData,
@@ -59,6 +49,35 @@ const createFolder = async (folderData) => {
   });
   return folder;
 };
+
+const getFolder = async (folderId, userId) => {
+  const folder = await prisma.folder.findFirst({
+    where: {
+      id: folderId,
+      userId: userId,
+    },
+  });
+  return folder;
+};
+
+const updateFolder = async (folderId, updatedFolderData) => {
+  const updatedFolder = await prisma.folder.update({
+    where: {
+      id: folderId,
+    },
+    data: updatedFolderData,
+  });
+  return updatedFolder;
+}
+
+const deleteFolder = async (folderId) => {
+  const deletedFolder = await prisma.folder.delete({
+    where: {
+      id: folderId,
+    }
+  });
+  return deletedFolder;
+}
 
 const createFolderTree = async (folderId, rootId = null) => {
   const tree = [];
@@ -89,4 +108,4 @@ const getVerifiedSharedFolder = async (folderId) => {
   return sharedFolder;
 }
 
-export { getFolder, getFolderContents, getRootContents, createFile, createFolder, createFolderTree, getVerifiedSharedFolder };
+export { getFolder, getFolderContents, getRootContents, createFile, createFolder, updateFolder, createFolderTree, getVerifiedSharedFolder };
