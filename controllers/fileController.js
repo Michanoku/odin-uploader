@@ -74,4 +74,6 @@ const getBrowser = async (req, res) => {
   res.render("files/browser", context);
 };
 
+// TODO: Rename folder, delete folder, move folder, download folder, open file, rename file, delete file, move file, download file
+
 export { uploadFile, getBrowser, createFolder };

@@ -55,8 +55,16 @@ model Folder {
   files     File[]
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  isShared    Boolean  @default(false)
+  sharedFolder  SharedFolder?
 
   @@unique([userId, parentId, name])
   @@index([userId])
+}
+
+model SharedFolder {
+  id        String   @id @default(cuid())
+  folder    Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId  String @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime 
 }
