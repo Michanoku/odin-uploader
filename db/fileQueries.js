@@ -58,4 +58,16 @@ const createFolderTree = async (folderId) => {
   return tree.reverse();
 };
 
-export { getFolder, getFolderContents, createFile, createFolder, createFolderTree };
+const getVerifiedSharedFolder = async (folderId) => {
+  const sharedFolder = await prisma.sharedFolder.findUnique({
+    where: {
+      folderId: folderId,
+    }
+  });
+  if (!sharedFolder || sharedFolder.expiresAt < new Date()) {
+    return null;
+  }
+  return sharedFolder;
+}
+
+export { getFolder, getFolderContents, createFile, createFolder, createFolderTree, getVerifiedSharedFolder };
