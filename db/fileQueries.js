@@ -1,4 +1,4 @@
-import { prisma } from '../lib/prisma.js';
+import { prisma } from "../lib/prisma.js";
 
 const getFolderContents = async (folderId) => {
   const [folders, files] = await Promise.all([
@@ -68,21 +68,34 @@ const updateFolder = async (folderId, updatedFolderData) => {
     data: updatedFolderData,
   });
   return updatedFolder;
-}
+};
 
 const deleteFolder = async (folderId) => {
   const deletedFolder = await prisma.folder.delete({
     where: {
       id: folderId,
-    }
+    },
   });
   return deletedFolder;
-}
+};
+
+const shareFolder = async (folderId, duration) => {
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + duration);
+
+  const sharedFolder = await prisma.sharedFolder.create({
+    data: {
+      folderId: folderId,
+      expiresAt: expiresAt,
+    },
+  });
+  return sharedFolder;
+};
 
 const createFolderTree = async (folderId, rootId = null) => {
   const tree = [];
   let currentId = folderId;
-  do {
+  while (currentId !== null) {
     const folder = await prisma.folder.findUnique({
       where: {
         id: currentId,
@@ -92,7 +105,7 @@ const createFolderTree = async (folderId, rootId = null) => {
     tree.push({ id: folder.id, name: folder.name });
     if (rootId && rootId === currentId) break;
     currentId = folder.parentId;
-  } while (currentId !== null);
+  }
   return tree.reverse();
 };
 
@@ -100,12 +113,42 @@ const getVerifiedSharedFolder = async (folderId) => {
   const sharedFolder = await prisma.sharedFolder.findUnique({
     where: {
       folderId: folderId,
-    }
+    },
   });
   if (!sharedFolder || sharedFolder.expiresAt < new Date()) {
     return null;
   }
   return sharedFolder;
-}
+};
 
-export { getFolder, getFolderContents, getRootContents, createFile, createFolder, updateFolder, deleteFolder, createFolderTree, getVerifiedSharedFolder };
+const isDescendant = async (folderId, sharedFolderId) => {
+  let currentId = folderId;
+
+  while (currentId !== null) {
+    const folder = await prisma.folder.findUnique({
+      where: { id: currentId },
+    });
+
+    if (!folder) return false;
+
+    if (folder.id === sharedFolderId) return true;
+
+    currentId = folder.parentId;
+  }
+
+  return false;
+};
+
+export {
+  getFolder,
+  getFolderContents,
+  getRootContents,
+  createFile,
+  createFolder,
+  updateFolder,
+  deleteFolder,
+  shareFolder,
+  createFolderTree,
+  getVerifiedSharedFolder,
+  isDescendant,
+};

@@ -111,11 +111,23 @@ const deleteFolder = async (req, res) => {
   }
 };
 
+const shareFolder = async (req, res) => {
+  const folderId = req.body.folderId;
+  const duration = parseInt(req.body.duration); // 1 - 30 days
+  try {
+    const sharedFolder = await db.shareFolder(folderId, duration);
+    res.json({ success: true, folder: sharedFolder });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
+};
+
 const getShared = async (req, res) => {
   const sharedFolder = req.sharedFolder;
   const folderId = req.params.folderId ?? req.sharedFolder.folderId;
 
-  const folder = await db.getSharedFolder(folderId);
+  const folder = await db.getFolder(folderId);
   const parentId = folderId === sharedFolder ? null : folder.parentId;
 
   const [contents, tree] = await Promise.all([
@@ -129,6 +141,7 @@ const getShared = async (req, res) => {
     files: contents.files,
     tree,
     folderId,
+    sharedFolder,
     parentId: parentId,
   };
 
@@ -144,5 +157,6 @@ export {
   renameFolder,
   moveFolder,
   deleteFolder,
+  shareFolder,
   getShared,
 };
