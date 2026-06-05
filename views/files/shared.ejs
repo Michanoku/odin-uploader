@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %>
+
+  <body>
+    <%- include('../partials/header') %>
+    <div>Shared Folder</div>
+    <a href="/shared/<%= sharedFolder.id %>"><%= sharedFolder.name %></a>
+    <% tree.forEach((folder, index, tree)=> { %>
+      >
+      <a href="/shared/<%= sharedFolder.id %>/folder/<%= folder.id %>">
+        <%= folder.name %>
+      </a>
+    <% }) %>
+    <hr>
+    <div>Folder Contents</div>
+    <% if (parentId) { %>
+      <a href="/shared/<%= sharedFolder.id %>/folder/<%= parentId %>">UP</a>
+    <% } %>
+    <% folders.forEach((folder)=> { %>
+      <a href="/shared/<%= sharedFolder.id %>/folder/<%= folder.id %>">
+        <%= folder.name %>
+      </a>
+    <% }) %>
+    <% files.forEach((file)=> { %>
+      <a href="#">
+        <%= folder.name %>
+      </a>
+    <% }) %>
+    <%- include('../partials/footer') %>
+  </body>
+
+</html>
