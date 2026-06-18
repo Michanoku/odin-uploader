@@ -13,8 +13,8 @@ import { fileURLToPath } from "url";
 
 import indexRoutes from "./routes/indexRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
-import folderRoutes from "./routes/folderRoutes.js";
-import fileRoutes from "./routes/fileRoutes.js";
+import browserRoutes from "./routes/browserRoutes.js";
+import sharedRoutes from "./routes/sharedRoutes.js";
 
 const app = express();
 
@@ -68,8 +68,8 @@ app.use((req, res, next) => {
 
 app.use("/", indexRoutes);
 app.use("/", userRoutes);
-app.use("/", folderRoutes);
-app.use("/", fileRoutes);
+app.use("/", browserRoutes);
+app.use("/", sharedRoutes);
 
 // 404
 app.use((req, res) => {

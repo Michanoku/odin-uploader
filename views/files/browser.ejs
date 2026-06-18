@@ -6,7 +6,7 @@
     <%- include('../partials/header') %>
     <div>Browse</div>
     <a href="/browser">Home</a>
-    <% tree.forEach((folder, index, tree)=> { %>
+    <% breadcrumbs.forEach((folder, index, breadcrumbs)=> { %>
       >
       <a href="/browser/folder/<%= folder.id %>">
         <%= folder.name %>
@@ -16,15 +16,15 @@
     <div>Folder Contents</div>
     <% if (parentId) { %>
       <a href="/browser/folder/<%= parentId %>">UP</a>
-    <% } else if (tree.length> 0) { %>
+    <% } else if (breadcrumbs.length> 0) { %>
       <a href="/browser">UP</a>
     <% } %>
-    <% folders.forEach((folder)=> { %>
+    <% contents.folders.forEach((folder)=> { %>
       <a href="/browser/folder/<%= folder.id %>">
         <%= folder.name %>
       </a>
     <% }) %>
-    <% files.forEach((file)=> { %>
+    <% contents.files.forEach((file)=> { %>
       <a href="#">
         <%= folder.name %>
       </a>

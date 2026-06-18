@@ -1,5 +1,7 @@
-import * as db from "../db/folderQueries.js";
+import * as db from "../db/browserQueries.js";
+import { getFolderContents, getBreadcrumbs } from "../lib/browserUtils.js";
 
+// Folders
 const createFolder = async (req, res) => {
   console.log(req.body);
   try {
@@ -20,28 +22,26 @@ const getFolder = async (req, res, next) => {
   const folder = req.folder ?? null;
   const folderId = folder?.id ?? null;
   let contents = { folders: [], files: [] };
-  let tree = [];
+  let breadcrumbs = [];
 
   try {
     if (folder) {
       const [contentsResult, treeResult] = await Promise.all([
-        db.getFolderContents(folderId),
-        db.createFolderTree(folderId),
+        getFolderContents({ folderId: folderId }),
+        getBreadcrumbs({ folderId: folderId }),
       ]);
-
       contents = contentsResult;
       tree = treeResult;
     } else {
-      contents = await db.getRootContents(req.user.id);
+      contents = await getFolderContents({ userId: req.user.id });
     }
 
     const context = {
       title: "Browser",
-      folders: contents.folders,
-      files: contents.files,
-      tree,
-      folderId,
       parentId: folder?.parentId ?? null,
+      contents,
+      breadcrumbs,
+      folderId,
     };
 
     res.render("files/browser", context);
@@ -89,44 +89,50 @@ const deleteFolder = async (req, res) => {
   }
 };
 
-const shareFolder = async (req, res) => {
-  const folderId = req.body.folderId;
-  const duration = parseInt(req.body.duration); // 1 - 30 days
+// TODO: download folder 
+
+// Files
+const uploadFile = async (req, res, next) => {
+  console.log(req.file);
   try {
-    const sharedFolder = await db.shareFolder(folderId, duration);
-    res.json({ success: true, folder: sharedFolder });
+    const fileData = {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      filename: req.file.filename,
+      size: req.file.size,
+      folderId: req.body.currentFolder === "" ? null : req.body.currentFolder,
+      userId: req.user.id,
+    };
+    const newFile = await db.createFile(fileData);
+    const reponse = { success: true, file: newFile };
+    console.log(response);
+    res.json(response);
   } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
+    return next(err);
   }
 };
 
-const getShared = async (req, res) => {
-  const sharedFolder = req.sharedFolder;
-  const folderId = req.params.folderId ?? req.sharedFolder.folderId;
-
-  const folder = await db.getFolder(folderId);
-  const parentId = folderId === sharedFolder ? null : folder.parentId;
-
-  const [contents, tree] = await Promise.all([
-    db.getFolderContents(folderId),
-    db.createFolderTree(folderId, sharedFolder.folderId),
-  ]);
-
-  const context = {
-    title: "Shared folder",
-    folders: contents.folders,
-    files: contents.files,
-    tree,
-    folderId,
-    sharedFolder,
-    parentId: parentId,
-  };
-
-  res.render("files/shared", context);
+const getFile = async (req, res, next) => {
+  const file = req.file;
+  const context = {}
+   res.render("files/file", context);
 };
 
-// TODO: download folder 
+const renameFile = async (req, res) => {
+  // TODO
+};
+
+const moveFile = async (req, res) => {
+  // TODO
+};
+
+const deleteFile = async (req, res) => {
+ // TODO
+};
+
+const shareFile = async (req, res) => {
+  // TODO
+};
 
 export {
   createFolder,
@@ -134,6 +140,10 @@ export {
   renameFolder,
   moveFolder,
   deleteFolder,
-  shareFolder,
-  getShared,
+  uploadFile,
+  getFile,
+  renameFile,
+  moveFile,
+  deleteFile,
+  shareFile,
 };
