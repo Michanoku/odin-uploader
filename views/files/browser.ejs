@@ -13,32 +13,11 @@
       </a>
     <% }) %>
     <hr>
-    <div>Folder Contents</div>
-    <% if (parentId) { %>
-      <a href="/browser/folder/<%= parentId %>">UP</a>
-    <% } else if (breadcrumbs.length> 0) { %>
-      <a href="/browser">UP</a>
+    <% if (view === "folder") { %>
+      <%- include("./partials/folderContents") %>
+    <% } else { %>
+      <%- include("./partials/fileDetails") %>
     <% } %>
-    <% contents.folders.forEach((folder)=> { %>
-      <a href="/browser/folder/<%= folder.id %>">
-        <%= folder.name %>
-      </a>
-    <% }) %>
-    <% contents.files.forEach((file)=> { %>
-      <a href="#">
-        <%= folder.name %>
-      </a>
-    <% }) %>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" />
-      <input type="hidden" name="currentFolder" value="<%= folderId %>" />
-      <button type="submit">Upload</button>
-    </form>
-    <form action="/createFolder" method="post">
-      <input type="text" name="newFolderName" />
-      <input type="hidden" name="currentFolder" value="<%= folderId %>" />
-      <button type="submit">Create New Folder</button>
-    </form>
     <%- include('../partials/footer') %>
   </body>
 

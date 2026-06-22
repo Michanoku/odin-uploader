@@ -31,12 +31,12 @@ router.post(
   upload.single("file"),
   browserController.uploadFile
 );
-// router.get(
-//   "/browser/file/:fileId",
-//   isAuth,
-//   isFileOwner,
-//   browserController.getFile
-// ); Causing error now, not sure why, for later. 
+router.get(
+  "/browser/file/:fileId",
+  isAuth,
+  isFileOwner,
+  browserController.getFile
+ );
 router.post("/renameFile", isAuth, isFileOwner, browserController.renameFile);
 router.post("/moveFile", isAuth, isFileOwner, browserController.moveFile);
 router.post("/deleteFile", isAuth, isFileOwner, browserController.deleteFile);

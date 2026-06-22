@@ -87,6 +87,14 @@ const isDescendant = async (folderId, sharedFolderId) => {
 };
 
 // Files
+const getFile = async ({ fileId, userId }) => {
+  const where = {
+    id: fileId,
+    userId: userId,
+  }; 
+  return await prisma.file.findFirst({where});
+};
+
 const createFile = async (fileData) => {
   const file = await prisma.file.create({
     data: fileData,
@@ -102,5 +110,6 @@ export {
     updateFolder,
     deleteFolder,
     isDescendant,
+    getFile,
     createFile,
 };

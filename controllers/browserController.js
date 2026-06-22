@@ -1,43 +1,82 @@
+import { ResultWithContextImpl } from "express-validator/lib/chain/index.js";
+import { body, validationResult, matchedData } from "express-validator";
+
 import * as db from "../db/browserQueries.js";
-import { getFolderContents, getBreadcrumbs } from "../lib/browserUtils.js";
+import { getFolderContents, getBreadcrumbs, formatFileSize, formatDate } from "../lib/browserUtils.js";
+
+export const validateFolderName = [
+  body("newFolderName")
+    .trim()
+    .notEmpty()
+    .withMessage("Folder name is required")
+
+    .isLength({ max: 255 })
+    .withMessage("Folder name must be 255 characters or fewer")
+    .custom((value) => {
+      if (value === "." || value === "..") {
+        throw new Error("Invalid folder name");
+      }
+
+      if (/[<>:"/\\|?*]/.test(value)) {
+        throw new Error("Folder name contains invalid characters");
+      }
+
+      if (/[\x00-\x1F\x7F]/.test(value)) {
+        throw new Error("Folder name contains invalid characters");
+      }
+
+      return true;
+    }),
+];
 
 // Folders
-const createFolder = async (req, res) => {
-  console.log(req.body);
-  try {
-    const folderData = {
-      name: req.body.newFolderName,
-      parentId: req.body.currentFolder === "" ? null : req.body.currentFolder,
-      userId: req.user.id,
-    };
-    const newFolder = await db.createFolder(folderData);
-    res.json({ success: true, folder: newFolder });
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
-  }
-};
+const createFolder = [
+  validateFolderName,
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+    const { newFolderName } = matchedData(req);
+    console.log(req.body);
+    try {
+      const folderData = {
+        name: newFolderName,
+        parentId: req.body.currentFolder === "" ? null : req.body.currentFolder,
+        userId: req.user.id,
+      };
+      const newFolder = await db.createFolder(folderData);
+      res.json({ success: true, folder: newFolder });
+    } catch (err) {
+      console.log(err);
+      res.json({ success: false, error: err });
+    }
+  },
+];
 
 const getFolder = async (req, res, next) => {
   const folder = req.folder ?? null;
   const folderId = folder?.id ?? null;
   let contents = { folders: [], files: [] };
   let breadcrumbs = [];
-
   try {
     if (folder) {
-      const [contentsResult, treeResult] = await Promise.all([
+      const [contentsResult, breadcrumbsResult] = await Promise.all([
         getFolderContents({ folderId: folderId }),
         getBreadcrumbs({ folderId: folderId }),
       ]);
       contents = contentsResult;
-      tree = treeResult;
+      breadcrumbs = breadcrumbsResult;
     } else {
       contents = await getFolderContents({ userId: req.user.id });
     }
 
     const context = {
       title: "Browser",
+      view: "folder",
       parentId: folder?.parentId ?? null,
       contents,
       breadcrumbs,
@@ -89,7 +128,7 @@ const deleteFolder = async (req, res) => {
   }
 };
 
-// TODO: download folder 
+// TODO: download folder
 
 // Files
 const uploadFile = async (req, res, next) => {
@@ -104,7 +143,7 @@ const uploadFile = async (req, res, next) => {
       userId: req.user.id,
     };
     const newFile = await db.createFile(fileData);
-    const reponse = { success: true, file: newFile };
+    const response = { success: true, file: newFile };
     console.log(response);
     res.json(response);
   } catch (err) {
@@ -114,8 +153,28 @@ const uploadFile = async (req, res, next) => {
 
 const getFile = async (req, res, next) => {
   const file = req.file;
-  const context = {}
-   res.render("files/file", context);
+  const folder = req.folder ?? null;
+  const folderId = folder?.id ?? null;
+  let breadcrumbs = [];
+  try {
+    if (folder) {
+      breadcrumbs = await getBreadcrumbs({ folderId: folderId });
+    }
+    const context = {
+      title: "Browser",
+      view: "file",
+      parentId: folder?.parentId ?? null,
+      fileSize: formatFileSize(file.size),
+      date: formatDate(file.createdAt),
+      file,
+      breadcrumbs,
+      folderId,
+    };
+
+    res.render("files/browser", context);
+  } catch (err) {
+    return next(err);
+  }
 };
 
 const renameFile = async (req, res) => {
@@ -127,7 +186,7 @@ const moveFile = async (req, res) => {
 };
 
 const deleteFile = async (req, res) => {
- // TODO
+  // TODO
 };
 
 const shareFile = async (req, res) => {
