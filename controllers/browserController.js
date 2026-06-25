@@ -2,7 +2,12 @@ import { ResultWithContextImpl } from "express-validator/lib/chain/index.js";
 import { body, validationResult, matchedData } from "express-validator";
 
 import * as db from "../db/browserQueries.js";
-import { getFolderContents, getBreadcrumbs, formatFileSize, formatDate } from "../lib/browserUtils.js";
+import {
+  getFolderContents,
+  getBreadcrumbs,
+  formatFileSize,
+  formatDate,
+} from "../lib/browserUtils.js";
 
 export const validateFolderName = [
   body("newFolderName")
@@ -23,6 +28,34 @@ export const validateFolderName = [
 
       if (/[\x00-\x1F\x7F]/.test(value)) {
         throw new Error("Folder name contains invalid characters");
+      }
+
+      return true;
+    }),
+  body("currentFolder")
+    .custom(async (value, { req }) => {
+      const exists = await db.folderExists({
+        folderName: req.body.newFolderName,
+        userId: req.user.id,
+        parentId: value,
+      });
+
+      if (exists) {
+        throw new Error(
+          "Folder of the same name already exists in the same location."
+        );
+      }
+      return true;
+    })
+    .if((value) => value !== "")
+    .bail()
+    .custom(async (value, { req }) => {
+      const isOwner = await db.getFolder({
+        folderId: value,
+        userId: req.user.id,
+      });
+      if (!isOwner) {
+        throw new Error("Folder not found");
       }
 
       return true;
@@ -132,6 +165,12 @@ const deleteFolder = async (req, res) => {
 
 // Files
 const uploadFile = async (req, res, next) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      error: "No file uploaded",
+    });
+  }
   console.log(req.file);
   try {
     const fileData = {

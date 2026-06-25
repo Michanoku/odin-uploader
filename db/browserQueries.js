@@ -12,6 +12,37 @@ const getFolder = async ({ folderId, userId = null }) => {
   return await prisma.folder.findFirst({where});
 };
 
+// Check if a folder of the same name exists in the same folder
+const folderExists = async ({ name, userId, parentId }) => {
+  const folder = await prisma.folder.findFirst({
+    where: {
+      name,
+      userId,
+      parentId: parentId === "" ? null : parentId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return !!folder;
+};
+
+const fileExists = async ({ originalname, userId, folderId }) => {
+  const file = await prisma.folder.findFirst({
+    where: {
+      originalname,
+      userId,
+      folderId: folderId === "" ? null : folderId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return !!file;
+};
+
 const getAllSubfolders = async ({ folderId = null, userId = null }) => {
   const where = {};
 
@@ -104,6 +135,8 @@ const createFile = async (fileData) => {
 
 export {
     getFolder,
+    folderExists,
+    fileExists,
     getAllFiles,
     getAllSubfolders,
     createFolder,
