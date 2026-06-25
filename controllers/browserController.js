@@ -9,6 +9,7 @@ import {
   formatDate,
 } from "../lib/browserUtils.js";
 
+// Validators used in this controller
 const validateFolder = [
   body("newFolderName")
     .trim()
@@ -33,6 +34,7 @@ const validateFolder = [
       return true;
     }),
   body("currentFolder")
+    // Check if a folder of the same name exists at the location
     .custom(async (value, { req }) => {
       const exists = await db.folderExists({
         folderName: req.body.newFolderName,
@@ -47,8 +49,10 @@ const validateFolder = [
       }
       return true;
     })
+    // If no parent folder is provided, skip the next check
     .if((value) => value !== "")
     .bail()
+    // Check if the user owns the provided folder
     .custom(async (value, { req }) => {
       const isOwner = await db.getFolder({
         folderId: value,
@@ -63,29 +67,29 @@ const validateFolder = [
 ];
 
 const validateFile = [
+  // If no file was provided, return error
   check("file")
-  .custom((value, { req }) => {
-    if (!req.file) {
-      throw new Error("Please select a file.");
-    }
-
-    return true;
-  }),
-   body("currentFolder")
+    .custom((value, { req }) => {
+      if (!req.file) {
+        throw new Error("Please select a file.");
+      }
+      return true;
+    })
+    // Check if a file of that name exists in the same folder
     .custom(async (value, { req }) => {
-      const exists = await db.folderExists({
+      const exists = await db.fileExists({
         originalname: req.file.originalname,
         userId: req.user.id,
         folderId: value,
       });
 
       if (exists) {
-        throw new Error(
-          "File of the same name already exists in the folder."
-        );
+        throw new Error("File of the same name already exists in the folder.");
       }
       return true;
-    })
+    }),
+  // If a folder was provided make sure the user is the owner
+  body("currentFolder")
     .if((value) => value !== "")
     .bail()
     .custom(async (value, { req }) => {
@@ -99,13 +103,11 @@ const validateFile = [
 
       return true;
     }),
-
 ];
-
-
 
 // Folders
 const createFolder = [
+  // Create a new folder in the users tree
   validateFolder,
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -116,8 +118,8 @@ const createFolder = [
       });
     }
     const { newFolderName } = matchedData(req);
-    console.log(req.body);
     try {
+      // Create the new folder with the provided data
       const folderData = {
         name: newFolderName,
         parentId: req.body.currentFolder === "" ? null : req.body.currentFolder,
@@ -132,9 +134,12 @@ const createFolder = [
   },
 ];
 
+// Get a folder and its contents to display to the user
 const getFolder = async (req, res, next) => {
+  // If the user is not in the root, a folder is provided
   const folder = req.folder ?? null;
   const folderId = folder?.id ?? null;
+  // Contents will have folder contents, breadcrumbs will serve as the tree to go back
   let contents = { folders: [], files: [] };
   let breadcrumbs = [];
   try {
@@ -206,14 +211,37 @@ const deleteFolder = async (req, res) => {
 // TODO: download folder
 
 // Files
+const uploadFile = [
+  // Create a new folder in the users tree
+  validateFile,
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+    try {
+      const fileData = {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        filename: req.file.filename,
+        size: req.file.size,
+        folderId: req.body.currentFolder === "" ? null : req.body.currentFolder,
+        userId: req.user.id,
+      };
+      const newFile = await db.createFile(fileData);
+      const response = { success: true, file: newFile };
+      console.log(response);
+      res.json(response);
+    } catch (err) {
+      return next(err);
+    }
+  },
+];
 const uploadFile = async (req, res, next) => {
-  if (!req.file) {
-    return res.status(400).json({
-      success: false,
-      error: "No file uploaded",
-    });
-  }
-  console.log(req.file);
+  // If no file is present, show error
   try {
     const fileData = {
       originalname: req.file.originalname,
