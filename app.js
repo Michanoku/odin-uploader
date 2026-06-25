@@ -82,8 +82,21 @@ app.use((req, res) => {
 
 // Error Handler
 app.use((err, req, res, _next) => {
+  // If the error is caused by file upload
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        success: false,
+        errors: [
+          {
+            path: "file",
+            msg: "File exceeds the maximum allowed size.",
+          },
+        ],
+      });
+    }
+  }
   console.error(err);
-
   const status = err.status || 500;
 
   res.status(status).render("error", {

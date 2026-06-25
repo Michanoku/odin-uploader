@@ -9,7 +9,7 @@ import {
   formatDate,
 } from "../lib/browserUtils.js";
 
-export const validateFolderName = [
+const validateFolder = [
   body("newFolderName")
     .trim()
     .notEmpty()
@@ -62,9 +62,51 @@ export const validateFolderName = [
     }),
 ];
 
+const validateFile = [
+  check("file")
+  .custom((value, { req }) => {
+    if (!req.file) {
+      throw new Error("Please select a file.");
+    }
+
+    return true;
+  }),
+   body("currentFolder")
+    .custom(async (value, { req }) => {
+      const exists = await db.folderExists({
+        originalname: req.file.originalname,
+        userId: req.user.id,
+        folderId: value,
+      });
+
+      if (exists) {
+        throw new Error(
+          "File of the same name already exists in the folder."
+        );
+      }
+      return true;
+    })
+    .if((value) => value !== "")
+    .bail()
+    .custom(async (value, { req }) => {
+      const isOwner = await db.getFolder({
+        folderId: value,
+        userId: req.user.id,
+      });
+      if (!isOwner) {
+        throw new Error("Folder not found");
+      }
+
+      return true;
+    }),
+
+];
+
+
+
 // Folders
 const createFolder = [
-  validateFolderName,
+  validateFolder,
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
