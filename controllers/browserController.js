@@ -287,20 +287,45 @@ const getFile = async (req, res, next) => {
 };
 
 const renameFile = async (req, res) => {
-  // TODO
+  const fileId = req.body.fileId;
+  try {
+    const updatedfileData = {
+      name: req.body.updatedFileName,
+    };
+    const updatedFile = await db.updateFile(fileId, updatedfileData);
+    res.json({ success: true, file: updatedFile });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
 };
 
 const moveFile = async (req, res) => {
-  // TODO
+  const fileId = req.body.fileId;
+  try {
+    const updatedfileData = {
+      parentId: req.body.updatedParentId,
+    };
+    const updatedFile = await db.updateFile(fileId, updatedfileData);
+    res.json({ success: true, file: updatedFile });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
 };
+
 
 const deleteFile = async (req, res) => {
-  // TODO
+  const fileId = req.body.fileId;
+  try {
+    const deletedFile = await db.deleteFile(fileId);
+    res.json({ success: true, file: deletedFile });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
+  }
 };
 
-const shareFile = async (req, res) => {
-  // TODO
-};
 
 export {
   createFolder,
@@ -313,5 +338,4 @@ export {
   renameFile,
   moveFile,
   deleteFile,
-  shareFile,
 };

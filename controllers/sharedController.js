@@ -51,7 +51,7 @@ const shareFile = async (req, res, next) => {
   // TODO
 };
 
-// Todo share single fil
+// Todo share single file
 
 export {
     shareFolder,
