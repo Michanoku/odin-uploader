@@ -10,7 +10,7 @@ import compression from "compression";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
-
+import multer from "multer";
 import indexRoutes from "./routes/indexRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import browserRoutes from "./routes/browserRoutes.js";

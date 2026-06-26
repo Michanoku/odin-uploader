@@ -29,7 +29,7 @@ const folderExists = async ({ name, userId, parentId }) => {
 };
 
 const fileExists = async ({ originalname, userId, folderId }) => {
-  const file = await prisma.folder.findFirst({
+  const file = await prisma.file.findFirst({
     where: {
       originalname,
       userId,
@@ -91,6 +91,7 @@ const updateFolder = async (folderId, updatedFolderData) => {
 };
 
 const deleteFolder = async (folderId) => {
+  // TODO: DELETE PHYSICAL FILES AND FOLDERS WITHIN
   const deletedFolder = await prisma.folder.delete({
     where: {
       id: folderId,
@@ -133,6 +134,26 @@ const createFile = async (fileData) => {
   return file;
 };
 
+const updateFile = async (fileId, updatedFileData) => {
+  const updatedFile = await prisma.file.update({
+    where: {
+      id: fileId,
+    },
+    data: updatedFileData,
+  });
+  return updatedFile;
+};
+
+const deleteFile = async (fileId) => {
+  // TODO DELETE PHYSICAL FILE
+  const deletedFile = await prisma.file.delete({
+    where: {
+      id: fileId,
+    },
+  });
+  return deletedFile;
+};
+
 export {
     getFolder,
     folderExists,
@@ -145,4 +166,6 @@ export {
     isDescendant,
     getFile,
     createFile,
+    updateFile,
+    deleteFile,
 };

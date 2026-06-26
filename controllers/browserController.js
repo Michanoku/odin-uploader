@@ -1,5 +1,5 @@
 import { ResultWithContextImpl } from "express-validator/lib/chain/index.js";
-import { body, validationResult, matchedData } from "express-validator";
+import { body, check, validationResult, matchedData } from "express-validator";
 
 import * as db from "../db/browserQueries.js";
 import {
@@ -80,7 +80,7 @@ const validateFile = [
       const exists = await db.fileExists({
         originalname: req.file.originalname,
         userId: req.user.id,
-        folderId: value,
+        folderId: req.body.currentFolder,
       });
 
       if (exists) {
@@ -233,32 +233,12 @@ const uploadFile = [
       };
       const newFile = await db.createFile(fileData);
       const response = { success: true, file: newFile };
-      console.log(response);
       res.json(response);
     } catch (err) {
       return next(err);
     }
   },
 ];
-const uploadFile = async (req, res, next) => {
-  // If no file is present, show error
-  try {
-    const fileData = {
-      originalname: req.file.originalname,
-      mimetype: req.file.mimetype,
-      filename: req.file.filename,
-      size: req.file.size,
-      folderId: req.body.currentFolder === "" ? null : req.body.currentFolder,
-      userId: req.user.id,
-    };
-    const newFile = await db.createFile(fileData);
-    const response = { success: true, file: newFile };
-    console.log(response);
-    res.json(response);
-  } catch (err) {
-    return next(err);
-  }
-};
 
 const getFile = async (req, res, next) => {
   const file = req.file;
@@ -290,7 +270,7 @@ const renameFile = async (req, res) => {
   const fileId = req.body.fileId;
   try {
     const updatedfileData = {
-      name: req.body.updatedFileName,
+      originalname: req.body.updatedFileName,
     };
     const updatedFile = await db.updateFile(fileId, updatedfileData);
     res.json({ success: true, file: updatedFile });
@@ -304,7 +284,7 @@ const moveFile = async (req, res) => {
   const fileId = req.body.fileId;
   try {
     const updatedfileData = {
-      parentId: req.body.updatedParentId,
+      folderId: req.body.updatedFolderId,
     };
     const updatedFile = await db.updateFile(fileId, updatedfileData);
     res.json({ success: true, file: updatedFile });
