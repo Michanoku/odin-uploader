@@ -1,6 +1,8 @@
 import request from "supertest";
 import app from "../app.js";
 
+
+//TODO VALIDATION TESTING
 describe("Folder Operations", () => {
   const agent = request.agent(app);
 

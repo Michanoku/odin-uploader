@@ -202,3 +202,81 @@ describe("File Ownership", () => {
     expect(response.status).toBe(404);
   });
 });
+
+describe("Recursive Folder Deletion", () => {
+  test("deleting a folder deletes all nested folders and uploaded files", async () => {
+    const agent = request.agent(app);
+
+    // Register user
+    await agent.post("/register").type("form").send({
+      username: "recursiveuser",
+      password: "supersecurepassword",
+      confirmation: "supersecurepassword",
+    });
+
+    // Root folder
+    const root = await agent.post("/createFolder").send({
+      newFolderName: "Root",
+      currentFolder: "",
+    });
+
+    const rootId = root.body.folder.id;
+
+    // Child folder
+    const child = await agent.post("/createFolder").send({
+      newFolderName: "Child",
+      currentFolder: rootId,
+    });
+
+    const childId = child.body.folder.id;
+
+    // Grandchild folder
+    const grandchild = await agent.post("/createFolder").send({
+      newFolderName: "Grandchild",
+      currentFolder: childId,
+    });
+
+    const grandchildId = grandchild.body.folder.id;
+
+    // Upload to grandchild folder
+    const upload = await agent
+      .post("/upload")
+      .field("currentFolder", grandchildId)
+      .attach("file", path.resolve("tests/files/test.txt"));
+
+    expect(upload.status).toBe(200);
+
+    const filename = upload.body.file.filename;
+    const uploadedPath = path.resolve("uploads", filename);
+
+    // Verify file on disk
+    expect(fs.existsSync(uploadedPath)).toBe(true);
+
+    // Delete root folder
+    const deletion = await agent.post("/deleteFolder").send({
+      folderId: rootId,
+    });
+
+    expect(deletion.status).toBe(200);
+    expect(deletion.body.success).toBe(true);
+
+    // Verify file was deleted
+    expect(fs.existsSync(uploadedPath)).toBe(false);
+
+    // Root folder no longer exists
+    const rootResponse = await agent.get(`/browser/folder/${rootId}`);
+    expect(rootResponse.status).toBe(404);
+
+    // Child folder no longer exists
+    const childResponse = await agent.get(`/browser/folder/${childId}`);
+    expect(childResponse.status).toBe(404);
+
+    // Grandchild folder no longer exists
+    const grandchildResponse = await agent.get(`/browser/folder/${grandchildId}`);
+    expect(grandchildResponse.status).toBe(404);
+
+    // File record no longer exists
+    const fileResponse = await agent.get(`/browser/file/${upload.body.file.id}`);
+    expect(fileResponse.status).toBe(404);
+  });
+});
