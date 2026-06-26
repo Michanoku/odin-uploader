@@ -1,3 +1,5 @@
+import fs from "fs/promises";
+import path from "path";
 import { ResultWithContextImpl } from "express-validator/lib/chain/index.js";
 import { body, check, validationResult, matchedData } from "express-validator";
 
@@ -200,7 +202,24 @@ const moveFolder = async (req, res) => {
 const deleteFolder = async (req, res) => {
   const folderId = req.body.folderId;
   try {
+    // Get the filenames of all files we are about to delete
+    const filesToDelete = await db.getAllFilesFromSubfolders(folderId);
+    // Delete the database entries for the folder (cascades to subfolders and files)
     const deletedFolder = await db.deleteFolder(folderId);
+
+    // Delete the files from disk
+    await Promise.all(
+      filesToDelete.map(async (file) => {
+        try {
+          await fs.unlink(path.resolve("uploads", file.filename));
+        } catch (err) {
+          if (err.code !== "ENOENT") {
+            throw err;
+          }
+        }
+      })
+    );
+
     res.json({ success: true, folder: deletedFolder });
   } catch (err) {
     console.log(err);
@@ -294,18 +313,22 @@ const moveFile = async (req, res) => {
   }
 };
 
-
 const deleteFile = async (req, res) => {
   const fileId = req.body.fileId;
   try {
+    // Delete file in database
     const deletedFile = await db.deleteFile(fileId);
+    // Get file path for the actual file on disk
+    const filePath = path.resolve("uploads", deletedFile.filename);
+    // Delete the file
+    await fs.unlink(filePath);
+
     res.json({ success: true, file: deletedFile });
   } catch (err) {
     console.log(err);
     res.json({ success: false, error: err });
   }
 };
-
 
 export {
   createFolder,

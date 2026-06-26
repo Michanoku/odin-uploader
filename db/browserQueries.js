@@ -4,12 +4,12 @@ import { prisma } from "../lib/prisma.js";
 const getFolder = async ({ folderId, userId = null }) => {
   const where = {
     id: folderId,
-  }; 
+  };
   if (userId !== null) {
     // If a userid is passed, include it in the query
     where.userId = userId;
-  } 
-  return await prisma.folder.findFirst({where});
+  }
+  return await prisma.folder.findFirst({ where });
 };
 
 // Check if a folder of the same name exists in the same folder
@@ -123,8 +123,8 @@ const getFile = async ({ fileId, userId }) => {
   const where = {
     id: fileId,
     userId: userId,
-  }; 
-  return await prisma.file.findFirst({where});
+  };
+  return await prisma.file.findFirst({ where });
 };
 
 const createFile = async (fileData) => {
@@ -145,7 +145,6 @@ const updateFile = async (fileId, updatedFileData) => {
 };
 
 const deleteFile = async (fileId) => {
-  // TODO DELETE PHYSICAL FILE
   const deletedFile = await prisma.file.delete({
     where: {
       id: fileId,
@@ -154,18 +153,55 @@ const deleteFile = async (fileId) => {
   return deletedFile;
 };
 
+// Get all subfolders, even within other subfolders
+const collectFolderIds = async (folderId) => {
+  const children = await prisma.folder.findMany({
+    where: {
+      parentId: folderId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const ids = [folderId];
+
+  for (const child of children) {
+    ids.push(...(await collectFolderIds(child.id)));
+  }
+
+  return ids;
+};
+
+const getAllFilesFromSubfolders = async (folderId) => {
+  const folderIds = await collectFolderIds(folderId);
+
+  const files = await prisma.file.findMany({
+    where: {
+      folderId: {
+        in: folderIds,
+      },
+    },
+    select: {
+      filename: true,
+    },
+  });
+  return files;
+};
+
 export {
-    getFolder,
-    folderExists,
-    fileExists,
-    getAllFiles,
-    getAllSubfolders,
-    createFolder,
-    updateFolder,
-    deleteFolder,
-    isDescendant,
-    getFile,
-    createFile,
-    updateFile,
-    deleteFile,
+  getFolder,
+  folderExists,
+  fileExists,
+  getAllFiles,
+  getAllSubfolders,
+  createFolder,
+  updateFolder,
+  deleteFolder,
+  isDescendant,
+  getFile,
+  createFile,
+  updateFile,
+  deleteFile,
+  getAllFilesFromSubfolders,
 };

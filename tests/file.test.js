@@ -3,7 +3,6 @@ import request from "supertest";
 import fs from "fs";
 import app from "../app.js";
 
-
 describe("File Operations", () => {
   const agent = request.agent(app);
 
@@ -27,9 +26,7 @@ describe("File Operations", () => {
 
   describe("File Upload", () => {
     test("user cannot upload without selecting a file", async () => {
-      const response = await agent
-        .post("/upload")
-        .field("currentFolder", "");
+      const response = await agent.post("/upload").field("currentFolder", "");
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -37,25 +34,22 @@ describe("File Operations", () => {
     });
 
     test("user can upload a file to the root", async () => {
-        const response = await agent
-            .post("/upload")
-            .field("currentFolder", "")
-            .attach("file", path.resolve("tests/files/test.txt"));
+      const response = await agent
+        .post("/upload")
+        .field("currentFolder", "")
+        .attach("file", path.resolve("tests/files/test.txt"));
 
-        expect(response.status).toBe(200);
-        expect(response.body.success).toBe(true);
-        expect(response.body.file.folderId).toBeNull();
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.file.folderId).toBeNull();
 
-        // Check that Multer created the file on disk
-        const uploadedPath = path.resolve(
-            "uploads",
-            response.body.file.filename
-        );
+      // Check that Multer created the file on disk
+      const uploadedPath = path.resolve("uploads", response.body.file.filename);
 
-        expect(fs.existsSync(uploadedPath)).toBe(true);
-        const stats = fs.statSync(uploadedPath);
-        expect(stats.size).toBe(response.body.file.size);
-        fileId = response.body.file.id;
+      expect(fs.existsSync(uploadedPath)).toBe(true);
+      const stats = fs.statSync(uploadedPath);
+      expect(stats.size).toBe(response.body.file.size);
+      fileId = response.body.file.id;
     });
 
     test("user cannot upload duplicate filenames into the same folder", async () => {
@@ -76,7 +70,7 @@ describe("File Operations", () => {
         .post("/upload")
         .field("currentFolder", folderId)
         .attach("file", path.resolve("tests/files/test.txt"));
-      
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.file.folderId).toBe(folderId);
@@ -139,6 +133,11 @@ describe("File Operations", () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.file.id).toBe(fileId);
+
+      // Verify the file was deleted
+      const uploadedPath = path.resolve("uploads", response.body.file.filename);
+
+      expect(fs.existsSync(uploadedPath)).toBe(false);
     });
   });
 });
