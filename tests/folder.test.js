@@ -1,7 +1,6 @@
 import request from "supertest";
 import app from "../app.js";
 
-
 //TODO VALIDATION TESTING
 describe("Folder Operations", () => {
   const agent = request.agent(app);
@@ -18,6 +17,16 @@ describe("Folder Operations", () => {
   });
 
   describe("Folder Creation", () => {
+    test("user cannot create a folder without a name", async () => {
+      const response = await agent.post("/createFolder").send({
+        newFolderName: "",
+        currentFolder: "",
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
     test("user can create a root folder", async () => {
       const response = await agent.post("/createFolder").send({
         newFolderName: "Documents",
@@ -30,6 +39,16 @@ describe("Folder Operations", () => {
       expect(response.body.folder.parentId).toBeNull();
 
       folderId = response.body.folder.id;
+    });
+
+    test("user cannot create two folders with the same name in the same parent folder", async () => {
+      const response = await agent.post("/createFolder").send({
+        newFolderName: "Documents",
+        currentFolder: "",
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
     });
 
     test("user can create a subfolder", async () => {
@@ -48,15 +67,42 @@ describe("Folder Operations", () => {
   });
 
   describe("Folder Rename", () => {
+    test("user cannot rename a folder to blank", async () => {
+      const response = await agent.post("/renameFolder").send({
+        folderId,
+        parentId: parentFolderId,
+        updatedFolderName: "",
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
     test("user can rename a folder", async () => {
       const response = await agent.post("/renameFolder").send({
         folderId,
+        parentId: parentFolderId,
         updatedFolderName: "Photos",
       });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.folder.name).toBe("Photos");
+    });
+
+    test("user cannot rename a folder to the same name as existing folder in the same location", async () => {
+      await agent.post("/createFolder").send({
+        newFolderName: "Documents",
+        currentFolder: parentFolderId,
+      });
+      const response = await agent.post("/renameFolder").send({
+        folderId,
+        parentId: parentFolderId,
+        updatedFolderName: "Documents",
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
     });
   });
 
@@ -81,6 +127,21 @@ describe("Folder Operations", () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.folder.parentId).toBe(parentFolderId);
+    });
+    
+    test("user can't move folder if folder of same name exists", async () => {
+      await agent.post("/createFolder").send({
+        newFolderName: "Photos",
+        currentFolder: "",
+      });
+
+      const response = await agent.post("/moveFolder").send({
+        folderId,
+        updatedParentId: "",
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
     });
   });
 
@@ -172,4 +233,36 @@ test("user cannot rename another user's folder", async () => {
   });
 
   expect(response.status).toBe(404);
+});
+
+test("user cannot create a folder inside another user's folder", async () => {
+  const user1 = request.agent(app);
+  const user2 = request.agent(app);
+
+  await user1.post("/register").type("form").send({
+    username: "owner3",
+    password: "supersecurepassword",
+    confirmation: "supersecurepassword",
+  });
+
+  const createResponse = await user1.post("/createFolder").send({
+    newFolderName: "Private Folder",
+    currentFolder: "",
+  });
+
+  const folderId = createResponse.body.folder.id;
+
+  await user2.post("/register").type("form").send({
+    username: "intruder3",
+    password: "supersecurepassword",
+    confirmation: "supersecurepassword",
+  });
+
+  const response = await user2.post("/createFolder").send({
+    newFolderName: "Hacked",
+    currentFolder: folderId,
+  });
+
+  expect(response.status).toBe(400);
+  expect(response.body.success).toBe(false);
 });

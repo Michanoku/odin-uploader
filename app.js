@@ -96,8 +96,10 @@ app.use((err, req, res, _next) => {
       });
     }
   }
-  console.error(err);
   const status = err.status || 500;
+  if (status !== 404) {
+    console.error(err);
+  }
 
   res.status(status).render("error", {
     title: "Error",

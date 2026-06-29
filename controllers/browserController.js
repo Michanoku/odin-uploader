@@ -10,6 +10,7 @@ import {
   formatFileSize,
   formatDate,
 } from "../lib/browserUtils.js";
+import { register } from "module";
 
 // Validators used in this controller
 const validateFolder = [
@@ -39,7 +40,7 @@ const validateFolder = [
     // Check if a folder of the same name exists at the location
     .custom(async (value, { req }) => {
       const exists = await db.folderExists({
-        folderName: req.body.newFolderName,
+        name: req.body.newFolderName,
         userId: req.user.id,
         parentId: value,
       });
@@ -64,6 +65,68 @@ const validateFolder = [
         throw new Error("Folder not found");
       }
 
+      return true;
+    }),
+];
+
+const validateRenameFolder = [
+  body("updatedFolderName")
+    .trim()
+    .notEmpty()
+    .withMessage("Folder name is required")
+
+    .isLength({ max: 255 })
+    .withMessage("Folder name must be 255 characters or fewer")
+    .custom((value) => {
+      if (value === "." || value === "..") {
+        throw new Error("Invalid folder name");
+      }
+
+      if (/[<>:"/\\|?*]/.test(value)) {
+        throw new Error("Folder name contains invalid characters");
+      }
+
+      if (/[\x00-\x1F\x7F]/.test(value)) {
+        throw new Error("Folder name contains invalid characters");
+      }
+
+      return true;
+    }),
+  check("currentFolder")
+    // Check if a folder of the same name exists at the location
+    .custom(async (value, { req }) => {
+      const folder = req.folder;
+      const exists = await db.folderExists({
+        name: req.body.updatedFolderName,
+        userId: req.user.id,
+        parentId: folder.parentId,
+      });
+
+      if (exists) {
+        throw new Error(
+          "Folder of the same name already exists in the same location."
+        );
+      }
+      return true;
+    }),
+];
+
+const validateMoveFolder = [
+  check("updatedParentId")
+    // Check if a folder of the same name exists at the location
+    .custom(async (value, { req }) => {
+      const folder = req.folder;
+      const exists = await db.folderExists({
+        name: req.folder.name,
+        userId: req.user.id,
+        parentId: req.body.updatedParentId,
+      });
+
+      if (exists) {
+        throw new Error(
+          "Folder of the same name already exists in the same location."
+        );
+      }
       return true;
     }),
 ];
@@ -171,36 +234,59 @@ const getFolder = async (req, res, next) => {
   }
 };
 
-const renameFolder = async (req, res) => {
-  const folderId = req.body.folderId;
-  try {
-    const updatedfolderData = {
-      name: req.body.updatedFolderName,
-    };
-    const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
-    res.json({ success: true, folder: updatedFolder });
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
-  }
-};
+const renameFolder = [
+  // Create a new folder in the users tree
+  validateRenameFolder,
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+    const { updatedFolderName } = matchedData(req);
+    const folderId = req.folder.id;
+    try {
+      const updatedfolderData = {
+        name: updatedFolderName,
+      };
+      const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
+      res.json({ success: true, folder: updatedFolder });
+    } catch (err) {
+      console.log(err);
+      res.json({ success: false, error: err });
+    }
+  },
+];
 
-const moveFolder = async (req, res) => {
-  const folderId = req.body.folderId;
-  try {
-    const updatedfolderData = {
-      parentId: req.body.updatedParentId,
-    };
-    const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
-    res.json({ success: true, folder: updatedFolder });
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
-  }
-};
+const moveFolder = [
+  // Create a new folder in the users tree
+  validateMoveFolder,
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+    const folderId = req.folder.id;
+    try {
+      const updatedfolderData = {
+        parentId: req.body.updatedParentId,
+      };
+      const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
+      res.json({ success: true, folder: updatedFolder });
+    } catch (err) {
+      console.log(err);
+      res.json({ success: false, error: err });
+    }
+  },
+];
 
 const deleteFolder = async (req, res) => {
-  const folderId = req.body.folderId;
+  const folderId = req.folder.id;
   try {
     // Get the filenames of all files we are about to delete
     const filesToDelete = await db.getAllFilesFromSubfolders(folderId);
