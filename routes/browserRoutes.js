@@ -9,7 +9,9 @@ const upload = multer({
 });
 import {
   isAuth,
-  isFolderOwner,
+  loadCurrentFolder,
+  loadTargetFolder,
+  isTargetRoot,
   isFileOwner,
 } from "../lib/authMiddleware.js";
 import * as browserController from "../controllers/browserController.js";
@@ -17,21 +19,21 @@ import * as browserController from "../controllers/browserController.js";
 
 
 // Folders
-router.get("/browser", isAuth, browserController.getFolder);
+router.get("/browser", isAuth, browserController.redirectToRoot);
 router.get(
-  "/browser/folder/:folderId",
+  "/browser/folder/:currentFolderId",
   isAuth,
-  isFolderOwner,
+  loadCurrentFolder,
   browserController.getFolder
 );
-router.post("/createFolder", isAuth, browserController.createFolder);
-router.post("/renameFolder", isAuth, isFolderOwner, browserController.renameFolder);
-router.post("/moveFolder", isAuth, isFolderOwner, browserController.moveFolder);
-router.post("/deleteFolder", isAuth, isFolderOwner, browserController.deleteFolder);
+router.post("/browser/folder/:currentFolderId/createFolder", isAuth, loadCurrentFolder, browserController.createFolder);
+router.post("/browser/folder/:currentFolderId/renameFolder", isAuth, loadCurrentFolder, loadTargetFolder, isTargetRoot, browserController.renameFolder);
+router.post("/browser/folder/:currentFolderId/moveFolder", isAuth, loadCurrentFolder, loadTargetFolder, isTargetRoot, browserController.moveFolder);
+router.post("/browser/folder/:currentFolderId/deleteFolder", isAuth, loadCurrentFolder, loadTargetFolder, isTargetRoot, browserController.deleteFolder);
 
 // Files
 router.post(
-  "/upload",
+  "/browser/folder/:currentFolderId/upload",
   isAuth,
   upload.single("file"),
   browserController.uploadFile

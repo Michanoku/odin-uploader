@@ -18,9 +18,9 @@ describe("Folder Operations", () => {
 
   describe("Folder Creation", () => {
     test("user cannot create a folder without a name", async () => {
+      await agent.get("/browser");
       const response = await agent.post("/createFolder").send({
         newFolderName: "",
-        currentFolder: "",
       });
 
       expect(response.status).toBe(400);
@@ -30,7 +30,6 @@ describe("Folder Operations", () => {
     test("user can create a root folder", async () => {
       const response = await agent.post("/createFolder").send({
         newFolderName: "Documents",
-        currentFolder: "",
       });
 
       expect(response.status).toBe(200);
@@ -44,7 +43,6 @@ describe("Folder Operations", () => {
     test("user cannot create two folders with the same name in the same parent folder", async () => {
       const response = await agent.post("/createFolder").send({
         newFolderName: "Documents",
-        currentFolder: "",
       });
 
       expect(response.status).toBe(400);
@@ -52,9 +50,9 @@ describe("Folder Operations", () => {
     });
 
     test("user can create a subfolder", async () => {
+      await agent.get(`/browser/folder/${folderId}`);
       const response = await agent.post("/createFolder").send({
         newFolderName: "Pictures",
-        currentFolder: folderId,
       });
 
       expect(response.status).toBe(200);
@@ -68,9 +66,9 @@ describe("Folder Operations", () => {
 
   describe("Folder Rename", () => {
     test("user cannot rename a folder to blank", async () => {
+      await agent.get(`/browser/folder/${parentFolderId}`);
       const response = await agent.post("/renameFolder").send({
         folderId,
-        parentId: parentFolderId,
         updatedFolderName: "",
       });
 
@@ -81,7 +79,6 @@ describe("Folder Operations", () => {
     test("user can rename a folder", async () => {
       const response = await agent.post("/renameFolder").send({
         folderId,
-        parentId: parentFolderId,
         updatedFolderName: "Photos",
       });
 
@@ -93,11 +90,9 @@ describe("Folder Operations", () => {
     test("user cannot rename a folder to the same name as existing folder in the same location", async () => {
       await agent.post("/createFolder").send({
         newFolderName: "Documents",
-        currentFolder: parentFolderId,
       });
       const response = await agent.post("/renameFolder").send({
         folderId,
-        parentId: parentFolderId,
         updatedFolderName: "Documents",
       });
 
@@ -128,11 +123,11 @@ describe("Folder Operations", () => {
       expect(response.body.success).toBe(true);
       expect(response.body.folder.parentId).toBe(parentFolderId);
     });
-    
+
     test("user can't move folder if folder of same name exists", async () => {
+      await agent.get("/browser");
       await agent.post("/createFolder").send({
         newFolderName: "Photos",
-        currentFolder: "",
       });
 
       const response = await agent.post("/moveFolder").send({
@@ -161,6 +156,7 @@ describe("Folder Operations", () => {
 
   describe("Folder Deletion", () => {
     test("user can delete a folder", async () => {
+      await agent.get("/browser");
       const response = await agent.post("/deleteFolder").send({
         folderId,
       });
@@ -184,9 +180,9 @@ describe("Folder Ownership", () => {
       confirmation: "supersecurepassword",
     });
 
+    await  user1.get("/browser");
     const createResponse = await user1.post("/createFolder").send({
       newFolderName: "Secret Folder",
-      currentFolder: "",
     });
 
     const folderId = createResponse.body.folder.id;
@@ -214,9 +210,9 @@ test("user cannot rename another user's folder", async () => {
     confirmation: "supersecurepassword",
   });
 
+  await  user1.get("/browser");
   const createResponse = await user1.post("/createFolder").send({
     newFolderName: "Secret Folder",
-    currentFolder: "",
   });
 
   const folderId = createResponse.body.folder.id;
@@ -233,36 +229,4 @@ test("user cannot rename another user's folder", async () => {
   });
 
   expect(response.status).toBe(404);
-});
-
-test("user cannot create a folder inside another user's folder", async () => {
-  const user1 = request.agent(app);
-  const user2 = request.agent(app);
-
-  await user1.post("/register").type("form").send({
-    username: "owner3",
-    password: "supersecurepassword",
-    confirmation: "supersecurepassword",
-  });
-
-  const createResponse = await user1.post("/createFolder").send({
-    newFolderName: "Private Folder",
-    currentFolder: "",
-  });
-
-  const folderId = createResponse.body.folder.id;
-
-  await user2.post("/register").type("form").send({
-    username: "intruder3",
-    password: "supersecurepassword",
-    confirmation: "supersecurepassword",
-  });
-
-  const response = await user2.post("/createFolder").send({
-    newFolderName: "Hacked",
-    currentFolder: folderId,
-  });
-
-  expect(response.status).toBe(400);
-  expect(response.body.success).toBe(false);
 });

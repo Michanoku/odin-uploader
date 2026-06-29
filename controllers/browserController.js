@@ -36,37 +36,21 @@ const validateFolder = [
 
       return true;
     }),
-  body("currentFolder")
-    // Check if a folder of the same name exists at the location
-    .custom(async (value, { req }) => {
-      const exists = await db.folderExists({
-        name: req.body.newFolderName,
-        userId: req.user.id,
-        parentId: value,
-      });
+  check("currentFolder").custom(async (_, { req }) => {
+    const exists = await db.folderExists({
+      name: req.body.newFolderName,
+      userId: req.user.id,
+      parentId: req.currentFolder?.id ?? null,
+    });
 
-      if (exists) {
-        throw new Error(
-          "Folder of the same name already exists in the same location."
-        );
-      }
-      return true;
-    })
-    // If no parent folder is provided, skip the next check
-    .if((value) => value !== "")
-    .bail()
-    // Check if the user owns the provided folder
-    .custom(async (value, { req }) => {
-      const isOwner = await db.getFolder({
-        folderId: value,
-        userId: req.user.id,
-      });
-      if (!isOwner) {
-        throw new Error("Folder not found");
-      }
+    if (exists) {
+      throw new Error(
+        "Folder of the same name already exists in the same location."
+      );
+    }
 
-      return true;
-    }),
+    return true;
+  }),
 ];
 
 const validateRenameFolder = [
@@ -171,6 +155,10 @@ const validateFile = [
 ];
 
 // Folders
+const redirectToRoot = (req, res) => {
+  res.redirect(`/browser/folder/${req.user.rootFolderId}`);
+};
+
 const createFolder = [
   // Create a new folder in the users tree
   validateFolder,
@@ -187,7 +175,7 @@ const createFolder = [
       // Create the new folder with the provided data
       const folderData = {
         name: newFolderName,
-        parentId: req.body.currentFolder === "" ? null : req.body.currentFolder,
+        parentId: req.currentFolder,
         userId: req.user.id,
       };
       const newFolder = await db.createFolder(folderData);
@@ -201,14 +189,13 @@ const createFolder = [
 
 // Get a folder and its contents to display to the user
 const getFolder = async (req, res, next) => {
-  // If the user is not in the root, a folder is provided
-  const folder = req.folder ?? null;
-  const folderId = folder?.id ?? null;
   // Contents will have folder contents, breadcrumbs will serve as the tree to go back
   let contents = { folders: [], files: [] };
   let breadcrumbs = [];
   try {
-    if (folder) {
+    if (req.currentFolder) {
+      // If the user is not in the root, a folder is provided
+      const folderId = req.currentFolder.id ?? null;
       const [contentsResult, breadcrumbsResult] = await Promise.all([
         getFolderContents({ folderId: folderId }),
         getBreadcrumbs({ folderId: folderId }),
@@ -222,10 +209,9 @@ const getFolder = async (req, res, next) => {
     const context = {
       title: "Browser",
       view: "folder",
-      parentId: folder?.parentId ?? null,
+      parentId: req.currentFolder?.parentId ?? null,
       contents,
       breadcrumbs,
-      folderId,
     };
 
     res.render("files/browser", context);
@@ -235,7 +221,7 @@ const getFolder = async (req, res, next) => {
 };
 
 const renameFolder = [
-  // Create a new folder in the users tree
+  // Rename Folder
   validateRenameFolder,
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -246,7 +232,7 @@ const renameFolder = [
       });
     }
     const { updatedFolderName } = matchedData(req);
-    const folderId = req.folder.id;
+    const folderId = req.targetFolder.id;
     try {
       const updatedfolderData = {
         name: updatedFolderName,
@@ -271,7 +257,7 @@ const moveFolder = [
         errors: errors.array(),
       });
     }
-    const folderId = req.folder.id;
+    const folderId = req.targetFolder.id;
     try {
       const updatedfolderData = {
         parentId: req.body.updatedParentId,
@@ -286,7 +272,7 @@ const moveFolder = [
 ];
 
 const deleteFolder = async (req, res) => {
-  const folderId = req.folder.id;
+  const folderId = req.targetFolder.id;
   try {
     // Get the filenames of all files we are about to delete
     const filesToDelete = await db.getAllFilesFromSubfolders(folderId);
@@ -417,6 +403,7 @@ const deleteFile = async (req, res) => {
 };
 
 export {
+  redirectToRoot,
   createFolder,
   getFolder,
   renameFolder,

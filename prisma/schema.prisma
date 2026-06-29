@@ -23,6 +23,9 @@ model User {
   username  String   @unique @db.VarChar(32)
   hash      String
   createdAt DateTime @default(now())
+  rootFolderId String?  @unique
+  rootFolder   Folder?  @relation(fields: [rootFolderId], references: [id])
+
   files     File[]
   folders   Folder[]
 }
