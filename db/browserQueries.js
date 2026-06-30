@@ -100,24 +100,6 @@ const deleteFolder = async (folderId) => {
   return deletedFolder;
 };
 
-const isDescendant = async (folderId, sharedFolderId) => {
-  let currentId = folderId;
-
-  while (currentId !== null) {
-    const folder = await prisma.folder.findUnique({
-      where: { id: currentId },
-    });
-
-    if (!folder) return false;
-
-    if (folder.id === sharedFolderId) return true;
-
-    currentId = folder.parentId;
-  }
-
-  return false;
-};
-
 // Files
 const getFile = async ({ fileId, userId }) => {
   const where = {
@@ -198,7 +180,6 @@ export {
   createFolder,
   updateFolder,
   deleteFolder,
-  isDescendant,
   getFile,
   createFile,
   updateFile,

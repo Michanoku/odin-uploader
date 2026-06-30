@@ -1,6 +1,5 @@
 import fs from "fs/promises";
 import path from "path";
-import { ResultWithContextImpl } from "express-validator/lib/chain/index.js";
 import { body, check, validationResult, matchedData } from "express-validator";
 
 import * as db from "../db/browserQueries.js";
@@ -75,13 +74,12 @@ const validateRenameFolder = [
       }
 
       return true;
-    }),
-  check("currentFolder")
+    })
     // Check if a folder of the same name exists at the location
     .custom(async (value, { req }) => {
-      const folder = req.folder;
+      const folder = req.targetFolder;
       const exists = await db.folderExists({
-        name: req.body.updatedFolderName,
+        name: value,
         userId: req.user.id,
         parentId: folder.parentId,
       });
@@ -99,9 +97,9 @@ const validateMoveFolder = [
   check("updatedParentId")
     // Check if a folder of the same name exists at the location
     .custom(async (value, { req }) => {
-      const folder = req.folder;
+      const folder = req.targetFolder;
       const exists = await db.folderExists({
-        name: req.folder.name,
+        name: folder.name,
         userId: req.user.id,
         parentId: req.body.updatedParentId,
       });
@@ -129,7 +127,7 @@ const validateFile = [
       const exists = await db.fileExists({
         originalname: req.file.originalname,
         userId: req.user.id,
-        folderId: req.body.currentFolder,
+        folderId: req.body.currentFolder.id,
       });
 
       if (exists) {
@@ -175,7 +173,7 @@ const createFolder = [
       // Create the new folder with the provided data
       const folderData = {
         name: newFolderName,
-        parentId: req.currentFolder,
+        parentId: req.currentFolder.id,
         userId: req.user.id,
       };
       const newFolder = await db.createFolder(folderData);
@@ -319,7 +317,7 @@ const uploadFile = [
         mimetype: req.file.mimetype,
         filename: req.file.filename,
         size: req.file.size,
-        folderId: req.body.currentFolder === "" ? null : req.body.currentFolder,
+        folderId: req.body.currentFolder.id === "" ? null : req.body.currentFolder.id,
         userId: req.user.id,
       };
       const newFile = await db.createFile(fileData);

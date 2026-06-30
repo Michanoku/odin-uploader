@@ -1230,13 +1230,13 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
-    files: number
     folders: number
+    files: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    files?: boolean | UserCountOutputTypeCountFilesArgs
     folders?: boolean | UserCountOutputTypeCountFoldersArgs
+    files?: boolean | UserCountOutputTypeCountFilesArgs
   }
 
   // Custom InputTypes
@@ -1253,15 +1253,15 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountFilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: FileWhereInput
+  export type UserCountOutputTypeCountFoldersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FolderWhereInput
   }
 
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountFoldersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: FolderWhereInput
+  export type UserCountOutputTypeCountFilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FileWhereInput
   }
 
 
@@ -2311,6 +2311,7 @@ export namespace Prisma {
     username: string | null
     hash: string | null
     createdAt: Date | null
+    rootFolderId: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -2318,6 +2319,7 @@ export namespace Prisma {
     username: string | null
     hash: string | null
     createdAt: Date | null
+    rootFolderId: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -2325,6 +2327,7 @@ export namespace Prisma {
     username: number
     hash: number
     createdAt: number
+    rootFolderId: number
     _all: number
   }
 
@@ -2334,6 +2337,7 @@ export namespace Prisma {
     username?: true
     hash?: true
     createdAt?: true
+    rootFolderId?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -2341,6 +2345,7 @@ export namespace Prisma {
     username?: true
     hash?: true
     createdAt?: true
+    rootFolderId?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -2348,6 +2353,7 @@ export namespace Prisma {
     username?: true
     hash?: true
     createdAt?: true
+    rootFolderId?: true
     _all?: true
   }
 
@@ -2428,6 +2434,7 @@ export namespace Prisma {
     username: string
     hash: string
     createdAt: Date
+    rootFolderId: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -2452,8 +2459,10 @@ export namespace Prisma {
     username?: boolean
     hash?: boolean
     createdAt?: boolean
-    files?: boolean | User$filesArgs<ExtArgs>
+    rootFolderId?: boolean
+    rootFolder?: boolean | User$rootFolderArgs<ExtArgs>
     folders?: boolean | User$foldersArgs<ExtArgs>
+    files?: boolean | User$filesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2462,6 +2471,8 @@ export namespace Prisma {
     username?: boolean
     hash?: boolean
     createdAt?: boolean
+    rootFolderId?: boolean
+    rootFolder?: boolean | User$rootFolderArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2469,6 +2480,8 @@ export namespace Prisma {
     username?: boolean
     hash?: boolean
     createdAt?: boolean
+    rootFolderId?: boolean
+    rootFolder?: boolean | User$rootFolderArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -2476,28 +2489,36 @@ export namespace Prisma {
     username?: boolean
     hash?: boolean
     createdAt?: boolean
+    rootFolderId?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "hash" | "createdAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "hash" | "createdAt" | "rootFolderId", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    files?: boolean | User$filesArgs<ExtArgs>
+    rootFolder?: boolean | User$rootFolderArgs<ExtArgs>
     folders?: boolean | User$foldersArgs<ExtArgs>
+    files?: boolean | User$filesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    rootFolder?: boolean | User$rootFolderArgs<ExtArgs>
+  }
+  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    rootFolder?: boolean | User$rootFolderArgs<ExtArgs>
+  }
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
-      files: Prisma.$FilePayload<ExtArgs>[]
+      rootFolder: Prisma.$FolderPayload<ExtArgs> | null
       folders: Prisma.$FolderPayload<ExtArgs>[]
+      files: Prisma.$FilePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       username: string
       hash: string
       createdAt: Date
+      rootFolderId: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2892,8 +2913,9 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    files<T extends User$filesArgs<ExtArgs> = {}>(args?: Subset<T, User$filesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    rootFolder<T extends User$rootFolderArgs<ExtArgs> = {}>(args?: Subset<T, User$rootFolderArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     folders<T extends User$foldersArgs<ExtArgs> = {}>(args?: Subset<T, User$foldersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    files<T extends User$filesArgs<ExtArgs> = {}>(args?: Subset<T, User$filesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2927,6 +2949,7 @@ export namespace Prisma {
     readonly username: FieldRef<"User", 'String'>
     readonly hash: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
+    readonly rootFolderId: FieldRef<"User", 'String'>
   }
     
 
@@ -3181,6 +3204,10 @@ export namespace Prisma {
      */
     data: UserCreateManyInput | UserCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3251,6 +3278,10 @@ export namespace Prisma {
      * Limit how many Users to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3320,27 +3351,22 @@ export namespace Prisma {
   }
 
   /**
-   * User.files
+   * User.rootFolder
    */
-  export type User$filesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$rootFolderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the File
+     * Select specific fields to fetch from the Folder
      */
-    select?: FileSelect<ExtArgs> | null
+    select?: FolderSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the File
+     * Omit specific fields from the Folder
      */
-    omit?: FileOmit<ExtArgs> | null
+    omit?: FolderOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FileInclude<ExtArgs> | null
-    where?: FileWhereInput
-    orderBy?: FileOrderByWithRelationInput | FileOrderByWithRelationInput[]
-    cursor?: FileWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: FileScalarFieldEnum | FileScalarFieldEnum[]
+    include?: FolderInclude<ExtArgs> | null
+    where?: FolderWhereInput
   }
 
   /**
@@ -3365,6 +3391,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: FolderScalarFieldEnum | FolderScalarFieldEnum[]
+  }
+
+  /**
+   * User.files
+   */
+  export type User$filesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the File
+     */
+    select?: FileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the File
+     */
+    omit?: FileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FileInclude<ExtArgs> | null
+    where?: FileWhereInput
+    orderBy?: FileOrderByWithRelationInput | FileOrderByWithRelationInput[]
+    cursor?: FileWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FileScalarFieldEnum | FileScalarFieldEnum[]
   }
 
   /**
@@ -4738,6 +4788,7 @@ export namespace Prisma {
     children?: boolean | Folder$childrenArgs<ExtArgs>
     files?: boolean | Folder$filesArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    rootOwner?: boolean | Folder$rootOwnerArgs<ExtArgs>
     sharedFolder?: boolean | Folder$sharedFolderArgs<ExtArgs>
     _count?: boolean | FolderCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["folder"]>
@@ -4779,6 +4830,7 @@ export namespace Prisma {
     children?: boolean | Folder$childrenArgs<ExtArgs>
     files?: boolean | Folder$filesArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    rootOwner?: boolean | Folder$rootOwnerArgs<ExtArgs>
     sharedFolder?: boolean | Folder$sharedFolderArgs<ExtArgs>
     _count?: boolean | FolderCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -4798,6 +4850,7 @@ export namespace Prisma {
       children: Prisma.$FolderPayload<ExtArgs>[]
       files: Prisma.$FilePayload<ExtArgs>[]
       user: Prisma.$UserPayload<ExtArgs>
+      rootOwner: Prisma.$UserPayload<ExtArgs> | null
       sharedFolder: Prisma.$SharedFolderPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -5205,6 +5258,7 @@ export namespace Prisma {
     children<T extends Folder$childrenArgs<ExtArgs> = {}>(args?: Subset<T, Folder$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     files<T extends Folder$filesArgs<ExtArgs> = {}>(args?: Subset<T, Folder$filesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    rootOwner<T extends Folder$rootOwnerArgs<ExtArgs> = {}>(args?: Subset<T, Folder$rootOwnerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     sharedFolder<T extends Folder$sharedFolderArgs<ExtArgs> = {}>(args?: Subset<T, Folder$sharedFolderArgs<ExtArgs>>): Prisma__SharedFolderClient<$Result.GetResult<Prisma.$SharedFolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -5706,6 +5760,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: FileScalarFieldEnum | FileScalarFieldEnum[]
+  }
+
+  /**
+   * Folder.rootOwner
+   */
+  export type Folder$rootOwnerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -6824,7 +6897,8 @@ export namespace Prisma {
     id: 'id',
     username: 'username',
     hash: 'hash',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    rootFolderId: 'rootFolderId'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -7010,8 +7084,10 @@ export namespace Prisma {
     username?: StringFilter<"User"> | string
     hash?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
-    files?: FileListRelationFilter
+    rootFolderId?: StringNullableFilter<"User"> | string | null
+    rootFolder?: XOR<FolderNullableScalarRelationFilter, FolderWhereInput> | null
     folders?: FolderListRelationFilter
+    files?: FileListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -7019,27 +7095,32 @@ export namespace Prisma {
     username?: SortOrder
     hash?: SortOrder
     createdAt?: SortOrder
-    files?: FileOrderByRelationAggregateInput
+    rootFolderId?: SortOrderInput | SortOrder
+    rootFolder?: FolderOrderByWithRelationInput
     folders?: FolderOrderByRelationAggregateInput
+    files?: FileOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     username?: string
+    rootFolderId?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     hash?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
-    files?: FileListRelationFilter
+    rootFolder?: XOR<FolderNullableScalarRelationFilter, FolderWhereInput> | null
     folders?: FolderListRelationFilter
-  }, "id" | "username">
+    files?: FileListRelationFilter
+  }, "id" | "username" | "rootFolderId">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
     username?: SortOrder
     hash?: SortOrder
     createdAt?: SortOrder
+    rootFolderId?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -7053,6 +7134,7 @@ export namespace Prisma {
     username?: StringWithAggregatesFilter<"User"> | string
     hash?: StringWithAggregatesFilter<"User"> | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    rootFolderId?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type FileWhereInput = {
@@ -7149,6 +7231,7 @@ export namespace Prisma {
     children?: FolderListRelationFilter
     files?: FileListRelationFilter
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    rootOwner?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     sharedFolder?: XOR<SharedFolderNullableScalarRelationFilter, SharedFolderWhereInput> | null
   }
 
@@ -7163,6 +7246,7 @@ export namespace Prisma {
     children?: FolderOrderByRelationAggregateInput
     files?: FileOrderByRelationAggregateInput
     user?: UserOrderByWithRelationInput
+    rootOwner?: UserOrderByWithRelationInput
     sharedFolder?: SharedFolderOrderByWithRelationInput
   }
 
@@ -7181,6 +7265,7 @@ export namespace Prisma {
     children?: FolderListRelationFilter
     files?: FileListRelationFilter
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    rootOwner?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     sharedFolder?: XOR<SharedFolderNullableScalarRelationFilter, SharedFolderWhereInput> | null
   }, "id" | "userId_parentId_name">
 
@@ -7312,8 +7397,9 @@ export namespace Prisma {
     username: string
     hash: string
     createdAt?: Date | string
-    files?: FileCreateNestedManyWithoutUserInput
+    rootFolder?: FolderCreateNestedOneWithoutRootOwnerInput
     folders?: FolderCreateNestedManyWithoutUserInput
+    files?: FileCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -7321,8 +7407,9 @@ export namespace Prisma {
     username: string
     hash: string
     createdAt?: Date | string
-    files?: FileUncheckedCreateNestedManyWithoutUserInput
+    rootFolderId?: string | null
     folders?: FolderUncheckedCreateNestedManyWithoutUserInput
+    files?: FileUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -7330,8 +7417,9 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    files?: FileUpdateManyWithoutUserNestedInput
+    rootFolder?: FolderUpdateOneWithoutRootOwnerNestedInput
     folders?: FolderUpdateManyWithoutUserNestedInput
+    files?: FileUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -7339,8 +7427,9 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    files?: FileUncheckedUpdateManyWithoutUserNestedInput
+    rootFolderId?: NullableStringFieldUpdateOperationsInput | string | null
     folders?: FolderUncheckedUpdateManyWithoutUserNestedInput
+    files?: FileUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -7348,6 +7437,7 @@ export namespace Prisma {
     username: string
     hash: string
     createdAt?: Date | string
+    rootFolderId?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -7362,6 +7452,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rootFolderId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type FileCreateInput = {
@@ -7455,6 +7546,7 @@ export namespace Prisma {
     children?: FolderCreateNestedManyWithoutParentInput
     files?: FileCreateNestedManyWithoutFolderInput
     user: UserCreateNestedOneWithoutFoldersInput
+    rootOwner?: UserCreateNestedOneWithoutRootFolderInput
     sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
@@ -7467,6 +7559,7 @@ export namespace Prisma {
     userId: string
     children?: FolderUncheckedCreateNestedManyWithoutParentInput
     files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    rootOwner?: UserUncheckedCreateNestedOneWithoutRootFolderInput
     sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
   }
 
@@ -7479,6 +7572,7 @@ export namespace Prisma {
     children?: FolderUpdateManyWithoutParentNestedInput
     files?: FileUpdateManyWithoutFolderNestedInput
     user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    rootOwner?: UserUpdateOneWithoutRootFolderNestedInput
     sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
   }
 
@@ -7491,6 +7585,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     children?: FolderUncheckedUpdateManyWithoutParentNestedInput
     files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    rootOwner?: UserUncheckedUpdateOneWithoutRootFolderNestedInput
     sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
   }
 
@@ -7646,58 +7741,6 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type FileListRelationFilter = {
-    every?: FileWhereInput
-    some?: FileWhereInput
-    none?: FileWhereInput
-  }
-
-  export type FolderListRelationFilter = {
-    every?: FolderWhereInput
-    some?: FolderWhereInput
-    none?: FolderWhereInput
-  }
-
-  export type FileOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type FolderOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type UserCountOrderByAggregateInput = {
-    id?: SortOrder
-    username?: SortOrder
-    hash?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type UserMaxOrderByAggregateInput = {
-    id?: SortOrder
-    username?: SortOrder
-    hash?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type UserMinOrderByAggregateInput = {
-    id?: SortOrder
-    username?: SortOrder
-    hash?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -7718,14 +7761,87 @@ export namespace Prisma {
     isNot?: FolderWhereInput | null
   }
 
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
+  export type FolderListRelationFilter = {
+    every?: FolderWhereInput
+    some?: FolderWhereInput
+    none?: FolderWhereInput
+  }
+
+  export type FileListRelationFilter = {
+    every?: FileWhereInput
+    some?: FileWhereInput
+    none?: FileWhereInput
   }
 
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
+  }
+
+  export type FolderOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FileOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type UserCountOrderByAggregateInput = {
+    id?: SortOrder
+    username?: SortOrder
+    hash?: SortOrder
+    createdAt?: SortOrder
+    rootFolderId?: SortOrder
+  }
+
+  export type UserMaxOrderByAggregateInput = {
+    id?: SortOrder
+    username?: SortOrder
+    hash?: SortOrder
+    createdAt?: SortOrder
+    rootFolderId?: SortOrder
+  }
+
+  export type UserMinOrderByAggregateInput = {
+    id?: SortOrder
+    username?: SortOrder
+    hash?: SortOrder
+    createdAt?: SortOrder
+    rootFolderId?: SortOrder
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
   }
 
   export type FileCountOrderByAggregateInput = {
@@ -7788,22 +7904,9 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
   }
 
   export type SharedFolderNullableScalarRelationFilter = {
@@ -7878,6 +7981,19 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type FolderCreateNestedOneWithoutRootOwnerInput = {
+    create?: XOR<FolderCreateWithoutRootOwnerInput, FolderUncheckedCreateWithoutRootOwnerInput>
+    connectOrCreate?: FolderCreateOrConnectWithoutRootOwnerInput
+    connect?: FolderWhereUniqueInput
+  }
+
+  export type FolderCreateNestedManyWithoutUserInput = {
+    create?: XOR<FolderCreateWithoutUserInput, FolderUncheckedCreateWithoutUserInput> | FolderCreateWithoutUserInput[] | FolderUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FolderCreateOrConnectWithoutUserInput | FolderCreateOrConnectWithoutUserInput[]
+    createMany?: FolderCreateManyUserInputEnvelope
+    connect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+  }
+
   export type FileCreateNestedManyWithoutUserInput = {
     create?: XOR<FileCreateWithoutUserInput, FileUncheckedCreateWithoutUserInput> | FileCreateWithoutUserInput[] | FileUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FileCreateOrConnectWithoutUserInput | FileCreateOrConnectWithoutUserInput[]
@@ -7885,7 +8001,7 @@ export namespace Prisma {
     connect?: FileWhereUniqueInput | FileWhereUniqueInput[]
   }
 
-  export type FolderCreateNestedManyWithoutUserInput = {
+  export type FolderUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<FolderCreateWithoutUserInput, FolderUncheckedCreateWithoutUserInput> | FolderCreateWithoutUserInput[] | FolderUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FolderCreateOrConnectWithoutUserInput | FolderCreateOrConnectWithoutUserInput[]
     createMany?: FolderCreateManyUserInputEnvelope
@@ -7899,11 +8015,28 @@ export namespace Prisma {
     connect?: FileWhereUniqueInput | FileWhereUniqueInput[]
   }
 
-  export type FolderUncheckedCreateNestedManyWithoutUserInput = {
+  export type FolderUpdateOneWithoutRootOwnerNestedInput = {
+    create?: XOR<FolderCreateWithoutRootOwnerInput, FolderUncheckedCreateWithoutRootOwnerInput>
+    connectOrCreate?: FolderCreateOrConnectWithoutRootOwnerInput
+    upsert?: FolderUpsertWithoutRootOwnerInput
+    disconnect?: FolderWhereInput | boolean
+    delete?: FolderWhereInput | boolean
+    connect?: FolderWhereUniqueInput
+    update?: XOR<XOR<FolderUpdateToOneWithWhereWithoutRootOwnerInput, FolderUpdateWithoutRootOwnerInput>, FolderUncheckedUpdateWithoutRootOwnerInput>
+  }
+
+  export type FolderUpdateManyWithoutUserNestedInput = {
     create?: XOR<FolderCreateWithoutUserInput, FolderUncheckedCreateWithoutUserInput> | FolderCreateWithoutUserInput[] | FolderUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FolderCreateOrConnectWithoutUserInput | FolderCreateOrConnectWithoutUserInput[]
+    upsert?: FolderUpsertWithWhereUniqueWithoutUserInput | FolderUpsertWithWhereUniqueWithoutUserInput[]
     createMany?: FolderCreateManyUserInputEnvelope
+    set?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    disconnect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    delete?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
     connect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    update?: FolderUpdateWithWhereUniqueWithoutUserInput | FolderUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: FolderUpdateManyWithWhereWithoutUserInput | FolderUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: FolderScalarWhereInput | FolderScalarWhereInput[]
   }
 
   export type FileUpdateManyWithoutUserNestedInput = {
@@ -7920,7 +8053,11 @@ export namespace Prisma {
     deleteMany?: FileScalarWhereInput | FileScalarWhereInput[]
   }
 
-  export type FolderUpdateManyWithoutUserNestedInput = {
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type FolderUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<FolderCreateWithoutUserInput, FolderUncheckedCreateWithoutUserInput> | FolderCreateWithoutUserInput[] | FolderUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FolderCreateOrConnectWithoutUserInput | FolderCreateOrConnectWithoutUserInput[]
     upsert?: FolderUpsertWithWhereUniqueWithoutUserInput | FolderUpsertWithWhereUniqueWithoutUserInput[]
@@ -7946,20 +8083,6 @@ export namespace Prisma {
     update?: FileUpdateWithWhereUniqueWithoutUserInput | FileUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: FileUpdateManyWithWhereWithoutUserInput | FileUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: FileScalarWhereInput | FileScalarWhereInput[]
-  }
-
-  export type FolderUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<FolderCreateWithoutUserInput, FolderUncheckedCreateWithoutUserInput> | FolderCreateWithoutUserInput[] | FolderUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: FolderCreateOrConnectWithoutUserInput | FolderCreateOrConnectWithoutUserInput[]
-    upsert?: FolderUpsertWithWhereUniqueWithoutUserInput | FolderUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: FolderCreateManyUserInputEnvelope
-    set?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
-    disconnect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
-    delete?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
-    connect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
-    update?: FolderUpdateWithWhereUniqueWithoutUserInput | FolderUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: FolderUpdateManyWithWhereWithoutUserInput | FolderUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: FolderScalarWhereInput | FolderScalarWhereInput[]
   }
 
   export type FolderCreateNestedOneWithoutFilesInput = {
@@ -8000,10 +8123,6 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFilesInput, UserUpdateWithoutFilesInput>, UserUncheckedUpdateWithoutFilesInput>
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
   export type FolderCreateNestedOneWithoutChildrenInput = {
     create?: XOR<FolderCreateWithoutChildrenInput, FolderUncheckedCreateWithoutChildrenInput>
     connectOrCreate?: FolderCreateOrConnectWithoutChildrenInput
@@ -8030,6 +8149,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type UserCreateNestedOneWithoutRootFolderInput = {
+    create?: XOR<UserCreateWithoutRootFolderInput, UserUncheckedCreateWithoutRootFolderInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRootFolderInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type SharedFolderCreateNestedOneWithoutFolderInput = {
     create?: XOR<SharedFolderCreateWithoutFolderInput, SharedFolderUncheckedCreateWithoutFolderInput>
     connectOrCreate?: SharedFolderCreateOrConnectWithoutFolderInput
@@ -8048,6 +8173,12 @@ export namespace Prisma {
     connectOrCreate?: FileCreateOrConnectWithoutFolderInput | FileCreateOrConnectWithoutFolderInput[]
     createMany?: FileCreateManyFolderInputEnvelope
     connect?: FileWhereUniqueInput | FileWhereUniqueInput[]
+  }
+
+  export type UserUncheckedCreateNestedOneWithoutRootFolderInput = {
+    create?: XOR<UserCreateWithoutRootFolderInput, UserUncheckedCreateWithoutRootFolderInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRootFolderInput
+    connect?: UserWhereUniqueInput
   }
 
   export type SharedFolderUncheckedCreateNestedOneWithoutFolderInput = {
@@ -8102,6 +8233,16 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFoldersInput, UserUpdateWithoutFoldersInput>, UserUncheckedUpdateWithoutFoldersInput>
   }
 
+  export type UserUpdateOneWithoutRootFolderNestedInput = {
+    create?: XOR<UserCreateWithoutRootFolderInput, UserUncheckedCreateWithoutRootFolderInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRootFolderInput
+    upsert?: UserUpsertWithoutRootFolderInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutRootFolderInput, UserUpdateWithoutRootFolderInput>, UserUncheckedUpdateWithoutRootFolderInput>
+  }
+
   export type SharedFolderUpdateOneWithoutFolderNestedInput = {
     create?: XOR<SharedFolderCreateWithoutFolderInput, SharedFolderUncheckedCreateWithoutFolderInput>
     connectOrCreate?: SharedFolderCreateOrConnectWithoutFolderInput
@@ -8138,6 +8279,16 @@ export namespace Prisma {
     update?: FileUpdateWithWhereUniqueWithoutFolderInput | FileUpdateWithWhereUniqueWithoutFolderInput[]
     updateMany?: FileUpdateManyWithWhereWithoutFolderInput | FileUpdateManyWithWhereWithoutFolderInput[]
     deleteMany?: FileScalarWhereInput | FileScalarWhereInput[]
+  }
+
+  export type UserUncheckedUpdateOneWithoutRootFolderNestedInput = {
+    create?: XOR<UserCreateWithoutRootFolderInput, UserUncheckedCreateWithoutRootFolderInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRootFolderInput
+    upsert?: UserUpsertWithoutRootFolderInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutRootFolderInput, UserUpdateWithoutRootFolderInput>, UserUncheckedUpdateWithoutRootFolderInput>
   }
 
   export type SharedFolderUncheckedUpdateOneWithoutFolderNestedInput = {
@@ -8245,6 +8396,34 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -8272,32 +8451,67 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
+  export type FolderCreateWithoutRootOwnerInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    parent?: FolderCreateNestedOneWithoutChildrenInput
+    children?: FolderCreateNestedManyWithoutParentInput
+    files?: FileCreateNestedManyWithoutFolderInput
+    user: UserCreateNestedOneWithoutFoldersInput
+    sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  export type FolderUncheckedCreateWithoutRootOwnerInput = {
+    id?: string
+    name: string
+    parentId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    children?: FolderUncheckedCreateNestedManyWithoutParentInput
+    files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
+  }
+
+  export type FolderCreateOrConnectWithoutRootOwnerInput = {
+    where: FolderWhereUniqueInput
+    create: XOR<FolderCreateWithoutRootOwnerInput, FolderUncheckedCreateWithoutRootOwnerInput>
+  }
+
+  export type FolderCreateWithoutUserInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    parent?: FolderCreateNestedOneWithoutChildrenInput
+    children?: FolderCreateNestedManyWithoutParentInput
+    files?: FileCreateNestedManyWithoutFolderInput
+    rootOwner?: UserCreateNestedOneWithoutRootFolderInput
+    sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
+  }
+
+  export type FolderUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    parentId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    children?: FolderUncheckedCreateNestedManyWithoutParentInput
+    files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    rootOwner?: UserUncheckedCreateNestedOneWithoutRootFolderInput
+    sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
+  }
+
+  export type FolderCreateOrConnectWithoutUserInput = {
+    where: FolderWhereUniqueInput
+    create: XOR<FolderCreateWithoutUserInput, FolderUncheckedCreateWithoutUserInput>
+  }
+
+  export type FolderCreateManyUserInputEnvelope = {
+    data: FolderCreateManyUserInput | FolderCreateManyUserInput[]
+    skipDuplicates?: boolean
   }
 
   export type FileCreateWithoutUserInput = {
@@ -8332,36 +8546,67 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type FolderCreateWithoutUserInput = {
-    id?: string
-    name: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    parent?: FolderCreateNestedOneWithoutChildrenInput
-    children?: FolderCreateNestedManyWithoutParentInput
-    files?: FileCreateNestedManyWithoutFolderInput
-    sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
+  export type FolderUpsertWithoutRootOwnerInput = {
+    update: XOR<FolderUpdateWithoutRootOwnerInput, FolderUncheckedUpdateWithoutRootOwnerInput>
+    create: XOR<FolderCreateWithoutRootOwnerInput, FolderUncheckedCreateWithoutRootOwnerInput>
+    where?: FolderWhereInput
   }
 
-  export type FolderUncheckedCreateWithoutUserInput = {
-    id?: string
-    name: string
-    parentId?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    children?: FolderUncheckedCreateNestedManyWithoutParentInput
-    files?: FileUncheckedCreateNestedManyWithoutFolderInput
-    sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
+  export type FolderUpdateToOneWithWhereWithoutRootOwnerInput = {
+    where?: FolderWhereInput
+    data: XOR<FolderUpdateWithoutRootOwnerInput, FolderUncheckedUpdateWithoutRootOwnerInput>
   }
 
-  export type FolderCreateOrConnectWithoutUserInput = {
+  export type FolderUpdateWithoutRootOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    parent?: FolderUpdateOneWithoutChildrenNestedInput
+    children?: FolderUpdateManyWithoutParentNestedInput
+    files?: FileUpdateManyWithoutFolderNestedInput
+    user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
+  }
+
+  export type FolderUncheckedUpdateWithoutRootOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    children?: FolderUncheckedUpdateManyWithoutParentNestedInput
+    files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
+  }
+
+  export type FolderUpsertWithWhereUniqueWithoutUserInput = {
     where: FolderWhereUniqueInput
+    update: XOR<FolderUpdateWithoutUserInput, FolderUncheckedUpdateWithoutUserInput>
     create: XOR<FolderCreateWithoutUserInput, FolderUncheckedCreateWithoutUserInput>
   }
 
-  export type FolderCreateManyUserInputEnvelope = {
-    data: FolderCreateManyUserInput | FolderCreateManyUserInput[]
-    skipDuplicates?: boolean
+  export type FolderUpdateWithWhereUniqueWithoutUserInput = {
+    where: FolderWhereUniqueInput
+    data: XOR<FolderUpdateWithoutUserInput, FolderUncheckedUpdateWithoutUserInput>
+  }
+
+  export type FolderUpdateManyWithWhereWithoutUserInput = {
+    where: FolderScalarWhereInput
+    data: XOR<FolderUpdateManyMutationInput, FolderUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type FolderScalarWhereInput = {
+    AND?: FolderScalarWhereInput | FolderScalarWhereInput[]
+    OR?: FolderScalarWhereInput[]
+    NOT?: FolderScalarWhereInput | FolderScalarWhereInput[]
+    id?: StringFilter<"Folder"> | string
+    name?: StringFilter<"Folder"> | string
+    parentId?: StringNullableFilter<"Folder"> | string | null
+    createdAt?: DateTimeFilter<"Folder"> | Date | string
+    updatedAt?: DateTimeFilter<"Folder"> | Date | string
+    userId?: StringFilter<"Folder"> | string
   }
 
   export type FileUpsertWithWhereUniqueWithoutUserInput = {
@@ -8395,34 +8640,6 @@ export namespace Prisma {
     userId?: StringFilter<"File"> | string
   }
 
-  export type FolderUpsertWithWhereUniqueWithoutUserInput = {
-    where: FolderWhereUniqueInput
-    update: XOR<FolderUpdateWithoutUserInput, FolderUncheckedUpdateWithoutUserInput>
-    create: XOR<FolderCreateWithoutUserInput, FolderUncheckedCreateWithoutUserInput>
-  }
-
-  export type FolderUpdateWithWhereUniqueWithoutUserInput = {
-    where: FolderWhereUniqueInput
-    data: XOR<FolderUpdateWithoutUserInput, FolderUncheckedUpdateWithoutUserInput>
-  }
-
-  export type FolderUpdateManyWithWhereWithoutUserInput = {
-    where: FolderScalarWhereInput
-    data: XOR<FolderUpdateManyMutationInput, FolderUncheckedUpdateManyWithoutUserInput>
-  }
-
-  export type FolderScalarWhereInput = {
-    AND?: FolderScalarWhereInput | FolderScalarWhereInput[]
-    OR?: FolderScalarWhereInput[]
-    NOT?: FolderScalarWhereInput | FolderScalarWhereInput[]
-    id?: StringFilter<"Folder"> | string
-    name?: StringFilter<"Folder"> | string
-    parentId?: StringNullableFilter<"Folder"> | string | null
-    createdAt?: DateTimeFilter<"Folder"> | Date | string
-    updatedAt?: DateTimeFilter<"Folder"> | Date | string
-    userId?: StringFilter<"Folder"> | string
-  }
-
   export type FolderCreateWithoutFilesInput = {
     id?: string
     name: string
@@ -8431,6 +8648,7 @@ export namespace Prisma {
     parent?: FolderCreateNestedOneWithoutChildrenInput
     children?: FolderCreateNestedManyWithoutParentInput
     user: UserCreateNestedOneWithoutFoldersInput
+    rootOwner?: UserCreateNestedOneWithoutRootFolderInput
     sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
@@ -8442,6 +8660,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     userId: string
     children?: FolderUncheckedCreateNestedManyWithoutParentInput
+    rootOwner?: UserUncheckedCreateNestedOneWithoutRootFolderInput
     sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
   }
 
@@ -8455,6 +8674,7 @@ export namespace Prisma {
     username: string
     hash: string
     createdAt?: Date | string
+    rootFolder?: FolderCreateNestedOneWithoutRootOwnerInput
     folders?: FolderCreateNestedManyWithoutUserInput
   }
 
@@ -8463,6 +8683,7 @@ export namespace Prisma {
     username: string
     hash: string
     createdAt?: Date | string
+    rootFolderId?: string | null
     folders?: FolderUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -8490,6 +8711,7 @@ export namespace Prisma {
     parent?: FolderUpdateOneWithoutChildrenNestedInput
     children?: FolderUpdateManyWithoutParentNestedInput
     user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    rootOwner?: UserUpdateOneWithoutRootFolderNestedInput
     sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
   }
 
@@ -8501,6 +8723,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
     children?: FolderUncheckedUpdateManyWithoutParentNestedInput
+    rootOwner?: UserUncheckedUpdateOneWithoutRootFolderNestedInput
     sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
   }
 
@@ -8520,6 +8743,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rootFolder?: FolderUpdateOneWithoutRootOwnerNestedInput
     folders?: FolderUpdateManyWithoutUserNestedInput
   }
 
@@ -8528,6 +8752,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rootFolderId?: NullableStringFieldUpdateOperationsInput | string | null
     folders?: FolderUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -8539,6 +8764,7 @@ export namespace Prisma {
     parent?: FolderCreateNestedOneWithoutChildrenInput
     files?: FileCreateNestedManyWithoutFolderInput
     user: UserCreateNestedOneWithoutFoldersInput
+    rootOwner?: UserCreateNestedOneWithoutRootFolderInput
     sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
@@ -8550,6 +8776,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     userId: string
     files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    rootOwner?: UserUncheckedCreateNestedOneWithoutRootFolderInput
     sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
   }
 
@@ -8566,6 +8793,7 @@ export namespace Prisma {
     children?: FolderCreateNestedManyWithoutParentInput
     files?: FileCreateNestedManyWithoutFolderInput
     user: UserCreateNestedOneWithoutFoldersInput
+    rootOwner?: UserCreateNestedOneWithoutRootFolderInput
     sharedFolder?: SharedFolderCreateNestedOneWithoutFolderInput
   }
 
@@ -8577,6 +8805,7 @@ export namespace Prisma {
     userId: string
     children?: FolderUncheckedCreateNestedManyWithoutParentInput
     files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    rootOwner?: UserUncheckedCreateNestedOneWithoutRootFolderInput
     sharedFolder?: SharedFolderUncheckedCreateNestedOneWithoutFolderInput
   }
 
@@ -8627,6 +8856,7 @@ export namespace Prisma {
     username: string
     hash: string
     createdAt?: Date | string
+    rootFolder?: FolderCreateNestedOneWithoutRootOwnerInput
     files?: FileCreateNestedManyWithoutUserInput
   }
 
@@ -8635,12 +8865,36 @@ export namespace Prisma {
     username: string
     hash: string
     createdAt?: Date | string
+    rootFolderId?: string | null
     files?: FileUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFoldersInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutFoldersInput, UserUncheckedCreateWithoutFoldersInput>
+  }
+
+  export type UserCreateWithoutRootFolderInput = {
+    id?: string
+    username: string
+    hash: string
+    createdAt?: Date | string
+    folders?: FolderCreateNestedManyWithoutUserInput
+    files?: FileCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutRootFolderInput = {
+    id?: string
+    username: string
+    hash: string
+    createdAt?: Date | string
+    folders?: FolderUncheckedCreateNestedManyWithoutUserInput
+    files?: FileUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutRootFolderInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutRootFolderInput, UserUncheckedCreateWithoutRootFolderInput>
   }
 
   export type SharedFolderCreateWithoutFolderInput = {
@@ -8679,6 +8933,7 @@ export namespace Prisma {
     parent?: FolderUpdateOneWithoutChildrenNestedInput
     files?: FileUpdateManyWithoutFolderNestedInput
     user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    rootOwner?: UserUpdateOneWithoutRootFolderNestedInput
     sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
   }
 
@@ -8690,6 +8945,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
     files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    rootOwner?: UserUncheckedUpdateOneWithoutRootFolderNestedInput
     sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
   }
 
@@ -8741,6 +8997,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rootFolder?: FolderUpdateOneWithoutRootOwnerNestedInput
     files?: FileUpdateManyWithoutUserNestedInput
   }
 
@@ -8749,6 +9006,36 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rootFolderId?: NullableStringFieldUpdateOperationsInput | string | null
+    files?: FileUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUpsertWithoutRootFolderInput = {
+    update: XOR<UserUpdateWithoutRootFolderInput, UserUncheckedUpdateWithoutRootFolderInput>
+    create: XOR<UserCreateWithoutRootFolderInput, UserUncheckedCreateWithoutRootFolderInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutRootFolderInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutRootFolderInput, UserUncheckedUpdateWithoutRootFolderInput>
+  }
+
+  export type UserUpdateWithoutRootFolderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    hash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folders?: FolderUpdateManyWithoutUserNestedInput
+    files?: FileUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutRootFolderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    hash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folders?: FolderUncheckedUpdateManyWithoutUserNestedInput
     files?: FileUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -8784,6 +9071,7 @@ export namespace Prisma {
     children?: FolderCreateNestedManyWithoutParentInput
     files?: FileCreateNestedManyWithoutFolderInput
     user: UserCreateNestedOneWithoutFoldersInput
+    rootOwner?: UserCreateNestedOneWithoutRootFolderInput
   }
 
   export type FolderUncheckedCreateWithoutSharedFolderInput = {
@@ -8795,6 +9083,7 @@ export namespace Prisma {
     userId: string
     children?: FolderUncheckedCreateNestedManyWithoutParentInput
     files?: FileUncheckedCreateNestedManyWithoutFolderInput
+    rootOwner?: UserUncheckedCreateNestedOneWithoutRootFolderInput
   }
 
   export type FolderCreateOrConnectWithoutSharedFolderInput = {
@@ -8822,6 +9111,7 @@ export namespace Prisma {
     children?: FolderUpdateManyWithoutParentNestedInput
     files?: FileUpdateManyWithoutFolderNestedInput
     user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    rootOwner?: UserUpdateOneWithoutRootFolderNestedInput
   }
 
   export type FolderUncheckedUpdateWithoutSharedFolderInput = {
@@ -8833,6 +9123,15 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     children?: FolderUncheckedUpdateManyWithoutParentNestedInput
     files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    rootOwner?: UserUncheckedUpdateOneWithoutRootFolderNestedInput
+  }
+
+  export type FolderCreateManyUserInput = {
+    id?: string
+    name: string
+    parentId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type FileCreateManyUserInput = {
@@ -8846,12 +9145,36 @@ export namespace Prisma {
     folderId?: string | null
   }
 
-  export type FolderCreateManyUserInput = {
-    id?: string
-    name: string
-    parentId?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
+  export type FolderUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    parent?: FolderUpdateOneWithoutChildrenNestedInput
+    children?: FolderUpdateManyWithoutParentNestedInput
+    files?: FileUpdateManyWithoutFolderNestedInput
+    rootOwner?: UserUpdateOneWithoutRootFolderNestedInput
+    sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
+  }
+
+  export type FolderUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    children?: FolderUncheckedUpdateManyWithoutParentNestedInput
+    files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    rootOwner?: UserUncheckedUpdateOneWithoutRootFolderNestedInput
+    sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
+  }
+
+  export type FolderUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FileUpdateWithoutUserInput = {
@@ -8887,36 +9210,6 @@ export namespace Prisma {
     folderId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type FolderUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    parent?: FolderUpdateOneWithoutChildrenNestedInput
-    children?: FolderUpdateManyWithoutParentNestedInput
-    files?: FileUpdateManyWithoutFolderNestedInput
-    sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
-  }
-
-  export type FolderUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    parentId?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    children?: FolderUncheckedUpdateManyWithoutParentNestedInput
-    files?: FileUncheckedUpdateManyWithoutFolderNestedInput
-    sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
-  }
-
-  export type FolderUncheckedUpdateManyWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    parentId?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type FolderCreateManyParentInput = {
     id?: string
     name: string
@@ -8944,6 +9237,7 @@ export namespace Prisma {
     children?: FolderUpdateManyWithoutParentNestedInput
     files?: FileUpdateManyWithoutFolderNestedInput
     user?: UserUpdateOneRequiredWithoutFoldersNestedInput
+    rootOwner?: UserUpdateOneWithoutRootFolderNestedInput
     sharedFolder?: SharedFolderUpdateOneWithoutFolderNestedInput
   }
 
@@ -8955,6 +9249,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     children?: FolderUncheckedUpdateManyWithoutParentNestedInput
     files?: FileUncheckedUpdateManyWithoutFolderNestedInput
+    rootOwner?: UserUncheckedUpdateOneWithoutRootFolderNestedInput
     sharedFolder?: SharedFolderUncheckedUpdateOneWithoutFolderNestedInput
   }
 

@@ -2,6 +2,7 @@ import express from "express";
 import {
   isAuth,
   loadCurrentFolder,
+  loadTargetFolder,
   isSharedFolder,
   isSharedDescendant,
   isFileOwner,
@@ -19,13 +20,13 @@ router.get(
   sharedController.getSharedFolder
 );
 router.get(
-  "/shared/:sharedFolderId/folder/:folderId",
+  "/shared/:sharedFolderId/folder/:sharedDescendantId",
   isAuth,
   isSharedFolder,
   isSharedDescendant,
   sharedController.getSharedFolder
 );
-router.post("/shareFolder", isAuth, loadCurrentFolder, sharedController.shareFolder);
+router.post("/browser/folder/:currentFolderId/shareFolder", isAuth, loadCurrentFolder, loadTargetFolder, sharedController.shareFolder);
 
 // Files
 // router.get(

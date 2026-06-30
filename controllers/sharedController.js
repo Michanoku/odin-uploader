@@ -1,37 +1,56 @@
 import * as sharedQueries from "../db/sharedQueries.js";
 import { getFolder } from "../db/browserQueries.js";
 import { getFolderContents, getBreadcrumbs } from "../lib/browserUtils.js";
+import { body, validationResult, matchedData } from "express-validator";
 
+const durationValidation = [
+  body("duration")
+    .toInt()
+    .isInt({ min: 1, max: 30 })
+    .withMessage("Duration must be an integer between 1 and 30"),
+];
 // Folders
-const shareFolder = async (req, res) => {
-  const folderId = req.body.folderId;
-  const duration = parseInt(req.body.duration); // 1 - 30 days
-  try {
-    const sharedFolder = await sharedQueries.shareFolder(folderId, duration);
-    res.json({ success: true, folder: sharedFolder });
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
-  }
-};
+const shareFolder = [
+  // Create a new folder in the users tree
+  durationValidation,
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+    const { duration } = matchedData(req);
+    const folderId = req.targetFolder.id;
+    try {
+      const sharedFolder = await sharedQueries.shareFolder(folderId, duration);
+      res.json({ success: true, folder: sharedFolder });
+    } catch (err) {
+      console.log(err);
+      res.json({ success: false, error: err });
+    }
+  },
+];
 
 const getSharedFolder = async (req, res) => {
   const sharedFolder = req.sharedFolder;
-  const folderId = req.params.folderId ?? req.sharedFolder.folderId;
+  const sharedDescendant = req.sharedDescendant;
 
-  const folder = await getFolder({ folderId });
-  const parentId = folderId === sharedFolder ? null : folder.parentId;
+  const currentFolder = sharedDescendant ? sharedDescendant : sharedFolder;
+
+  const parentId = currentFolder.parentId ? currentFolder.parentId : null;
 
   const [contents, breadcrumbs] = await Promise.all([
-    getFolderContents({ folderId: folderId }),
-    getBreadcrumbs({ folderId: folderId }),
+    getFolderContents({ folderId: currentFolder.id }),
+    getBreadcrumbs({ folderId: currentFolder.id }),
   ]);
 
   const context = {
     title: "Shared folder",
     contents,
     breadcrumbs,
-    folderId,
+    folderId: currentFolder.id,
     sharedFolder,
     parentId: parentId,
   };
@@ -53,9 +72,4 @@ const shareFile = async (req, res, next) => {
 
 // Todo share single file
 
-export {
-    shareFolder,
-    getSharedFolder,
-    getSharedFile,
-    shareFile,
-}
+export { shareFolder, getSharedFolder, getSharedFile, shareFile };

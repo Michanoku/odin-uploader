@@ -15,7 +15,7 @@ const shareFolder = async (folderId, duration) => {
 };
 
 const getSharedRoot = async (folderId) => {
-  const sharedFolder = await prisma.sharedFolder.findUnique({
+  const sharedFolder = await prisma.sharedFolder.findFirst({
     where: {
       folderId: folderId,
     },
@@ -49,7 +49,7 @@ const isSharedFile = async (fileId, sharedFolderId) => {
   const file = await prisma.file.findUnique({
     where: {
       id: fileId,
-    }
+    },
   });
   let currentId = file.folderId;
 
@@ -68,13 +68,32 @@ const isSharedFile = async (fileId, sharedFolderId) => {
   return false;
 };
 
-export const folders = {
-    
-}
+const isDescendant = async (folderId, sharedFolderId) => {
+  let currentId = folderId;
 
-export  {
+  while (currentId !== null) {
+    const folder = await prisma.folder.findUnique({
+      where: { id: currentId },
+    });
+    if (!folder) return false;
+
+    if (folder.id === sharedFolderId) {
+      return await prisma.folder.findFirst({
+        where: {
+          id: folderId,
+        },
+      });
+    }
+    currentId = folder.parentId;
+  }
+
+  return false;
+};
+
+export {
   shareFolder,
   getSharedRoot,
   isSharedFolder,
-    isSharedFile,
+  isSharedFile,
+  isDescendant,
 };

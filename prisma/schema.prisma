@@ -23,11 +23,11 @@ model User {
   username  String   @unique @db.VarChar(32)
   hash      String
   createdAt DateTime @default(now())
-  rootFolderId String?  @unique
-  rootFolder   Folder?  @relation(fields: [rootFolderId], references: [id])
+  rootFolderId String? @unique
+  rootFolder Folder? @relation("RootFolder", fields: [rootFolderId], references: [id])
 
+  folders Folder[] @relation("OwnedFolders")
   files     File[]
-  folders   Folder[]
 }
 
 // Files belonging to users
@@ -56,8 +56,9 @@ model Folder {
   parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children  Folder[] @relation("FolderHierarchy")
   files     File[]
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation("OwnedFolders", fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+  rootOwner User? @relation("RootFolder")
   sharedFolder  SharedFolder?
 
   @@unique([userId, parentId, name])
