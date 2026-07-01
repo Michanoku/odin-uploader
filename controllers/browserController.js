@@ -137,6 +137,48 @@ const validateFile = [
     }),
 ];
 
+const validateRenameFile = [
+  // If no file was provided, return error
+  body("updatedFileName")
+    .trim()
+    .notEmpty()
+    .withMessage("File name is required")
+    // Check if a file of that name exists in the same folder
+    .custom(async (value, { req }) => {
+      const exists = await db.fileExists({
+        originalname: value,
+        userId: req.user.id,
+        folderId: req.currentFolder.id,
+      });
+
+      if (exists) {
+        throw new Error("File of the same name already exists in the folder.");
+      }
+      return true;
+    }),
+];
+
+const validateMoveFile = [
+  body("updatedFolderId")
+    .trim()
+    .notEmpty()
+    .withMessage("Target folder is required.")
+    // Check if a folder of the same name exists at the location
+    .custom(async (value, { req }) => {
+      const file = req.targetFile;
+      const exists = await db.fileExists({
+        originalname: file.originalname,
+        userId: req.user.id,
+        folderId: value,
+      });
+
+      if (exists) {
+        throw new Error("File of the same name already exists in the folder.");
+      }
+      return true;
+    }),
+];
+
 // Folders
 const redirectToRoot = (req, res) => {
   res.redirect(`/browser/folder/${req.user.rootFolderId}`);
@@ -340,33 +382,55 @@ const getFile = async (req, res, next) => {
   }
 };
 
-const renameFile = async (req, res) => {
-  const fileId = req.targetFile.id;
-  try {
-    const updatedfileData = {
-      originalname: req.body.updatedFileName,
-    };
-    const updatedFile = await db.updateFile(fileId, updatedfileData);
-    res.json({ success: true, file: updatedFile });
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
-  }
-};
+const renameFile = [
+  // Create a new folder in the users tree
+  validateRenameFile,
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+    try {
+      const fileId = req.targetFile.id;
+      const updatedfileData = {
+        originalname: req.body.updatedFileName,
+      };
+      const updatedFile = await db.updateFile(fileId, updatedfileData);
+      res.json({ success: true, file: updatedFile });
+    } catch (err) {
+      console.log(err);
+      res.json({ success: false, error: err });
+    }
+  },
+];
 
-const moveFile = async (req, res) => {
-  const fileId = req.body.fileId;
-  try {
-    const updatedfileData = {
-      folderId: req.body.updatedFolderId,
-    };
-    const updatedFile = await db.updateFile(fileId, updatedfileData);
-    res.json({ success: true, file: updatedFile });
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, error: err });
-  }
-};
+const moveFile = [
+  // Create a new folder in the users tree
+  validateMoveFile,
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+    try {
+      const fileId = req.body.fileId;
+      const updatedfileData = {
+        folderId: req.body.updatedFolderId,
+      };
+      const updatedFile = await db.updateFile(fileId, updatedfileData);
+      res.json({ success: true, file: updatedFile });
+    } catch (err) {
+      console.log(err);
+      res.json({ success: false, error: err });
+    }
+  },
+];
 
 const deleteFile = async (req, res) => {
   const fileId = req.body.fileId;

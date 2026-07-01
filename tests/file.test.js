@@ -34,7 +34,7 @@ describe("File Operations", () => {
       const root = await getRootPathAndId(agent);
       const response = await agent
         .post(`${root.path}/upload`)
-        .attach("file", path.resolve("tests/files/test.txt"));
+        .attach("file", path.resolve("tests/files/test.txt"), "upload1.txt");
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -52,7 +52,7 @@ describe("File Operations", () => {
       const root = await getRootPathAndId(agent);
       const response = await agent
         .post(`${root.path}/upload`)
-        .attach("file", path.resolve("tests/files/test.txt"));
+        .attach("file", path.resolve("tests/files/test.txt"), "upload1.txt");
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -72,7 +72,7 @@ describe("File Operations", () => {
       const folderId = createResponse.body.folder.id;
       const response = await agent
         .post(`/browser/folder/${folderId}/upload`)
-        .attach("file", path.resolve("tests/files/test.txt"));
+        .attach("file", path.resolve("tests/files/test.txt"), "upload3.txt");
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -85,7 +85,7 @@ describe("File Operations", () => {
       const root = await getRootPathAndId(agent);
       const uploadResponse = await agent
         .post(`${root.path}/upload`)
-        .attach("file", path.resolve("tests/files/test2.txt"));
+        .attach("file", path.resolve("tests/files/test.txt"), "rename1.txt");
 
       const fileId = uploadResponse.body.file.id;
       const response = await agent.post(`${root.path}/renameFile`).send({
@@ -97,10 +97,26 @@ describe("File Operations", () => {
       expect(response.body.success).toBe(true);
       expect(response.body.file.originalname).toBe("renamed.txt");
     });
+
+    test("user cannot rename a file to the same name of another file", async () => {
+      const root = await getRootPathAndId(agent);
+      const uploadResponse = await agent
+        .post(`${root.path}/upload`)
+        .attach("file", path.resolve("tests/files/test.txt"), "rename2.txt");
+
+      const fileId = uploadResponse.body.file.id;
+      const response = await agent.post(`${root.path}/renameFile`).send({
+        fileId,
+        updatedFileName: "renamed.txt",
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
   });
 
   describe("File Move", () => {
-    test("user can move a file to the root", async () => {
+    test("user can't move a file to nowhere", async () => {
       const root = await getRootPathAndId(agent);
       const createResponse = await agent
         .post(`${root.path}/createFolder`)
@@ -110,7 +126,30 @@ describe("File Operations", () => {
       const folderId = createResponse.body.folder.id;
       const uploadResponse = await agent
         .post(`/browser/folder/${folderId}/upload`)
-        .attach("file", path.resolve("tests/files/test3.txt"));
+        .attach("file", path.resolve("tests/files/test.txt"), "move1.txt");
+
+      const fileId = uploadResponse.body.file.id;
+      const response = await agent
+        .post(`/browser/folder/${folderId}/moveFile`)
+        .send({
+          fileId,
+          updatedFolderId: "",
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+    test("user can move a file to the root", async () => {
+      const root = await getRootPathAndId(agent);
+      const createResponse = await agent
+        .post(`${root.path}/createFolder`)
+        .send({
+          newFolderName: "NotRoot2",
+        });
+      const folderId = createResponse.body.folder.id;
+      const uploadResponse = await agent
+        .post(`/browser/folder/${folderId}/upload`)
+        .attach("file", path.resolve("tests/files/test.txt"), "move2.txt");
 
       const fileId = uploadResponse.body.file.id;
       const response = await agent
@@ -129,13 +168,13 @@ describe("File Operations", () => {
       const root = await getRootPathAndId(agent);
       const uploadResponse = await agent
         .post(`${root.path}/upload`)
-        .attach("file", path.resolve("tests/files/test4.txt"));
+        .attach("file", path.resolve("tests/files/test.txt"), "move3.txt");
 
       const fileId = uploadResponse.body.file.id;
       const createResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "NotRoot2",
+          newFolderName: "NotRoot3",
         });
       const folderId = createResponse.body.folder.id;
       const response = await agent.post(`${root.path}/moveFile`).send({
@@ -154,7 +193,7 @@ describe("File Operations", () => {
       const root = await getRootPathAndId(agent);
       const uploadResponse = await agent
         .post(`${root.path}/upload`)
-        .attach("file", path.resolve("tests/files/test5.txt"));
+        .attach("file", path.resolve("tests/files/test.txt"), "open1.txt");
       const fileId = uploadResponse.body.file.id;
       const response = await agent.get(`/browser/file/${fileId}`);
 
@@ -167,7 +206,7 @@ describe("File Operations", () => {
       const root = await getRootPathAndId(agent);
       const uploadResponse = await agent
         .post(`${root.path}/upload`)
-        .attach("file", path.resolve("tests/files/test6.txt"));
+        .attach("file", path.resolve("tests/files/test.txt"), "delete1.txt");
       const fileId = uploadResponse.body.file.id;
       const response = await agent.post(`${root.path}/deleteFile`).send({
         fileId,
@@ -199,7 +238,7 @@ describe("File Ownership", () => {
     const root1 = await getRootPathAndId(user1);
     const uploadResponse = await user1
       .post(`${root1.path}/upload`)
-      .attach("file", path.resolve("tests/files/test.txt"));
+      .attach("file", path.resolve("tests/files/test.txt"), "access1.txt");
 
     const fileId = uploadResponse.body.file.id;
 
@@ -227,7 +266,7 @@ describe("File Ownership", () => {
     const root1 = await getRootPathAndId(user1);
     const uploadResponse = await user1
       .post(`${root1.path}/upload`)
-      .attach("file", path.resolve("tests/files/test.txt"));
+      .attach("file", path.resolve("tests/files/test.txt"), "access2.txt");
 
     const fileId = uploadResponse.body.file.id;
 
@@ -286,7 +325,7 @@ describe("Recursive Folder Deletion", () => {
     // Upload to grandchild folder
     const upload = await agent
       .post(`/browser/folder/${grandChildId}/upload`)
-      .attach("file", path.resolve("tests/files/test.txt"));
+      .attach("file", path.resolve("tests/files/test.txt"), "recursion.txt");
 
     expect(upload.status).toBe(200);
 

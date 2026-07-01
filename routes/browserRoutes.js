@@ -72,6 +72,7 @@ router.get(
 router.post(
   "/browser/folder/:currentFolderId/renameFile",
   isAuth,
+  loadCurrentFolder,
   loadTargetFile,
   browserController.renameFile
 );
