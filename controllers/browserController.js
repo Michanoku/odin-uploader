@@ -127,27 +127,12 @@ const validateFile = [
       const exists = await db.fileExists({
         originalname: req.file.originalname,
         userId: req.user.id,
-        folderId: req.body.currentFolder.id,
+        folderId: req.currentFolder.id,
       });
 
       if (exists) {
         throw new Error("File of the same name already exists in the folder.");
       }
-      return true;
-    }),
-  // If a folder was provided make sure the user is the owner
-  body("currentFolder")
-    .if((value) => value !== "")
-    .bail()
-    .custom(async (value, { req }) => {
-      const isOwner = await db.getFolder({
-        folderId: value,
-        userId: req.user.id,
-      });
-      if (!isOwner) {
-        throw new Error("Folder not found");
-      }
-
       return true;
     }),
 ];
@@ -317,7 +302,7 @@ const uploadFile = [
         mimetype: req.file.mimetype,
         filename: req.file.filename,
         size: req.file.size,
-        folderId: req.body.currentFolder.id === "" ? null : req.body.currentFolder.id,
+        folderId: req.currentFolder.id,
         userId: req.user.id,
       };
       const newFile = await db.createFile(fileData);
@@ -330,8 +315,8 @@ const uploadFile = [
 ];
 
 const getFile = async (req, res, next) => {
-  const file = req.file;
-  const folder = req.folder ?? null;
+  const file = req.targetFile;
+  const folder = req.targetFolder ?? null;
   const folderId = folder?.id ?? null;
   let breadcrumbs = [];
   try {
@@ -356,7 +341,7 @@ const getFile = async (req, res, next) => {
 };
 
 const renameFile = async (req, res) => {
-  const fileId = req.body.fileId;
+  const fileId = req.targetFile.id
   try {
     const updatedfileData = {
       originalname: req.body.updatedFileName,

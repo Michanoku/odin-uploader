@@ -12,7 +12,7 @@ import {
   loadCurrentFolder,
   loadTargetFolder,
   isTargetRoot,
-  isFileOwner,
+  loadTargetFile,
 } from "../lib/authMiddleware.js";
 import * as browserController from "../controllers/browserController.js";
 
@@ -35,17 +35,18 @@ router.post("/browser/folder/:currentFolderId/deleteFolder", isAuth, loadCurrent
 router.post(
   "/browser/folder/:currentFolderId/upload",
   isAuth,
+  loadCurrentFolder,
   upload.single("file"),
   browserController.uploadFile
 );
 router.get(
   "/browser/file/:fileId",
   isAuth,
-  isFileOwner,
+  loadTargetFile,
   browserController.getFile
  );
-router.post("/renameFile", isAuth, isFileOwner, browserController.renameFile);
-router.post("/moveFile", isAuth, isFileOwner, browserController.moveFile);
-router.post("/deleteFile", isAuth, isFileOwner, browserController.deleteFile);
+router.post("/browser/folder/:currentFolderId/renameFile", isAuth, loadTargetFile, browserController.renameFile);
+router.post("/browser/folder/:currentFolderId/moveFile", isAuth, loadTargetFile, browserController.moveFile);
+router.post("/browser/folder/:currentFolderId/deleteFile", isAuth, loadTargetFile, browserController.deleteFile);
 
 export default router;

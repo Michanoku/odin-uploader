@@ -5,7 +5,7 @@ import {
   loadTargetFolder,
   isSharedFolder,
   isSharedDescendant,
-  isFileOwner,
+  loadTargetFile,
   isSharedFile,
 } from "../lib/authMiddleware.js";
 import * as sharedController from "../controllers/sharedController.js";
@@ -36,6 +36,6 @@ router.post("/browser/folder/:currentFolderId/shareFolder", isAuth, loadCurrentF
 //   isSharedFile,
 //   sharedController.getSharedFile
 // );
-router.post("/shareFile", isAuth, isFileOwner, sharedController.shareFile);
+router.post("/shareFile", isAuth, loadTargetFile, sharedController.shareFile);
 
 export default router;
