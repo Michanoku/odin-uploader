@@ -341,7 +341,7 @@ const getFile = async (req, res, next) => {
 };
 
 const renameFile = async (req, res) => {
-  const fileId = req.targetFile.id
+  const fileId = req.targetFile.id;
   try {
     const updatedfileData = {
       originalname: req.body.updatedFileName,

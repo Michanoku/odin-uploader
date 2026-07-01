@@ -5,14 +5,11 @@ describe("Authentication", () => {
   const agent = request.agent(app);
 
   test("user can register and access protected route", async () => {
-    const registerResponse = await agent
-      .post("/register")
-      .type("form")
-      .send({
-        username: "testuser",
-        password: "supersecurepassword",
-        confirmation: "supersecurepassword",
-      });
+    const registerResponse = await agent.post("/register").type("form").send({
+      username: "testuser",
+      password: "supersecurepassword",
+      confirmation: "supersecurepassword",
+    });
 
     expect(registerResponse.status).toBe(302);
     expect(registerResponse.headers.location).toBe("/");

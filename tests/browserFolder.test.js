@@ -225,12 +225,10 @@ describe("Folder Operations", () => {
           newFolderName: "NewRoot",
         });
       const newRoot = creationResponse.body.folder.id;
-      const response = await agent
-        .post(`${root.path}/moveFolder`)
-        .send({
-          folderId: root.id,
-          updatedParentId: newRoot,
-        });
+      const response = await agent.post(`${root.path}/moveFolder`).send({
+        folderId: root.id,
+        updatedParentId: newRoot,
+      });
       expect(response.status).toBe(403);
     });
   });
@@ -278,7 +276,7 @@ describe("Folder Operations", () => {
     });
 
     test("user cannot delete root folder", async () => {
-      const root = await getRootPathAndId(agent); 
+      const root = await getRootPathAndId(agent);
 
       const response = await agent.post(`${root.path}/deleteFolder`).send({
         folderId: root.id,

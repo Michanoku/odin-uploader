@@ -26,7 +26,13 @@ router.get(
   isSharedDescendant,
   sharedController.getSharedFolder
 );
-router.post("/browser/folder/:currentFolderId/shareFolder", isAuth, loadCurrentFolder, loadTargetFolder, sharedController.shareFolder);
+router.post(
+  "/browser/folder/:currentFolderId/shareFolder",
+  isAuth,
+  loadCurrentFolder,
+  loadTargetFolder,
+  sharedController.shareFolder
+);
 
 // Files
 // router.get(

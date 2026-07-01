@@ -12,7 +12,6 @@ async function getRootPathAndId(agent) {
 describe("File Operations", () => {
   const agent = request.agent(app);
 
-
   beforeAll(async () => {
     await agent.post("/register").type("form").send({
       username: "filetestuser",
@@ -63,10 +62,12 @@ describe("File Operations", () => {
     });
 
     test("user can upload a file into a folder", async () => {
-      const root = await getRootPathAndId(agent);   
-      const createResponse = await agent.post(`${root.path}/createFolder`).send({
-        newFolderName: "Documents",
-      });
+      const root = await getRootPathAndId(agent);
+      const createResponse = await agent
+        .post(`${root.path}/createFolder`)
+        .send({
+          newFolderName: "Documents",
+        });
 
       const folderId = createResponse.body.folder.id;
       const response = await agent
@@ -81,7 +82,7 @@ describe("File Operations", () => {
 
   describe("File Rename", () => {
     test("user can rename a file", async () => {
-      const root = await getRootPathAndId(agent);   
+      const root = await getRootPathAndId(agent);
       const uploadResponse = await agent
         .post(`${root.path}/upload`)
         .attach("file", path.resolve("tests/files/test2.txt"));
@@ -100,20 +101,24 @@ describe("File Operations", () => {
 
   describe("File Move", () => {
     test("user can move a file to the root", async () => {
-      const root = await getRootPathAndId(agent);   
-      const createResponse = await agent.post(`${root.path}/createFolder`).send({
-        newFolderName: "NotRoot",
-      });
+      const root = await getRootPathAndId(agent);
+      const createResponse = await agent
+        .post(`${root.path}/createFolder`)
+        .send({
+          newFolderName: "NotRoot",
+        });
       const folderId = createResponse.body.folder.id;
       const uploadResponse = await agent
         .post(`/browser/folder/${folderId}/upload`)
         .attach("file", path.resolve("tests/files/test3.txt"));
 
       const fileId = uploadResponse.body.file.id;
-      const response = await agent.post(`/browser/folder/${folderId}/moveFile`).send({
-        fileId,
-        updatedFolderId: root.id,
-      });
+      const response = await agent
+        .post(`/browser/folder/${folderId}/moveFile`)
+        .send({
+          fileId,
+          updatedFolderId: root.id,
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -127,9 +132,11 @@ describe("File Operations", () => {
         .attach("file", path.resolve("tests/files/test4.txt"));
 
       const fileId = uploadResponse.body.file.id;
-      const createResponse = await agent.post(`${root.path}/createFolder`).send({
-        newFolderName: "NotRoot2",
-      });
+      const createResponse = await agent
+        .post(`${root.path}/createFolder`)
+        .send({
+          newFolderName: "NotRoot2",
+        });
       const folderId = createResponse.body.folder.id;
       const response = await agent.post(`${root.path}/moveFile`).send({
         fileId,
@@ -259,16 +266,20 @@ describe("Recursive Folder Deletion", () => {
     const rootId = rootFolder.body.folder.id;
 
     // Child folder
-    const child = await agent.post(`/browser/folder/${rootId}/createFolder`).send({
-      newFolderName: "Child",
-    });
+    const child = await agent
+      .post(`/browser/folder/${rootId}/createFolder`)
+      .send({
+        newFolderName: "Child",
+      });
 
     const childId = child.body.folder.id;
 
     // Grandchild folder
-    const grandchild = await agent.post(`/browser/folder/${childId}/createFolder`).send({
-      newFolderName: "Grandchild",
-    });
+    const grandchild = await agent
+      .post(`/browser/folder/${childId}/createFolder`)
+      .send({
+        newFolderName: "Grandchild",
+      });
 
     const grandChildId = grandchild.body.folder.id;
 
@@ -305,11 +316,15 @@ describe("Recursive Folder Deletion", () => {
     expect(childResponse.status).toBe(404);
 
     // Grandchild folder no longer exists
-    const grandchildResponse = await agent.get(`/browser/folder/${grandChildId}`);
+    const grandchildResponse = await agent.get(
+      `/browser/folder/${grandChildId}`
+    );
     expect(grandchildResponse.status).toBe(404);
 
     // File record no longer exists
-    const fileResponse = await agent.get(`/browser/file/${upload.body.file.id}`);
+    const fileResponse = await agent.get(
+      `/browser/file/${upload.body.file.id}`
+    );
     expect(fileResponse.status).toBe(404);
   });
 });

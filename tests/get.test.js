@@ -6,7 +6,7 @@ test("GET / should return 200", async () => {
   expect(res.statusCode).toBe(200);
 });
 
-test('GET /nonexistent should return 404', async () => {
-  const res = await request(app).get('/does-not-exist');
+test("GET /nonexistent should return 404", async () => {
+  const res = await request(app).get("/does-not-exist");
   expect(res.statusCode).toBe(404);
 });

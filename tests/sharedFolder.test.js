@@ -23,43 +23,55 @@ describe("Shared Folder Access", () => {
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
-    
+
     const rootOwner = await getRootPathAndId(sharedFolderOwner);
     // create root
-    const rootRes = await sharedFolderOwner.post(`${rootOwner.path}/createFolder`).send({
-      newFolderName: "SharedRoot",
-    });
+    const rootRes = await sharedFolderOwner
+      .post(`${rootOwner.path}/createFolder`)
+      .send({
+        newFolderName: "SharedRoot",
+      });
     rootId = rootRes.body.folder.id;
 
     // create parent
-    const parentRes = await sharedFolderOwner.post(`/browser/folder/${rootId}/createFolder`).send({
-      newFolderName: "SharedParent",
-    });
+    const parentRes = await sharedFolderOwner
+      .post(`/browser/folder/${rootId}/createFolder`)
+      .send({
+        newFolderName: "SharedParent",
+      });
     parentId = parentRes.body.folder.id;
 
     // create shared folder
-    const folderRes = await sharedFolderOwner.post(`/browser/folder/${parentId}/createFolder`).send({
-      newFolderName: "SharedFolder",
-    });
+    const folderRes = await sharedFolderOwner
+      .post(`/browser/folder/${parentId}/createFolder`)
+      .send({
+        newFolderName: "SharedFolder",
+      });
     folderId = folderRes.body.folder.id;
 
     // create child
-    const childRes = await sharedFolderOwner.post(`/browser/folder/${folderId}/createFolder`).send({
-      newFolderName: "SharedChild",
-    });
+    const childRes = await sharedFolderOwner
+      .post(`/browser/folder/${folderId}/createFolder`)
+      .send({
+        newFolderName: "SharedChild",
+      });
     childId = childRes.body.folder.id;
 
     // create grandchild
-    const grandRes = await sharedFolderOwner.post(`/browser/folder/${childId}/createFolder`).send({
-      newFolderName: "SharedGrandChild",
-    });
+    const grandRes = await sharedFolderOwner
+      .post(`/browser/folder/${childId}/createFolder`)
+      .send({
+        newFolderName: "SharedGrandChild",
+      });
     grandChildId = grandRes.body.folder.id;
 
     // share the shared folder
-    const sharedFolder = await sharedFolderOwner.post(`/browser/folder/${parentId}/shareFolder`).send({
-      folderId,
-      duration: 7,
-    });
+    const sharedFolder = await sharedFolderOwner
+      .post(`/browser/folder/${parentId}/shareFolder`)
+      .send({
+        folderId,
+        duration: 7,
+      });
 
     await sharedFolderGuest.post("/register").type("form").send({
       username: "sharedGuest",
