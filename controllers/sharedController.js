@@ -9,6 +9,7 @@ const durationValidation = [
     .isInt({ min: 1, max: 30 })
     .withMessage("Duration must be an integer between 1 and 30"),
 ];
+
 // Folders
 const shareFolder = [
   // Create a new folder in the users tree
@@ -32,6 +33,8 @@ const shareFolder = [
     }
   },
 ];
+
+// Todo Unshare Folder
 
 const getSharedFolder = async (req, res) => {
   const sharedFolder = req.sharedFolder;
@@ -61,7 +64,7 @@ const getSharedFolder = async (req, res) => {
 //Files
 const getSharedFile = async (req, res, next) => {
   const file = req.file;
-  // TODO
+  // TODO Check if the file itself is shared or if the parent folder is shared. 
 };
 
 //Files
@@ -70,6 +73,7 @@ const shareFile = async (req, res, next) => {
   // TODO
 };
 
-// Todo share single file
+// Todo Unshare File
+
 
 export { shareFolder, getSharedFolder, getSharedFile, shareFile };

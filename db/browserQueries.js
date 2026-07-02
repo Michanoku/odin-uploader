@@ -91,7 +91,6 @@ const updateFolder = async (folderId, updatedFolderData) => {
 };
 
 const deleteFolder = async (folderId) => {
-  // TODO: DELETE PHYSICAL FILES AND FOLDERS WITHIN
   const deletedFolder = await prisma.folder.delete({
     where: {
       id: folderId,
@@ -171,6 +170,29 @@ const getAllFilesFromSubfolders = async (folderId) => {
   return files;
 };
 
+const getFolderContentWithPaths = async (folderId) => {
+  const folder = await prisma.folder.findUnique({
+    where: { id: folderId },
+    include: {
+      files: {
+        select: {
+          originalname: true,
+          filename: true, // or whatever your column is called
+        },
+      },
+      children: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  return folder;
+};
+
+
 export {
   getFolder,
   folderExists,
@@ -185,4 +207,5 @@ export {
   updateFile,
   deleteFile,
   getAllFilesFromSubfolders,
+  getFolderContentWithPaths,
 };

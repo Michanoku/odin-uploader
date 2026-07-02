@@ -43,6 +43,7 @@ model File {
   folderId     String?
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
+  sharedFile  SharedFile?
 
   @@index([userId])
 }
@@ -69,6 +70,15 @@ model SharedFolder {
   id        String   @id @default(cuid())
   folder    Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId  String @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime 
+}
+
+
+model SharedFile {
+  id        String   @id @default(cuid())
+  file    File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId  String @unique
   createdAt DateTime @default(now())
   expiresAt DateTime 
 }

@@ -32,17 +32,18 @@ model User {
 
 // Files belonging to users
 model File {
-  id           String   @id @default(cuid())
+  id           String      @id @default(cuid())
   originalname String
   mimetype     String
   filename     String
   size         Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  folder       Folder?  @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  folder       Folder?     @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId     String?
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
+  sharedFile   SharedFile?
 
   @@index([userId])
 }
@@ -69,6 +70,14 @@ model SharedFolder {
   id        String   @id @default(cuid())
   folder    Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId  String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model SharedFile {
+  id        String   @id @default(cuid())
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId    String   @unique
   createdAt DateTime @default(now())
   expiresAt DateTime
 }

@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { body, check, validationResult, matchedData } from "express-validator";
+import { ZipArchive } from "archiver";
 
 import * as db from "../db/browserQueries.js";
 import {
@@ -8,6 +9,7 @@ import {
   getBreadcrumbs,
   formatFileSize,
   formatDate,
+  collectFilesWithPaths,
 } from "../lib/browserUtils.js";
 import { register } from "module";
 
@@ -324,7 +326,40 @@ const deleteFolder = async (req, res) => {
   }
 };
 
-// TODO: download folder
+const downloadFolder = async (req, res, next) => {
+  try {
+    const results = await collectFilesWithPaths(
+      req.targetFolder.id,
+      req.targetFolder.name
+    );
+
+    const archive = new ZipArchive("zip", {
+      zlib: { level: 6 },
+    });
+
+    archive.on("warning", (err) => {
+      console.warn(err);
+    });
+
+    archive.on("error", (err) => {
+      next(err);
+    });
+
+    res.attachment(`${req.targetFolder.name}.zip`);
+
+    archive.pipe(res);
+
+    for (const file of results) {
+      archive.file(file.diskPath, {
+        name: file.zipPath,
+      });
+    }
+
+    await archive.finalize();
+  } catch (err) {
+    next(err);
+  }
+};
 
 // Files
 const uploadFile = [
@@ -355,6 +390,17 @@ const uploadFile = [
     }
   },
 ];
+
+const downloadFile = (req, res, next) => {
+  console.log(req.targetFile)
+  const filePath = path.resolve("uploads", req.targetFile.filename);
+
+  res.download(filePath, req.targetFile.originalname, (err) => {
+    if (err) {
+      next(err);
+    }
+  });
+};
 
 const getFile = async (req, res, next) => {
   const file = req.targetFile;
@@ -449,14 +495,18 @@ const deleteFile = async (req, res) => {
   }
 };
 
+//TODO Download File
+
 export {
   redirectToRoot,
   createFolder,
+  downloadFolder,
   getFolder,
   renameFolder,
   moveFolder,
   deleteFolder,
   uploadFile,
+  downloadFile,
   getFile,
   renameFile,
   moveFile,

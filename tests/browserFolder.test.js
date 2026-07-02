@@ -1,4 +1,5 @@
 import request from "supertest";
+import path from "path";
 import app from "../app.js";
 
 async function getRootPathAndId(agent) {
@@ -348,5 +349,73 @@ describe("Folder Ownership", () => {
     });
 
     expect(response.status).toBe(404);
+  });
+});
+
+describe("Recursive Folder Download", () => {
+  test("downloads a zip containing all nested folders and files", async () => {
+    const agent = request.agent(app);
+
+    // Register user
+    await agent.post("/register").type("form").send({
+      username: "downloaduser",
+      password: "supersecurepassword",
+      confirmation: "supersecurepassword",
+    });
+
+    const root = await getRootPathAndId(agent);
+
+    // Root folder
+    const rootFolder = await agent.post(`${root.path}/createFolder`).send({
+      newFolderName: "Root",
+    });
+
+    const rootId = rootFolder.body.folder.id;
+
+    // Child
+    const child = await agent
+      .post(`/browser/folder/${rootId}/createFolder`)
+      .send({
+        newFolderName: "Child",
+      });
+
+    const childId = child.body.folder.id;
+
+    // Grandchild
+    const grandchild = await agent
+      .post(`/browser/folder/${childId}/createFolder`)
+      .send({
+        newFolderName: "Grandchild",
+      });
+
+    const grandchildId = grandchild.body.folder.id;
+
+    // Upload to root
+    await agent
+      .post(`/browser/folder/${rootId}/upload`)
+      .attach("file", path.resolve("tests/files/test.txt"), "root.txt");
+
+    // Upload to child
+    await agent
+      .post(`/browser/folder/${childId}/upload`)
+      .attach("file", path.resolve("tests/files/test.txt"), "child.txt");
+
+    // Upload to grandchild
+    await agent
+      .post(`/browser/folder/${grandchildId}/upload`)
+      .attach("file", path.resolve("tests/files/test.txt"), "grandchild.txt");
+
+    // Download zip
+    const download = await agent.post(
+      `${root.path}/downloadFolder`
+    ).send({
+      folderId: rootId,
+    });
+
+    expect(download.status).toBe(200);
+    expect(download.headers["content-type"]).toMatch(/zip/);
+    expect(download.headers["content-disposition"]).toContain(".zip");
+
+    // TODO: inspect zip contents
   });
 });

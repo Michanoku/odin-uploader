@@ -163,6 +163,13 @@ exports.Prisma.SharedFolderScalarFieldEnum = {
   expiresAt: 'expiresAt'
 };
 
+exports.Prisma.SharedFileScalarFieldEnum = {
+  id: 'id',
+  fileId: 'fileId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -184,7 +191,8 @@ exports.Prisma.ModelName = {
   User: 'User',
   File: 'File',
   Folder: 'Folder',
-  SharedFolder: 'SharedFolder'
+  SharedFolder: 'SharedFolder',
+  SharedFile: 'SharedFile'
 };
 
 /**

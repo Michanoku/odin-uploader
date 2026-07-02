@@ -31,6 +31,13 @@ router.post(
   browserController.createFolder
 );
 router.post(
+  "/browser/folder/:currentFolderId/downloadFolder",
+  isAuth,
+  loadCurrentFolder,
+  loadTargetFolder,
+  browserController.downloadFolder,
+);
+router.post(
   "/browser/folder/:currentFolderId/renameFolder",
   isAuth,
   loadCurrentFolder,
@@ -62,6 +69,13 @@ router.post(
   loadCurrentFolder,
   upload.single("file"),
   browserController.uploadFile
+);
+router.post(
+  "/browser/folder/:currentFolderId/downloadFile",
+  isAuth,
+  loadCurrentFolder,
+  loadTargetFile,
+  browserController.downloadFile,
 );
 router.get(
   "/browser/file/:fileId",

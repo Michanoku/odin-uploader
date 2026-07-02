@@ -222,6 +222,39 @@ describe("File Operations", () => {
       expect(fs.existsSync(uploadedPath)).toBe(false);
     });
   });
+  describe("File Download", () => {
+    test("user can download a file", async () => {
+      const root = await getRootPathAndId(agent);
+
+      const uploadResponse = await agent
+        .post(`${root.path}/upload`)
+        .attach("file", path.resolve("tests/files/test.txt"), "download1.txt");
+
+      const fileId = uploadResponse.body.file.id;
+
+      const download = await agent
+        .post(`${root.path}/downloadFile`)
+        .send({
+          fileId,
+        })
+        .buffer(true)
+        .parse((res, callback) => {
+          const chunks = [];
+
+          res.on("data", (chunk) => chunks.push(chunk));
+          res.on("end", () => callback(null, Buffer.concat(chunks)));
+        });
+
+      expect(download.status).toBe(200);
+      expect(download.headers["content-disposition"]).toContain(
+        "download1.txt"
+      );
+
+      const original = fs.readFileSync(path.resolve("tests/files/test.txt"));
+
+      expect(download.body.equals(original)).toBe(true);
+    });
+  });
 });
 
 describe("File Ownership", () => {
