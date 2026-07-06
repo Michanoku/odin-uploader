@@ -177,7 +177,7 @@ const getFolderContentWithPaths = async (folderId) => {
       files: {
         select: {
           originalname: true,
-          filename: true, // or whatever your column is called
+          filename: true,
         },
       },
       children: {
@@ -191,7 +191,6 @@ const getFolderContentWithPaths = async (folderId) => {
 
   return folder;
 };
-
 
 export {
   getFolder,

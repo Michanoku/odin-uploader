@@ -3,10 +3,11 @@ import {
   isAuth,
   loadCurrentFolder,
   loadTargetFolder,
-  isSharedFolder,
-  isSharedDescendant,
+  loadSharedCurrentFolder,
+  loadSharedTargetFolder,
   loadTargetFile,
-  isSharedFile,
+  loadSharedFile,
+  loadSharedTargetFile,
 } from "../lib/authMiddleware.js";
 import * as sharedController from "../controllers/sharedController.js";
 
@@ -14,17 +15,17 @@ const router = express.Router();
 
 // Folders
 router.get(
-  "/shared/:sharedFolderId",
+  "/shared/folder/:sharedFolderId",
   isAuth,
-  isSharedFolder,
+  loadSharedCurrentFolder,
   sharedController.getSharedFolder
 );
-router.get(
-  "/shared/:sharedFolderId/folder/:sharedDescendantId",
+router.post(
+  "/shared/folder/:sharedFolderId/downloadFolder",
   isAuth,
-  isSharedFolder,
-  isSharedDescendant,
-  sharedController.getSharedFolder
+  loadSharedCurrentFolder,
+  loadSharedTargetFolder,
+  sharedController.downloadSharedFolder
 );
 router.post(
   "/browser/folder/:currentFolderId/shareFolder",
@@ -33,15 +34,35 @@ router.post(
   loadTargetFolder,
   sharedController.shareFolder
 );
+router.post(
+  "/browser/folder/:currentFolderId/unshareFolder",
+  isAuth,
+  loadCurrentFolder,
+  loadTargetFolder,
+  sharedController.unshareFolder
+);
 
 // Files
-// router.get(
-//   "/shared/:sharedFolderId/file/:fileId",
-//   isAuth,
-//   isSharedFolder,
-//   isSharedFile,
-//   sharedController.getSharedFile
-// );
-router.post("/shareFile", isAuth, loadTargetFile, sharedController.shareFile);
+router.get(
+  "/shared/file/:sharedFileId",
+  isAuth,
+  loadSharedFile,
+  sharedController.getSharedFile
+);
+router.post(
+  "/shared/file/:sharedFileId/downloadFile",
+  isAuth,
+  loadSharedTargetFile,
+  sharedController.downloadSharedFile
+);
+router.post(
+  "/shared/folder/:sharedFolderId/downloadFile",
+  isAuth,
+  loadSharedCurrentFolder,
+  loadSharedTargetFile,
+  sharedController.downloadSharedFile
+);
+router.post("/browser/folder/:currentFolderId/shareFile", isAuth, loadCurrentFolder, loadTargetFile, sharedController.shareFile);
+router.post("/browser/folder/:currentFolderId/unshareFile", isAuth, loadCurrentFolder, loadTargetFile, sharedController.unshareFile);
 
 export default router;

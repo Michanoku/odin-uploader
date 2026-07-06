@@ -144,7 +144,8 @@ exports.Prisma.FileScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   folderId: 'folderId',
-  userId: 'userId'
+  userId: 'userId',
+  shareId: 'shareId'
 };
 
 exports.Prisma.FolderScalarFieldEnum = {
@@ -153,19 +154,14 @@ exports.Prisma.FolderScalarFieldEnum = {
   parentId: 'parentId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  userId: 'userId'
+  userId: 'userId',
+  shareId: 'shareId'
 };
 
-exports.Prisma.SharedFolderScalarFieldEnum = {
+exports.Prisma.ShareScalarFieldEnum = {
   id: 'id',
-  folderId: 'folderId',
-  createdAt: 'createdAt',
-  expiresAt: 'expiresAt'
-};
-
-exports.Prisma.SharedFileScalarFieldEnum = {
-  id: 'id',
-  fileId: 'fileId',
+  rootFolderId: 'rootFolderId',
+  rootFileId: 'rootFileId',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt'
 };
@@ -191,8 +187,7 @@ exports.Prisma.ModelName = {
   User: 'User',
   File: 'File',
   Folder: 'Folder',
-  SharedFolder: 'SharedFolder',
-  SharedFile: 'SharedFile'
+  Share: 'Share'
 };
 
 /**

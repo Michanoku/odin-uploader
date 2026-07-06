@@ -1,29 +1,177 @@
 import { prisma } from "../lib/prisma.js";
 
 // Folders
+const collectFolderIds = async (folderId) => {
+  const children = await prisma.folder.findMany({
+    where: {
+      parentId: folderId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const ids = [folderId];
+
+  for (const child of children) {
+    ids.push(...(await collectFolderIds(child.id)));
+  }
+
+  return ids;
+};
+
+const getAllFilesFromSubfolders = async (folderIds) => {
+  const files = await prisma.file.findMany({
+    where: {
+      folderId: {
+        in: folderIds,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+  return files;
+};
+
 const shareFolder = async (folderId, duration) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + duration);
 
-  const sharedFolder = await prisma.sharedFolder.create({
+  const folderIds = await collectFolderIds(folderId);
+  const fileIds = await getAllFilesFromSubfolders(folderIds);
+
+  const share = await prisma.share.create({
     data: {
-      folderId: folderId,
-      expiresAt: expiresAt,
+      rootFolderId: folderId,
+      expiresAt,
+      folders: {
+        connect: folderIds.map((id) => ({ id })),
+      },
+      files: {
+        connect: fileIds,
+      },
     },
   });
-  return sharedFolder;
+  return share;
 };
 
-const getSharedRoot = async (folderId) => {
-  const sharedFolder = await prisma.sharedFolder.findFirst({
+const unshareFolder = async (folderId) => {
+  const share = await prisma.share.findFirst({
     where: {
-      folderId: folderId,
+      folders: {
+        some: {
+          id: folderId,
+        },
+      },
     },
   });
-  if (!sharedFolder || sharedFolder.expiresAt < new Date()) {
+
+  if (!share) {
     return null;
   }
-  return sharedFolder;
+
+  return prisma.share.delete({
+    where: {
+      id: share.id,
+    },
+  });
+};
+
+const getFolderShare = async (folderId) => {
+  const share = await prisma.share.findFirst({
+    where: {
+      folders: {
+        some: {
+          id: folderId,
+        },
+      },
+    },
+    include: {
+      folders: {
+        where: {
+          id: folderId,
+        },
+      },
+    },
+  });
+  if (!share || share.expiresAt < new Date()) {
+    return null;
+  }
+  const shareId = share.id;
+  const sharedFolder = share.folders[0];
+  const sharedRootId = share.rootFolderId;
+  return { shareId, sharedFolder, sharedRootId };
+};
+
+// Files
+const shareFile = async (fileId, duration) => {
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + duration);
+
+  const share = await prisma.share.create({
+    data: {
+      rootFileId: fileId,
+      expiresAt,
+      files: {
+        connect: fileId,
+      },
+    },
+  });
+  return share;
+};
+
+const unshareFile = async (fileId) => {
+  const share = await prisma.share.findFirst({
+    where: {
+      files: {
+        some: {
+          id: fileId,
+        },
+      },
+    },
+  });
+
+  if (!share) {
+    return null;
+  }
+
+  return prisma.share.delete({
+    where: {
+      id: share.id,
+    },
+  });
+};
+
+const getFileShare = async (fileId) => {
+  const share = await prisma.share.findFirst({
+    where: {
+      files: {
+        some: {
+          id: fileId,
+        },
+      },
+    },
+    include: {
+      files: {
+        where: {
+          id: fileId,
+        },
+      },
+    },
+  });
+  if (!share || share.expiresAt < new Date()) {
+    return null;
+  }
+  const result = {
+    shareId: share.id,
+    sharedFile: share.files[0],
+  }
+  if (share.rootFolderId) {
+    result.sharedRootId = share.rootFolderId;
+  }
+
+  return result;
 };
 
 const isSharedFolder = async (folderId, sharedFolderId) => {
@@ -92,8 +240,11 @@ const isDescendant = async (folderId, sharedFolderId) => {
 
 export {
   shareFolder,
-  getSharedRoot,
+  unshareFolder,
+  getFolderShare,
   isSharedFolder,
+  shareFile,
+  unshareFile,
   isSharedFile,
   isDescendant,
 };

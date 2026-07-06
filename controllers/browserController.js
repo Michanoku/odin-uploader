@@ -392,7 +392,6 @@ const uploadFile = [
 ];
 
 const downloadFile = (req, res, next) => {
-  console.log(req.targetFile)
   const filePath = path.resolve("uploads", req.targetFile.filename);
 
   res.download(filePath, req.targetFile.originalname, (err) => {
@@ -494,8 +493,6 @@ const deleteFile = async (req, res) => {
     res.json({ success: false, error: err });
   }
 };
-
-//TODO Download File
 
 export {
   redirectToRoot,

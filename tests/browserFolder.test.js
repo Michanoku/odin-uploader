@@ -8,7 +8,6 @@ async function getRootPathAndId(agent) {
   return { path: response.headers.location, id: parentId };
 }
 
-//TODO VALIDATION TESTING
 describe("Folder Operations", () => {
   const agent = request.agent(app);
 
@@ -406,9 +405,7 @@ describe("Recursive Folder Download", () => {
       .attach("file", path.resolve("tests/files/test.txt"), "grandchild.txt");
 
     // Download zip
-    const download = await agent.post(
-      `${root.path}/downloadFolder`
-    ).send({
+    const download = await agent.post(`${root.path}/downloadFolder`).send({
       folderId: rootId,
     });
 

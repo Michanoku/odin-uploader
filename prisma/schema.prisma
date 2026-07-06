@@ -19,15 +19,15 @@ model Session {
 
 // User model
 model User {
-  id        String   @id @default(cuid())
-  username  String   @unique @db.VarChar(32)
-  hash      String
-  createdAt DateTime @default(now())
-  rootFolderId String? @unique
-  rootFolder Folder? @relation("RootFolder", fields: [rootFolderId], references: [id])
+  id           String   @id @default(cuid())
+  username     String   @unique @db.VarChar(32)
+  hash         String
+  createdAt    DateTime @default(now())
+  rootFolderId String?  @unique
+  rootFolder   Folder?  @relation("RootFolder", fields: [rootFolderId], references: [id])
 
   folders Folder[] @relation("OwnedFolders")
-  files     File[]
+  files   File[]
 }
 
 // Files belonging to users
@@ -43,7 +43,9 @@ model File {
   folderId     String?
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
-  sharedFile  SharedFile?
+  shareId      String?
+  share       Share?   @relation("SharedFiles", fields: [shareId], references: [id], onDelete: SetNull)
+  rootShare Share?   @relation("ShareRootFile")
 
   @@index([userId])
 }
@@ -57,28 +59,26 @@ model Folder {
   parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children  Folder[] @relation("FolderHierarchy")
   files     File[]
-  user User @relation("OwnedFolders", fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation("OwnedFolders", fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  rootOwner User? @relation("RootFolder")
-  sharedFolder  SharedFolder?
+  rootOwner User?    @relation("RootFolder")
+  shareId   String?
+  share    Share?   @relation("SharedFolders", fields: [shareId], references: [id], onDelete: SetNull)
+  rootShare Share?   @relation("ShareRootFolder")
 
   @@unique([userId, parentId, name])
   @@index([userId])
 }
 
-model SharedFolder {
-  id        String   @id @default(cuid())
-  folder    Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId  String @unique
-  createdAt DateTime @default(now())
-  expiresAt DateTime 
-}
+model Share {
+  id           String   @id @default(cuid())
+  rootFolder   Folder?  @relation("ShareRootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
+  rootFolderId String?  @unique
+  rootFile   File?  @relation("ShareRootFile", fields: [rootFileId], references: [id], onDelete: Cascade)
+  rootFileId String?  @unique
+  folders      Folder[] @relation("SharedFolders")
+  files        File[]   @relation("SharedFiles")
 
-
-model SharedFile {
-  id        String   @id @default(cuid())
-  file    File @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  fileId  String @unique
   createdAt DateTime @default(now())
   expiresAt DateTime 
 }
