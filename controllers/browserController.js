@@ -14,8 +14,9 @@ import {
   collectFilesWithPaths,
 } from "../lib/browserUtils.js";
 
-// Validators used in this controller
-const validateFolder = [
+// Validators
+// Validate New Folders
+const validateNewFolder = [
   body("newFolderName")
     .trim()
     .notEmpty()
@@ -38,6 +39,7 @@ const validateFolder = [
 
       return true;
     }),
+  // Check if a folder of that name alreadys exists at the location
   check("currentFolder").custom(async (_, { req }) => {
     const exists = await db.folderExists({
       name: req.body.newFolderName,
@@ -55,6 +57,7 @@ const validateFolder = [
   }),
 ];
 
+// Validate Folder on Renaming
 const validateRenameFolder = [
   body("updatedFolderName")
     .trim()
@@ -96,6 +99,7 @@ const validateRenameFolder = [
     }),
 ];
 
+// Validate Folder on Moving
 const validateMoveFolder = [
   check("updatedParentId")
     // Check if a folder of the same name exists at the location
@@ -116,7 +120,9 @@ const validateMoveFolder = [
     }),
 ];
 
-const validateFile = [
+// Validate New Files
+// There could be more checks here, like file size, but for this project, this shall do
+const validateNewFile = [
   // If no file was provided, return error
   check("file")
     .custom((value, { req }) => {
@@ -140,6 +146,7 @@ const validateFile = [
     }),
 ];
 
+// Validate file on renaming
 const validateRenameFile = [
   // If no file was provided, return error
   body("updatedFileName")
@@ -161,6 +168,7 @@ const validateRenameFile = [
     }),
 ];
 
+// Validate file on moving
 const validateMoveFile = [
   body("updatedFolderId")
     .trim()
@@ -182,14 +190,15 @@ const validateMoveFile = [
     }),
 ];
 
-// Folders
+// Folder related functions
+// When the user accesses index, they are redirected to their own root folder
 const redirectToRoot = (req, res) => {
   res.redirect(`/browser/folder/${req.user.rootFolderId}`);
 };
 
+// The user can create a folder, it will be validated and if passed, created
 const createFolder = [
-  // Create a new folder in the users tree
-  validateFolder,
+  validateNewFolder,
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -218,26 +227,16 @@ const createFolder = [
 // Get a folder and its contents to display to the user
 const getFolder = async (req, res, next) => {
   // Contents will have folder contents, breadcrumbs will serve as the tree to go back
-  let contents = { folders: [], files: [] };
-  let breadcrumbs = [];
   try {
-    if (req.currentFolder) {
-      // If the user is not in the root, a folder is provided
-      const folderId = req.currentFolder.id ?? null;
-      const [contentsResult, breadcrumbsResult] = await Promise.all([
-        getFolderContents({ folderId: folderId }),
-        getBreadcrumbs({ folderId: folderId }),
-      ]);
-      contents = contentsResult;
-      breadcrumbs = breadcrumbsResult;
-    } else {
-      contents = await getFolderContents({ userId: req.user.id });
-    }
-
+    const folderId = req.currentFolder.id;
+    const [contents, breadcrumbs] = await Promise.all([
+      getFolderContents({ folderId }),
+      getBreadcrumbs({ folderId }),
+    ]);
     const context = {
       title: "Browser",
       view: "folder",
-      parentId: req.currentFolder?.parentId ?? null,
+      parentId: req.currentFolder.parentId ?? null,
       contents,
       breadcrumbs,
     };
@@ -248,8 +247,8 @@ const getFolder = async (req, res, next) => {
   }
 };
 
+// Rename a folder, but check if the name collides with existing folders
 const renameFolder = [
-  // Rename Folder
   validateRenameFolder,
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -260,6 +259,7 @@ const renameFolder = [
       });
     }
     const { updatedFolderName } = matchedData(req);
+    // The folder to be renamed
     const folderId = req.targetFolder.id;
     try {
       const updatedfolderData = {
@@ -274,8 +274,8 @@ const renameFolder = [
   },
 ];
 
+// Move a folder, but check if the folder name collides with existing folders
 const moveFolder = [
-  // Create a new folder in the users tree
   validateMoveFolder,
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -285,6 +285,7 @@ const moveFolder = [
         errors: errors.array(),
       });
     }
+    // The folder to be moved
     const folderId = req.targetFolder.id;
     try {
       const updatedfolderData = {
@@ -299,6 +300,8 @@ const moveFolder = [
   },
 ];
 
+// Delete a folder and all of its contents (other folders as well as files)
+// Some services don't allow this, but I decided I don't care and the user can yeet their folders if they want
 const deleteFolder = async (req, res) => {
   const folderId = req.targetFolder.id;
   try {
@@ -311,8 +314,10 @@ const deleteFolder = async (req, res) => {
     await Promise.all(
       filesToDelete.map(async (file) => {
         try {
+          // Apparantly unlink means delete in this. Learned something new.
           await fs.unlink(path.resolve("uploads", file.filename));
         } catch (err) {
+          // If there is any other error other than file no longer exists, throw the error.
           if (err.code !== "ENOENT") {
             throw err;
           }
@@ -327,17 +332,21 @@ const deleteFolder = async (req, res) => {
   }
 };
 
+// Download an entire folder including subfolders and files
 const downloadFolder = async (req, res, next) => {
+  // Get a list of all files and all paths
   try {
     const results = await collectFilesWithPaths(
       req.targetFolder.id,
       req.targetFolder.name
     );
 
+    // Create a new zip archive with a medium compression
     const archive = new ZipArchive("zip", {
       zlib: { level: 6 },
     });
 
+    // Add some safeguards for errors
     archive.on("warning", (err) => {
       console.warn(err);
     });
@@ -346,10 +355,11 @@ const downloadFolder = async (req, res, next) => {
       next(err);
     });
 
+    // Attach the zip file and pipe it to the user
     res.attachment(`${req.targetFolder.name}.zip`);
-
     archive.pipe(res);
 
+    // Combine paths and original file names to create the zip file
     for (const file of results) {
       archive.file(file.diskPath, {
         name: file.zipPath,
@@ -362,10 +372,10 @@ const downloadFolder = async (req, res, next) => {
   }
 };
 
-// Files
+// File related functions
+// Upload a file, but check if file was provided or if same filename exists
 const uploadFile = [
-  // Create a new folder in the users tree
-  validateFile,
+  validateNewFile,
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -374,6 +384,7 @@ const uploadFile = [
         errors: errors.array(),
       });
     }
+    // Create the file in the database
     try {
       const fileData = {
         originalname: req.file.originalname,
@@ -392,7 +403,9 @@ const uploadFile = [
   },
 ];
 
+// Allows the user to download single files
 const downloadFile = (req, res, next) => {
+  // Get the file and send it to the download with the original filename
   const filePath = path.resolve("uploads", req.targetFile.filename);
 
   res.download(filePath, req.targetFile.originalname, (err) => {
@@ -402,8 +415,12 @@ const downloadFile = (req, res, next) => {
   });
 };
 
+// Open file details for the user to view
 const getFile = async (req, res, next) => {
   const file = req.targetFile;
+  // TODO currently the app is not made to serve targetfolder here. I do want breadcrumbs maybe so I
+  // will have to check how to best implement this. could be that simply using the same method as in
+  // getFolder is enough.
   const folder = req.targetFolder ?? null;
   const folderId = folder?.id ?? null;
   let breadcrumbs = [];
@@ -428,8 +445,8 @@ const getFile = async (req, res, next) => {
   }
 };
 
+// Rename a file but check if it collide with existing files
 const renameFile = [
-  // Create a new folder in the users tree
   validateRenameFile,
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -440,6 +457,7 @@ const renameFile = [
       });
     }
     try {
+      // Get the file and rename it.
       const fileId = req.targetFile.id;
       const updatedfileData = {
         originalname: req.body.updatedFileName,
@@ -453,8 +471,8 @@ const renameFile = [
   },
 ];
 
+// Move a file but check if it collides with existing files first
 const moveFile = [
-  // Create a new folder in the users tree
   validateMoveFile,
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -464,6 +482,7 @@ const moveFile = [
         errors: errors.array(),
       });
     }
+    // Move the file
     try {
       const fileId = req.body.fileId;
       const updatedfileData = {
@@ -478,6 +497,7 @@ const moveFile = [
   },
 ];
 
+// Delete a file from the users database and the disk
 const deleteFile = async (req, res) => {
   const fileId = req.body.fileId;
   try {
