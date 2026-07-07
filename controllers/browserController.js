@@ -1,7 +1,9 @@
 import fs from "fs/promises";
 import path from "path";
-import { body, check, validationResult, matchedData } from "express-validator";
+import { register } from "module";
+
 import { ZipArchive } from "archiver";
+import { body, check, validationResult, matchedData } from "express-validator";
 
 import * as db from "../db/browserQueries.js";
 import {
@@ -11,7 +13,6 @@ import {
   formatDate,
   collectFilesWithPaths,
 } from "../lib/browserUtils.js";
-import { register } from "module";
 
 // Validators used in this controller
 const validateFolder = [

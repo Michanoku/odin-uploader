@@ -1,12 +1,6 @@
 import express from "express";
-const router = express.Router();
 import multer from "multer";
-const upload = multer({
-  dest: "uploads/",
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50 MB
-  },
-});
+
 import {
   isAuth,
   loadCurrentFolder,
@@ -15,6 +9,14 @@ import {
   loadTargetFile,
 } from "../lib/authMiddleware.js";
 import * as browserController from "../controllers/browserController.js";
+
+const router = express.Router();
+const upload = multer({
+  dest: "uploads/",
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50 MB
+  },
+});
 
 // Folders
 router.get("/browser", isAuth, browserController.redirectToRoot);

@@ -1,3 +1,8 @@
+import path from "path";
+
+import { body, validationResult, matchedData } from "express-validator";
+import { ZipArchive } from "archiver";
+
 import * as sharedQueries from "../db/sharedQueries.js";
 import { getFolder } from "../db/browserQueries.js";
 import {
@@ -7,9 +12,6 @@ import {
   formatDate,
   formatFileSize,
 } from "../lib/browserUtils.js";
-import { body, validationResult, matchedData } from "express-validator";
-import path from "path";
-import { ZipArchive } from "archiver";
 
 const durationValidation = [
   body("duration")

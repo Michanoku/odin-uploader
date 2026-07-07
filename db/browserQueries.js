@@ -1,3 +1,4 @@
+// All prisma queries that have to do with the users own files and folders
 import { prisma } from "../lib/prisma.js";
 
 // Folders

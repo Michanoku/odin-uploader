@@ -1,4 +1,5 @@
 import request from "supertest";
+
 import app from "../app.js";
 
 async function getRootPathAndId(agent) {

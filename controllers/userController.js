@@ -1,8 +1,8 @@
 import passport from "passport";
+import { body, validationResult, matchedData } from "express-validator";
+
 import { generateHash } from "../lib/passwordUtils.js";
 import * as db from "../db/userQueries.js";
-import { ResultWithContextImpl } from "express-validator/lib/chain/index.js";
-import { body, validationResult, matchedData } from "express-validator";
 
 const validateRegister = [
   body("username")

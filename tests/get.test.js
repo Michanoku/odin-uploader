@@ -1,4 +1,5 @@
 import request from "supertest";
+
 import app from "../app.js";
 
 test("GET / should return 200", async () => {

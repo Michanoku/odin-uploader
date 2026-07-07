@@ -1,20 +1,23 @@
 import "./config/env.js";
-import express from "express";
-import session from "express-session";
-import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-import { prisma } from "./lib/prisma.js";
-import passport from "passport";
-import "./config/passport.js";
-import helmet from "helmet";
-import compression from "compression";
-import morgan from "morgan";
+
 import path from "path";
 import { fileURLToPath } from "url";
+
+import compression from "compression";
+import express from "express";
+import session from "express-session";
+import helmet from "helmet";
+import morgan from "morgan";
 import multer from "multer";
-import indexRoutes from "./routes/indexRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
+import passport from "passport";
+import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+
+import "./config/passport.js";
+import { prisma } from "./lib/prisma.js";
 import browserRoutes from "./routes/browserRoutes.js";
+import indexRoutes from "./routes/indexRoutes.js";
 import sharedRoutes from "./routes/sharedRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 
