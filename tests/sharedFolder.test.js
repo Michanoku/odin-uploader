@@ -70,6 +70,42 @@ describe("Shared Folder Access", () => {
     privateFolderId = privateFolder.body.folder.id;
   });
 
+  test("cannot share with duration below minimum", async () => {
+    const res = await owner
+      .post(`/browser/folder/${parentId}/shareFolder`)
+      .send({
+        folderId: sharedFolderId,
+        duration: 0,
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  test("cannot share with duration above maximum", async () => {
+    const res = await owner
+      .post(`/browser/folder/${parentId}/shareFolder`)
+      .send({
+        folderId: sharedFolderId,
+        duration: 31,
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  test("cannot share with non-integer duration", async () => {
+    const res = await owner
+      .post(`/browser/folder/${sharedFolderId}/shareFolder`)
+      .send({
+        folderId: childId,
+        duration: "banana",
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
   test("owner can share a folder", async () => {
     const res = await owner
       .post(`/browser/folder/${parentId}/shareFolder`)
@@ -82,46 +118,7 @@ describe("Shared Folder Access", () => {
     expect(res.body.success).toBe(true);
   });
 
-  test("cannot share with duration below minimum", async () => {
-    const res = await owner
-      .post(`/browser/folder/${sharedFolderId}/shareFolder`)
-      .send({
-        duration: 0,
-      });
-
-    expect(res.status).toBe(400);
-    expect(res.body.success).toBe(false);
-  });
-
-  test("cannot share with duration above maximum", async () => {
-    const res = await owner
-      .post(`/browser/folder/${sharedFolderId}/shareFolder`)
-      .send({
-        duration: 31,
-      });
-
-    expect(res.status).toBe(400);
-    expect(res.body.success).toBe(false);
-  });
-
-  test("cannot share with non-integer duration", async () => {
-    const res = await owner
-      .post(`/browser/folder/${sharedFolderId}/shareFolder`)
-      .send({
-        duration: "banana",
-      });
-
-    expect(res.status).toBe(400);
-    expect(res.body.success).toBe(false);
-  });
-
   describe("after folder is shared", () => {
-    beforeAll(async () => {
-      await owner.post(`/browser/folder/${sharedFolderId}/shareFolder`).send({
-        duration: 7,
-      });
-    });
-
     test("guest can access shared folder", async () => {
       const res = await guest.get(`/shared/folder/${sharedFolderId}`);
 
@@ -161,24 +158,32 @@ describe("Shared Folder Access", () => {
       expect(res.status).toBe(404);
     });
 
+    test("guest can download shared folder", async () => {
+      const agent = request.agent(app);
+      const download = await guest
+        .post(`/shared/folder/${sharedFolderId}/downloadFolder`)
+        .send({
+          sharedTargetFolderId: childId,
+        });
+
+      console.log(download.body);
+      expect(download.status).toBe(200);
+      expect(download.headers["content-type"]).toMatch(/zip/);
+      expect(download.headers["content-disposition"]).toContain(".zip");
+    });
+
     test("owner can unshare folder", async () => {
-      const res = await owner.post(
-        `/browser/folder/${parentId}/unshareFolder`
-      ).send({
-        folderId: sharedFolderId,
-      });
+      const res = await owner
+        .post(`/browser/folder/${parentId}/unshareFolder`)
+        .send({
+          folderId: sharedFolderId,
+        });
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
     });
 
     test("guest loses access after folder is unshared", async () => {
-      await owner.post(`/browser/folder/${sharedFolderId}/shareFolder`).send({
-        duration: 7,
-      });
-
-      await owner.post(`/browser/folder/${sharedFolderId}/unshareFolder`);
-
       const res = await guest.get(`/shared/folder/${sharedFolderId}`);
 
       expect(res.status).toBe(404);

@@ -114,7 +114,7 @@ const shareFile = async (fileId, duration) => {
       rootFileId: fileId,
       expiresAt,
       files: {
-        connect: fileId,
+        connect: { id: fileId },
       },
     },
   });
@@ -166,7 +166,7 @@ const getFileShare = async (fileId) => {
   const result = {
     shareId: share.id,
     sharedFile: share.files[0],
-  }
+  };
   if (share.rootFolderId) {
     result.sharedRootId = share.rootFolderId;
   }
@@ -174,77 +174,11 @@ const getFileShare = async (fileId) => {
   return result;
 };
 
-const isSharedFolder = async (folderId, sharedFolderId) => {
-  let currentId = folderId;
-
-  while (currentId !== null) {
-    const folder = await prisma.folder.findUnique({
-      where: { id: currentId },
-    });
-
-    if (!folder) return false;
-
-    if (folder.id === sharedFolderId) return true;
-
-    currentId = folder.parentId;
-  }
-
-  return false;
-};
-
-// Files
-const isSharedFile = async (fileId, sharedFolderId) => {
-  const file = await prisma.file.findUnique({
-    where: {
-      id: fileId,
-    },
-  });
-  let currentId = file.folderId;
-
-  while (currentId !== null) {
-    const folder = await prisma.folder.findUnique({
-      where: { id: currentId },
-    });
-
-    if (!folder) return false;
-
-    if (folder.id === sharedFolderId) return true;
-
-    currentId = folder.parentId;
-  }
-
-  return false;
-};
-
-const isDescendant = async (folderId, sharedFolderId) => {
-  let currentId = folderId;
-
-  while (currentId !== null) {
-    const folder = await prisma.folder.findUnique({
-      where: { id: currentId },
-    });
-    if (!folder) return false;
-
-    if (folder.id === sharedFolderId) {
-      return await prisma.folder.findFirst({
-        where: {
-          id: folderId,
-        },
-      });
-    }
-    currentId = folder.parentId;
-  }
-
-  return false;
-};
-
 export {
   shareFolder,
   unshareFolder,
   getFolderShare,
-  isSharedFolder,
   shareFile,
   unshareFile,
-  isSharedFile,
-  isDescendant,
+  getFileShare,
 };

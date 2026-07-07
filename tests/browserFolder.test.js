@@ -412,7 +412,5 @@ describe("Recursive Folder Download", () => {
     expect(download.status).toBe(200);
     expect(download.headers["content-type"]).toMatch(/zip/);
     expect(download.headers["content-disposition"]).toContain(".zip");
-
-    // TODO: inspect zip contents
   });
 });

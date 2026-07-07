@@ -1,7 +1,15 @@
 import * as sharedQueries from "../db/sharedQueries.js";
 import { getFolder } from "../db/browserQueries.js";
-import { getFolderContents, getBreadcrumbs } from "../lib/browserUtils.js";
+import {
+  getFolderContents,
+  getBreadcrumbs,
+  collectFilesWithPaths,
+  formatDate,
+  formatFileSize,
+} from "../lib/browserUtils.js";
 import { body, validationResult, matchedData } from "express-validator";
+import path from "path";
+import { ZipArchive } from "archiver";
 
 const durationValidation = [
   body("duration")
@@ -72,7 +80,7 @@ const downloadSharedFolder = async (req, res, next) => {
   try {
     const results = await collectFilesWithPaths(
       req.sharedTargetFolder.id,
-      req.targetTargetFolder.name
+      req.sharedTargetFolder.name
     );
 
     const archive = new ZipArchive("zip", {
