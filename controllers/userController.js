@@ -4,6 +4,7 @@ import { body, validationResult, matchedData } from "express-validator";
 import { generateHash } from "../lib/passwordUtils.js";
 import * as db from "../db/userQueries.js";
 
+// Validation for user registration
 const validateRegister = [
   body("username")
     .trim()
@@ -33,15 +34,18 @@ const validateRegister = [
     }),
 ];
 
+// Validation for login
 const validateLogin = [
   body("username").trim().notEmpty().withMessage("Username is required."),
   body("password").trim().notEmpty().withMessage("Password is required."),
 ];
 
+// Get route for Login page
 const getLogin = (req, res) => {
   res.render("users/login", { title: "Login" });
 };
 
+// Post route for Login page
 const postLogin = [
   validateLogin,
   async (req, res, next) => {
@@ -60,10 +64,12 @@ const postLogin = [
   }),
 ];
 
+// Get route for register page
 const getRegister = (req, res) => {
   res.render("users/register", { title: "Register" });
 };
 
+// Post route for register page
 const postRegister = [
   validateRegister,
   async (req, res, next) => {
@@ -74,9 +80,11 @@ const postRegister = [
         errors: errors.array(),
       });
     }
+    // If the validation passed, generate a hash with the user password
     const { username, password } = matchedData(req);
     const hash = generateHash(password);
 
+    // Create the user with the username and hash
     const newUser = await db.createUser(username, hash);
     req.login(newUser, (err) => {
       if (err) {
@@ -88,6 +96,7 @@ const postRegister = [
   },
 ];
 
+// Get route for logout
 const getLogout = (req, res, next) => {
   req.logout((err) => {
     if (err) {
