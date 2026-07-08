@@ -1,3 +1,4 @@
+// Simple prisma DB test
 import { prisma } from "../lib/prisma.js";
 
 test("db connection", async () => {

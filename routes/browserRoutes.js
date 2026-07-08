@@ -11,6 +11,8 @@ import {
 import * as browserController from "../controllers/browserController.js";
 
 const router = express.Router();
+// Multer is configured to only allow 50MB at this point
+// for practice im considering going to 1mb later with each user having 5MB total.
 const upload = multer({
   dest: "uploads/",
   limits: {
@@ -18,7 +20,7 @@ const upload = multer({
   },
 });
 
-// Folders
+// Folder routes
 router.get("/browser", isAuth, browserController.redirectToRoot);
 router.get(
   "/browser/folder/:currentFolderId",
@@ -37,7 +39,7 @@ router.post(
   isAuth,
   loadCurrentFolder,
   loadTargetFolder,
-  browserController.downloadFolder,
+  browserController.downloadFolder
 );
 router.post(
   "/browser/folder/:currentFolderId/renameFolder",
@@ -64,7 +66,7 @@ router.post(
   browserController.deleteFolder
 );
 
-// Files
+// File routes
 router.post(
   "/browser/folder/:currentFolderId/upload",
   isAuth,
@@ -77,7 +79,7 @@ router.post(
   isAuth,
   loadCurrentFolder,
   loadTargetFile,
-  browserController.downloadFile,
+  browserController.downloadFile
 );
 router.get(
   "/browser/file/:fileId",

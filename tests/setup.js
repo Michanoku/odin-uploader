@@ -1,3 +1,4 @@
+// Test setup, get envs and erase the entire test database everytime. Disconnect after. 
 import "../config/env.js";
 import { prisma } from "../lib/prisma.js";
 

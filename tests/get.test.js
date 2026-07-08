@@ -1,3 +1,4 @@
+// Simple check if regular get and 404 works
 import request from "supertest";
 
 import app from "../app.js";

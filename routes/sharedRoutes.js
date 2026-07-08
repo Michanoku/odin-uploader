@@ -14,7 +14,7 @@ import * as sharedController from "../controllers/sharedController.js";
 
 const router = express.Router();
 
-// Folders
+// Shared folder routes
 router.get(
   "/shared/folder/:sharedFolderId",
   isAuth,
@@ -43,7 +43,7 @@ router.post(
   sharedController.unshareFolder
 );
 
-// Files
+// Shared file routes
 router.get(
   "/shared/file/:sharedFileId",
   isAuth,
@@ -63,7 +63,19 @@ router.post(
   loadSharedTargetFile,
   sharedController.downloadSharedFile
 );
-router.post("/browser/folder/:currentFolderId/shareFile", isAuth, loadCurrentFolder, loadTargetFile, sharedController.shareFile);
-router.post("/browser/folder/:currentFolderId/unshareFile", isAuth, loadCurrentFolder, loadTargetFile, sharedController.unshareFile);
+router.post(
+  "/browser/folder/:currentFolderId/shareFile",
+  isAuth,
+  loadCurrentFolder,
+  loadTargetFile,
+  sharedController.shareFile
+);
+router.post(
+  "/browser/folder/:currentFolderId/unshareFile",
+  isAuth,
+  loadCurrentFolder,
+  loadTargetFile,
+  sharedController.unshareFile
+);
 
 export default router;

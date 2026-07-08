@@ -6,6 +6,7 @@ describe("Authentication", () => {
   const agent = request.agent(app);
 
   test("user can register and access protected route", async () => {
+    // Create a user and see if they are redirected correctly
     const registerResponse = await agent.post("/register").type("form").send({
       username: "testuser",
       password: "supersecurepassword",
@@ -15,6 +16,7 @@ describe("Authentication", () => {
     expect(registerResponse.status).toBe(302);
     expect(registerResponse.headers.location).toBe("/");
 
+    // See if the user can access the protected route 
     const protectedResponse = await agent.get("/protected");
 
     expect(protectedResponse.status).toBe(200);
@@ -24,6 +26,7 @@ describe("Authentication", () => {
   test("logged out user cannot access protected route", async () => {
     await agent.get("/logout");
 
+    // See if logged out user can access the protected route
     const protectedResponse = await agent.get("/protected");
 
     expect(protectedResponse.status).toBe(302);
