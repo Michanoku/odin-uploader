@@ -1,6 +1,7 @@
 // All prisma queries that have to do with the user
 import { prisma } from "../lib/prisma.js";
 
+// Create a new user with the username and the hash provided
 const createUser = async (username, hash) => {
   return await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
@@ -10,6 +11,7 @@ const createUser = async (username, hash) => {
       },
     });
 
+    // Create a root folder for the user and assign it to them
     const rootFolder = await tx.folder.create({
       data: {
         name: "Root",
@@ -18,6 +20,7 @@ const createUser = async (username, hash) => {
       },
     });
 
+    // Update the user with the newly created root folder
     return await tx.user.update({
       where: {
         id: user.id,
@@ -29,6 +32,7 @@ const createUser = async (username, hash) => {
   });
 };
 
+// Look up a user by their name
 const lookupUserByName = async (username) => {
   return await prisma.user.findUnique({
     where: {
@@ -37,6 +41,7 @@ const lookupUserByName = async (username) => {
   });
 };
 
+// Look up a user by their ID
 const lookupUserById = async (userId) => {
   return await prisma.user.findUnique({
     where: {

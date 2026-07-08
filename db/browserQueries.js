@@ -1,7 +1,8 @@
 // All prisma queries that have to do with the users own files and folders
 import { prisma } from "../lib/prisma.js";
 
-// Folders
+// Queries for folders
+// Get a single folder
 const getFolder = async ({ folderId, userId = null }) => {
   const where = {
     id: folderId,
@@ -29,6 +30,7 @@ const folderExists = async ({ name, userId, parentId }) => {
   return !!folder;
 };
 
+// Check if a file of the same name exists in the same folder
 const fileExists = async ({ originalname, userId, folderId }) => {
   const file = await prisma.file.findFirst({
     where: {
@@ -44,36 +46,25 @@ const fileExists = async ({ originalname, userId, folderId }) => {
   return !!file;
 };
 
-const getAllSubfolders = async ({ folderId = null, userId = null }) => {
-  const where = {};
-
-  if (folderId !== null) {
-    // If a folder id is passed, look for children of that folder
-    where.parentId = folderId;
-  } else {
-    // If no folder id is passed, look for children of the users root
-    where.parentId = null;
-    where.userId = userId;
-  }
-
-  return prisma.folder.findMany({ where });
+// Get all subfolders of a folder, but only direct children
+const getAllSubfolders = async (folderId) => {
+  return prisma.folder.findMany({
+    where: {
+      parentId: folderId,
+    },
+  });
 };
 
-const getAllFiles = async ({ folderId = null, userId = null }) => {
-  const where = {};
-
-  if (folderId !== null) {
-    // If a folder id is passed, look for files in that folder
-    where.folderId = folderId;
-  } else {
-    // If no folder id is passed, look for files in the users root
-    where.folderId = null;
-    where.userId = userId;
-  }
-
-  return prisma.file.findMany({ where });
+// Get all files  of a folder, but only direct children
+const getAllFiles = async (folderId) => {
+  return prisma.file.findMany({
+    where: {
+      folderId: folderId,
+    },
+  });
 };
 
+// Create a new folder from the provided data
 const createFolder = async (folderData) => {
   const folder = await prisma.folder.create({
     data: folderData,
@@ -81,6 +72,7 @@ const createFolder = async (folderData) => {
   return folder;
 };
 
+// Update the folder with the new data
 const updateFolder = async (folderId, updatedFolderData) => {
   const updatedFolder = await prisma.folder.update({
     where: {
@@ -91,6 +83,7 @@ const updateFolder = async (folderId, updatedFolderData) => {
   return updatedFolder;
 };
 
+// Delete the folder
 const deleteFolder = async (folderId) => {
   const deletedFolder = await prisma.folder.delete({
     where: {
@@ -100,7 +93,8 @@ const deleteFolder = async (folderId) => {
   return deletedFolder;
 };
 
-// Files
+// Queries for files
+// Get a single file
 const getFile = async ({ fileId, userId }) => {
   const where = {
     id: fileId,
@@ -109,6 +103,7 @@ const getFile = async ({ fileId, userId }) => {
   return await prisma.file.findFirst({ where });
 };
 
+// Create a new file using the data
 const createFile = async (fileData) => {
   const file = await prisma.file.create({
     data: fileData,
@@ -116,6 +111,7 @@ const createFile = async (fileData) => {
   return file;
 };
 
+// Update the file using the new data
 const updateFile = async (fileId, updatedFileData) => {
   const updatedFile = await prisma.file.update({
     where: {
@@ -126,6 +122,7 @@ const updateFile = async (fileId, updatedFileData) => {
   return updatedFile;
 };
 
+// Delete the file
 const deleteFile = async (fileId) => {
   const deletedFile = await prisma.file.delete({
     where: {
@@ -135,7 +132,7 @@ const deleteFile = async (fileId) => {
   return deletedFile;
 };
 
-// Get all subfolders, even within other subfolders
+// Get all ids from subfolders, even within other subfolders
 const collectFolderIds = async (folderId) => {
   const children = await prisma.folder.findMany({
     where: {
@@ -148,6 +145,7 @@ const collectFolderIds = async (folderId) => {
 
   const ids = [folderId];
 
+  // Recursion (Dang I can't believe I'm actually using recursion in my own project after all this time!)
   for (const child of children) {
     ids.push(...(await collectFolderIds(child.id)));
   }
@@ -155,9 +153,8 @@ const collectFolderIds = async (folderId) => {
   return ids;
 };
 
-const getAllFilesFromSubfolders = async (folderId) => {
-  const folderIds = await collectFolderIds(folderId);
-
+// Get all files in all folders provided
+const getAllFilesFromSubfolders = async (folderIds) => {
   const files = await prisma.file.findMany({
     where: {
       folderId: {
@@ -165,12 +162,14 @@ const getAllFilesFromSubfolders = async (folderId) => {
       },
     },
     select: {
+      id: true,
       filename: true,
     },
   });
   return files;
 };
 
+// Get all the contents of a folder, include filenames and original names for files
 const getFolderContentWithPaths = async (folderId) => {
   const folder = await prisma.folder.findUnique({
     where: { id: folderId },
@@ -206,6 +205,7 @@ export {
   createFile,
   updateFile,
   deleteFile,
+  collectFolderIds,
   getAllFilesFromSubfolders,
   getFolderContentWithPaths,
 };

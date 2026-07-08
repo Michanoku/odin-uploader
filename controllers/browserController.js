@@ -230,7 +230,7 @@ const getFolder = async (req, res, next) => {
   try {
     const folderId = req.currentFolder.id;
     const [contents, breadcrumbs] = await Promise.all([
-      getFolderContents({ folderId }),
+      getFolderContents(folderId),
       getBreadcrumbs({ folderId }),
     ]);
     const context = {
@@ -306,7 +306,8 @@ const deleteFolder = async (req, res) => {
   const folderId = req.targetFolder.id;
   try {
     // Get the filenames of all files we are about to delete
-    const filesToDelete = await db.getAllFilesFromSubfolders(folderId);
+    const folderIds = await db.collectFolderIds(folderId);
+    const filesToDelete = await db.getAllFilesFromSubfolders(folderIds);
     // Delete the database entries for the folder (cascades to subfolders and files)
     const deletedFolder = await db.deleteFolder(folderId);
 

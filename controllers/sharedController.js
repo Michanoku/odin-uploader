@@ -4,7 +4,6 @@ import { body, validationResult, matchedData } from "express-validator";
 import { ZipArchive } from "archiver";
 
 import * as sharedQueries from "../db/sharedQueries.js";
-import { getFolder } from "../db/browserQueries.js";
 import {
   getFolderContents,
   getBreadcrumbs,
@@ -69,7 +68,7 @@ const getSharedFolder = async (req, res) => {
 
   // Get the breadcrumbs of any and the contents of the folder
   const [contents, breadcrumbs] = await Promise.all([
-    getFolderContents({ folderId: sharedFolder.id }),
+    getFolderContents(sharedFolder.id),
     getBreadcrumbs({ folderId: sharedFolder.id, rootId: sharedRootId }),
   ]);
 
@@ -146,7 +145,7 @@ const getSharedFile = async (req, res, next) => {
       const parentId =
         file.folderId === sharedRootId ? null : req.sharedFolder.parentId;
       const [contents, breadcrumbs] = await Promise.all([
-        getFolderContents({ folderId: req.sharedFolder.id }),
+        getFolderContents(req.sharedFolder.id),
         getBreadcrumbs({ folderId: req.sharedFolder.id, rootId: sharedRootId }),
       ]);
       context.parentId = parentId;
