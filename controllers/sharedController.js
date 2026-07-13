@@ -12,6 +12,8 @@ import {
   formatFileSize,
 } from "../lib/browserUtils.js";
 
+const uploadFolder = process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
+
 // Only duration needs to be validated here. All other validations happen in authMiddleware.js
 const durationValidation = [
   body("duration")
@@ -198,7 +200,7 @@ const unshareFile = async (req, res, next) => {
 // Download a shared file
 const downloadSharedFile = async (req, res, next) => {
   // Name the file its original filename and send it to the user
-  const filePath = path.resolve("uploads", req.sharedTargetFile.filename);
+  const filePath = path.resolve(uploadFolder, req.sharedTargetFile.filename);
 
   res.download(filePath, req.sharedTargetFile.originalname, (err) => {
     if (err) {

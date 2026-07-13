@@ -44,7 +44,7 @@ describe("File Operations", () => {
       expect(response.body.success).toBe(true);
 
       // Check that Multer created the file on disk
-      const uploadedPath = path.resolve("uploads", response.body.file.filename);
+      const uploadedPath = path.resolve("uploads/test", response.body.file.filename);
 
       expect(fs.existsSync(uploadedPath)).toBe(true);
       const stats = fs.statSync(uploadedPath);
@@ -249,7 +249,7 @@ describe("File Operations", () => {
       expect(response.body.file.id).toBe(fileId);
 
       // See if the file was deleted
-      const uploadedPath = path.resolve("uploads", response.body.file.filename);
+      const uploadedPath = path.resolve("uploads/test", response.body.file.filename);
 
       expect(fs.existsSync(uploadedPath)).toBe(false);
     });
@@ -395,7 +395,7 @@ describe("Recursive Folder Deletion", () => {
     expect(upload.status).toBe(200);
 
     const filename = upload.body.file.filename;
-    const uploadedPath = path.resolve("uploads", filename);
+    const uploadedPath = path.resolve("uploads/test", filename);
 
     // Verify the files are there
     expect(fs.existsSync(uploadedPath)).toBe(true);

@@ -14,6 +14,8 @@ import {
   collectFilesWithPaths,
 } from "../lib/browserUtils.js";
 
+const uploadFolder = process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
+
 // Validators
 // Validate New Folders
 const validateNewFolder = [
@@ -316,7 +318,7 @@ const deleteFolder = async (req, res) => {
       filesToDelete.map(async (file) => {
         try {
           // Apparantly unlink means delete in this. Learned something new.
-          await fs.unlink(path.resolve("uploads", file.filename));
+          await fs.unlink(path.resolve(uploadFolder, file.filename));
         } catch (err) {
           // If there is any other error other than file no longer exists, throw the error.
           if (err.code !== "ENOENT") {
@@ -407,7 +409,7 @@ const uploadFile = [
 // Allows the user to download single files
 const downloadFile = (req, res, next) => {
   // Get the file and send it to the download with the original filename
-  const filePath = path.resolve("uploads", req.targetFile.filename);
+  const filePath = path.resolve(uploadFolder, req.targetFile.filename);
 
   res.download(filePath, req.targetFile.originalname, (err) => {
     if (err) {
@@ -505,7 +507,7 @@ const deleteFile = async (req, res) => {
     // Delete file in database
     const deletedFile = await db.deleteFile(fileId);
     // Get file path for the actual file on disk
-    const filePath = path.resolve("uploads", deletedFile.filename);
+    const filePath = path.resolve(uploadFolder, deletedFile.filename);
     // Delete the file
     await fs.unlink(filePath);
 
