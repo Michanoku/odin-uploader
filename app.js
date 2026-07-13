@@ -41,6 +41,7 @@ app.use(express.json());
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
 
+// Configure the session and cookie
 const sessionConfig = {
   secret: process.env.SECRET,
   resave: false,
@@ -52,6 +53,7 @@ const sessionConfig = {
     secure: process.env.NODE_ENV === "production",
   },
 };
+// If we are not testing, use prisma to store session
 if (process.env.NODE_ENV !== "test") {
   sessionConfig.store = new PrismaSessionStore(prisma, {
     checkPeriod: 2 * 60 * 1000,
@@ -60,6 +62,8 @@ if (process.env.NODE_ENV !== "test") {
 }
 app.set("trust proxy", 1);
 app.use(session(sessionConfig));
+
+// Initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -69,6 +73,7 @@ app.use((req, res, next) => {
   next();
 });
 
+// Routes
 app.use("/", indexRoutes);
 app.use("/", userRoutes);
 app.use("/", browserRoutes);
@@ -101,7 +106,7 @@ app.use((err, req, res, _next) => {
   }
   const status = err.status || 500;
   if (process.env.NODE_ENV !== "test" && status !== 404) {
-      console.error(err);
+    console.error(err);
   }
 
   res.status(status).render("error", {
