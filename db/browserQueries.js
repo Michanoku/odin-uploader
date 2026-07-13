@@ -93,6 +93,27 @@ const deleteFolder = async (folderId) => {
   return deletedFolder;
 };
 
+// Get all ids from subfolders, even within other subfolders
+const collectFolderIds = async (folderId) => {
+  const children = await prisma.folder.findMany({
+    where: {
+      parentId: folderId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const ids = [folderId];
+
+  // Recursion (Dang I can't believe I'm actually using recursion in my own project after all this time!)
+  for (const child of children) {
+    ids.push(...(await collectFolderIds(child.id)));
+  }
+
+  return ids;
+};
+
 // Queries for files
 // Get a single file
 const getFile = async ({ fileId, userId }) => {
@@ -132,25 +153,19 @@ const deleteFile = async (fileId) => {
   return deletedFile;
 };
 
-// Get all ids from subfolders, even within other subfolders
-const collectFolderIds = async (folderId) => {
-  const children = await prisma.folder.findMany({
+// Check combined size of current users files
+const calculateTotalSize = async (userId) => {
+  const currentSize = await prisma.file.aggregate({
     where: {
-      parentId: folderId,
+      folder: {
+        userId: userId,
+      },
     },
-    select: {
-      id: true,
+    _sum: {
+      size: true,
     },
   });
-
-  const ids = [folderId];
-
-  // Recursion (Dang I can't believe I'm actually using recursion in my own project after all this time!)
-  for (const child of children) {
-    ids.push(...(await collectFolderIds(child.id)));
-  }
-
-  return ids;
+  return currentSize._sum.size ?? 0;
 };
 
 // Get all files in all folders provided
@@ -201,11 +216,12 @@ export {
   createFolder,
   updateFolder,
   deleteFolder,
+  collectFolderIds,
   getFile,
   createFile,
   updateFile,
   deleteFile,
-  collectFolderIds,
+  calculateTotalSize,
   getAllFilesFromSubfolders,
   getFolderContentWithPaths,
 };

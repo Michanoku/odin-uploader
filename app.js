@@ -105,7 +105,7 @@ app.use((err, req, res, _next) => {
     }
   }
   const status = err.status || 500;
-  if (process.env.NODE_ENV !== "test" && status !== 404) {
+  if (status !== 404) {
     console.error(err);
   }
 

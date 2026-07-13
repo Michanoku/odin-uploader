@@ -12,9 +12,11 @@ import {
   formatFileSize,
   formatDate,
   collectFilesWithPaths,
+  limitExceeded,
 } from "../lib/browserUtils.js";
 
-const uploadFolder = process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
+const uploadFolder =
+  process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
 
 // Validators
 // Validate New Folders
@@ -40,23 +42,23 @@ const validateNewFolder = [
       }
 
       return true;
+    })
+    .bail()
+    .custom(async (_, { req }) => {
+      const exists = await db.folderExists({
+        name: req.body.newFolderName,
+        userId: req.user.id,
+        parentId: req.currentFolder?.id ?? null,
+      });
+
+      if (exists) {
+        throw new Error(
+          "Folder of the same name already exists in the same location."
+        );
+      }
+
+      return true;
     }),
-  // Check if a folder of that name alreadys exists at the location
-  check("currentFolder").custom(async (_, { req }) => {
-    const exists = await db.folderExists({
-      name: req.body.newFolderName,
-      userId: req.user.id,
-      parentId: req.currentFolder?.id ?? null,
-    });
-
-    if (exists) {
-      throw new Error(
-        "Folder of the same name already exists in the same location."
-      );
-    }
-
-    return true;
-  }),
 ];
 
 // Validate Folder on Renaming
@@ -83,6 +85,7 @@ const validateRenameFolder = [
 
       return true;
     })
+    .bail()
     // Check if a folder of the same name exists at the location
     .custom(async (value, { req }) => {
       const folder = req.targetFolder;
@@ -133,6 +136,7 @@ const validateNewFile = [
       }
       return true;
     })
+    .bail()
     // Check if a file of that name exists in the same folder
     .custom(async (value, { req }) => {
       const exists = await db.fileExists({
@@ -145,6 +149,14 @@ const validateNewFile = [
         throw new Error("File of the same name already exists in the folder.");
       }
       return true;
+    })
+    .bail()
+    // Check that the user has not reached their limit
+    .custom(async (value, { req }) => {
+      const exceeded = await limitExceeded(req.user.id, req.file.size);
+      if (exceeded) {
+        throw new Error("Maximum storage space exceeded.");
+      }
     }),
 ];
 
@@ -382,11 +394,16 @@ const uploadFile = [
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      if (req.file) {
+        const filePath = path.resolve(uploadFolder, req.file.filename);
+        await fs.unlink(filePath);
+      }
       return res.status(400).json({
         success: false,
         errors: errors.array(),
       });
     }
+
     // Create the file in the database
     try {
       const fileData = {
