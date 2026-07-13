@@ -4,6 +4,7 @@ import request from "supertest";
 
 import app from "../app.js";
 
+// Get the path and parent id of the users root.
 async function getRootPathAndId(agent) {
   const response = await agent.get("/browser");
   const parentId = response.headers.location.split("/").pop();
@@ -18,6 +19,7 @@ describe("Shared File Access", () => {
   let fileId;
 
   beforeAll(async () => {
+    // Register two users, one for sharing and one for accessing
     await owner.post("/register").type("form").send({
       username: "sharedFileOwner",
       password: "supersecurepassword",
@@ -29,101 +31,115 @@ describe("Shared File Access", () => {
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
-
     const root = await getRootPathAndId(owner);
 
+    // Create a folder and upload file to it, save the ids
     const folder = await owner.post(`${root.path}/createFolder`).send({
       newFolderName: "Documents",
     });
-
     folderId = folder.body.folder.id;
-
     const upload = await owner
       .post(`/browser/folder/${folderId}/upload`)
       .attach("file", path.resolve("tests/files/test.txt"), "upload.txt");
-
     fileId = upload.body.file.id;
   });
 
   test("cannot share file with duration below minimum", async () => {
-    const res = await owner.post(`/browser/folder/${folderId}/shareFile`).send({
-      fileId,
-      duration: 0,
-    });
+    // Attempt to share the file without a duration
+    const response = await owner
+      .post(`/browser/folder/${folderId}/shareFile`)
+      .send({
+        fileId,
+        duration: 0,
+      });
 
-    expect(res.status).toBe(400);
-    expect(res.body.success).toBe(false);
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
   });
 
   test("cannot share file with duration above maximum", async () => {
-    const res = await owner.post(`/browser/folder/${folderId}/shareFile`).send({
-      fileId,
-      duration: 31,
-    });
+    // Attempt to share the file with the maximum duration exceeded
+    const response = await owner
+      .post(`/browser/folder/${folderId}/shareFile`)
+      .send({
+        fileId,
+        duration: 31,
+      });
 
-    expect(res.status).toBe(400);
-    expect(res.body.success).toBe(false);
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
   });
 
   test("cannot share file with non-integer duration", async () => {
-    const res = await owner.post(`/browser/folder/${folderId}/shareFile`).send({
-      fileId,
-      duration: "banana",
-    });
+    // Attempt to share file with a duration of bananas, which is nuts, even though a banana is a fruit
+    const response = await owner
+      .post(`/browser/folder/${folderId}/shareFile`)
+      .send({
+        fileId,
+        duration: "banana",
+      });
 
-    expect(res.status).toBe(400);
-    expect(res.body.success).toBe(false);
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
   });
 
   test("owner can share file", async () => {
-    const res = await owner.post(`/browser/folder/${folderId}/shareFile`).send({
-      fileId,
-      duration: 7,
-    });
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
+    // Share the file with valid parameters
+    const response = await owner
+      .post(`/browser/folder/${folderId}/shareFile`)
+      .send({
+        fileId,
+        duration: 7,
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
   });
 
   describe("after file is shared", () => {
     test("guest can view shared file", async () => {
-      const res = await guest.get(`/shared/file/${fileId}`);
+      // Attempt to access the file as a guest
+      const response = await guest.get(`/shared/file/${fileId}`);
 
-      expect(res.status).toBe(200);
-      expect(res.text).toContain("upload.txt");
+      expect(response.status).toBe(200);
+      expect(response.text).toContain("upload.txt");
     });
 
     test("guest can download shared file", async () => {
-      const res = await guest
+      // Attempt to download the file as a guest
+      const response = await guest
         .post(`/shared/file/${fileId}/downloadFile`)
         .send({ sharedFileId: fileId });
 
-      expect(res.status).toBe(200);
-      expect(res.headers["content-disposition"]).toContain("upload.txt");
+      expect(response.status).toBe(200);
+      expect(response.headers["content-disposition"]).toContain("upload.txt");
     });
 
     test("owner can unshare file", async () => {
-      const res = await owner
+      // Unshare the file
+      const response = await owner
         .post(`/browser/folder/${folderId}/unshareFile`)
         .send({
           fileId,
         });
 
-      expect(res.status).toBe(200);
-      expect(res.body.success).toBe(true);
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
     });
 
     test("guest loses access after file is unshared", async () => {
-      const res = await guest.get(`/shared/file/${fileId}`);
+      // Try to access the file again after it has been unshared
+      const response = await guest.get(`/shared/file/${fileId}`);
 
-      expect(res.status).toBe(404);
+      expect(response.status).toBe(404);
     });
 
     test("guest cannot download file after it is unshared", async () => {
-      const res = await guest
+      // Try to download the file after it has been unshared
+      const response = await guest
         .post(`/shared/file/${fileId}/downloadFile`)
         .send({ sharedFileId: fileId });
 
-      expect(res.status).toBe(404);
+      expect(response.status).toBe(404);
     });
   });
 });

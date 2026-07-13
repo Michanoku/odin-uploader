@@ -5,7 +5,7 @@ import request from "supertest";
 
 import app from "../app.js";
 
-// Get the path and parent id of the users root. 
+// Get the path and parent id of the users root.
 async function getRootPathAndId(agent) {
   const response = await agent.get("/browser");
   const parentId = response.headers.location.split("/").pop();
@@ -96,7 +96,7 @@ describe("File Operations", () => {
         .attach("file", path.resolve("tests/files/test.txt"), "rename1.txt");
       const fileId = uploadResponse.body.file.id;
 
-      // Rename the file 
+      // Rename the file
       const response = await agent.post(`${root.path}/renameFile`).send({
         fileId,
         updatedFileName: "renamed.txt",
@@ -130,7 +130,7 @@ describe("File Operations", () => {
   describe("File Move", () => {
     test("user can't move a file to nowhere", async () => {
       const root = await getRootPathAndId(agent);
-      
+
       // Create a folder and get the id from it, then upload a file to that folder and get its id
       const createResponse = await agent
         .post(`${root.path}/createFolder`)
@@ -232,7 +232,7 @@ describe("File Operations", () => {
   describe("File Deletion", () => {
     test("user can delete a file", async () => {
       const root = await getRootPathAndId(agent);
-      
+
       // Upload a file to delete later and get the id
       const uploadResponse = await agent
         .post(`${root.path}/upload`)
@@ -258,7 +258,7 @@ describe("File Operations", () => {
     test("user can download a file", async () => {
       const root = await getRootPathAndId(agent);
 
-      // Upload a file and get the id 
+      // Upload a file and get the id
       const uploadResponse = await agent
         .post(`${root.path}/upload`)
         .attach("file", path.resolve("tests/files/test.txt"), "download1.txt");
