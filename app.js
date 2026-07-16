@@ -15,7 +15,6 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import "./config/passport.js";
 import { prisma } from "./lib/prisma.js";
 import browserRoutes from "./routes/browserRoutes.js";
-import indexRoutes from "./routes/indexRoutes.js";
 import sharedRoutes from "./routes/sharedRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
@@ -74,7 +73,6 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/", indexRoutes);
 app.use("/", userRoutes);
 app.use("/", browserRoutes);
 app.use("/", sharedRoutes);

@@ -22,7 +22,7 @@ const upload = multer({
 });
 
 // Folder routes
-router.get("/browser", isAuth, browserController.redirectToRoot);
+router.get("/", browserController.redirectUser);
 router.get(
   "/browser/folder/:currentFolderId",
   isAuth,

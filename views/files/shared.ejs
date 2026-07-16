@@ -2,8 +2,7 @@
 <html lang="en">
 <%- include('../partials/head') %>
 
-  <body>
-    <%- include('../partials/header') %>
+  <body class="browser">
     <div>Shared Folder</div>
     <a href="/shared/<%= sharedFolder.id %>"><%= sharedFolder.name %></a>
     <% breadcrumbs.forEach((folder, index, breadcrumbs)=> { %>

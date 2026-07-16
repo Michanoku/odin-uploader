@@ -206,8 +206,12 @@ const validateMoveFile = [
 
 // Folder related functions
 // When the user accesses index, they are redirected to their own root folder
-const redirectToRoot = (req, res) => {
-  res.redirect(`/browser/folder/${req.user.rootFolderId}`);
+const redirectUser = (req, res) => {
+  if (req.user) {
+    res.redirect(`/browser/folder/${req.user.rootFolderId}`);
+  } else {
+    res.render("users/register", { title: "Register" });
+  }
 };
 
 // The user can create a folder, it will be validated and if passed, created
@@ -536,7 +540,7 @@ const deleteFile = async (req, res) => {
 };
 
 export {
-  redirectToRoot,
+  redirectUser,
   createFolder,
   downloadFolder,
   getFolder,

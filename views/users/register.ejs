@@ -3,16 +3,25 @@
 <%- include('../partials/head') %>
 
   <body>
-    <%- include('../partials/header') %>
-      <div>Register</div>
-      <%- include("../partials/errors.ejs") %>
-        <form action="/register" method="post">
-          <input type="text" name="username" minlength="2" maxlength="32">
-          <input type="password" name="password" minlength="12" maxlength="72">
-          <input type="password" name="confirmation" minlength="12" maxlength="72">
+    <%- include('../partials/nav') %>
+    <main class="flex">
+      <div class="column">
+        <div class="main-title">Register</div>
+        <%- include("../partials/errors.ejs") %>
+        <form class="form-column" action="/register" method="post">
+          <label class="form-label" for="username">Username</label>
+          <input id="username" type="text" name="username" minlength="2" maxlength="32">
+          <label class="form-label" for="password">Password</label>
+          <input id="password" type="password" name="password" minlength="12" maxlength="72">
+          <label class="form-label" for="confirmation">Confirmation</label>
+          <input id="confirmation" type="password" name="confirmation" minlength="12" maxlength="72">
           <button type="submit">Register</button>
         </form>
-        <%- include('../partials/footer') %>
+        <span>Already a member? <a href="/login">Login</a>
+      </div>
+     
+    </main>
+    <%- include('../partials/footer') %>
   </body>
 
 </html>

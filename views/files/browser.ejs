@@ -2,8 +2,12 @@
 <html lang="en">
 <%- include('../partials/head') %>
 
-  <body>
-    <%- include('../partials/header') %>
+  <body class="browser">
+    <nav>NAME</nav>
+    <aside>Menu</aside>
+    <main>
+
+    </main>
     <div>Browse</div>
     <a href="/browser">Home</a>
     <% breadcrumbs.forEach((folder, index, breadcrumbs)=> { %>
@@ -18,6 +22,7 @@
     <% } else { %>
       <%- include("./partials/fileDetails") %>
     <% } %>
+    </main>
     <%- include('../partials/footer') %>
   </body>
 
