@@ -3,19 +3,27 @@
 <%- include('../partials/head') %>
 
   <body class="browser">
-    <nav>NAME</nav>
-    <aside>Menu</aside>
-    <main>
 
-    </main>
-    <div>Browse</div>
-    <a href="/browser">Home</a>
-    <% breadcrumbs.forEach((folder, index, breadcrumbs)=> { %>
+  </div>
+    <%- include('../partials/nav') %>
+    <%- include('../partials/aside') %>
+    <main>
+    <div class="main-title">
+    <% if (view === "folder") { %>
+      <%= currentFolder.name %>
+    <% } else { %>
+      <%= file.originalname %>
+    <% } %>
+    </div>
+    <div class="breadcrumbs">
+    <a class="breadcrumb" href="/browser/folder/<%= user.rootFolderId %>">Root</a>
+    <% breadcrumbs.forEach((folder, index, breadcrumbs) => { if (folder.id !== user.rootFolderId) { %>
       >
-      <a href="/browser/folder/<%= folder.id %>">
+      <a class="breadcrumb" href="/browser/folder/<%= folder.id %>">
         <%= folder.name %>
       </a>
-    <% }) %>
+    <% }}) %>
+    </div>
     <hr>
     <% if (view === "folder") { %>
       <%- include("./partials/folderContents") %>

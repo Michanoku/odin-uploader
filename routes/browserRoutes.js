@@ -11,8 +11,7 @@ import {
 import * as browserController from "../controllers/browserController.js";
 
 const router = express.Router();
-// Multer is configured to only allow 50MB at this point
-// for practice im considering going to 1mb later with each user having 5MB total.
+// Multer is configured to only allow 1MB at this point (user max 5MB)
 const uploadFolder = process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
 const upload = multer({
   dest: uploadFolder,

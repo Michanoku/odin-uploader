@@ -220,6 +220,7 @@ const createFolder = [
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log(errors.array())
       return res.status(400).json({
         success: false,
         errors: errors.array(),
@@ -234,7 +235,9 @@ const createFolder = [
         userId: req.user.id,
       };
       const newFolder = await db.createFolder(folderData);
-      res.json({ success: true, folder: newFolder });
+      const folderContents = await getFolderContents(req.currentFolder.id);
+      const response = { success: true, folder: newFolder, folderContents: folderContents };
+      res.json(response);
     } catch (err) {
       console.log(err);
       res.json({ success: false, error: err });
@@ -419,7 +422,8 @@ const uploadFile = [
         userId: req.user.id,
       };
       const newFile = await db.createFile(fileData);
-      const response = { success: true, file: newFile };
+      const folderContents = await getFolderContents(req.currentFolder.id);
+      const response = { success: true, file: newFile, folderContents: folderContents };
       res.json(response);
     } catch (err) {
       return next(err);

@@ -10,9 +10,9 @@
   --accent: #2563eb;
   --accent-hover: #1d4ed8;
 
-  --border: #CBD5E1;
-  --border-strong: #94A3B8;
-  --focus: #2563EB;
+  --border: #cbd5e1;
+  --border-strong: #94a3b8;
+  --focus: #2563eb;
 
   --success: #16a34a;
   --warning: #d97706;
@@ -72,7 +72,7 @@ nav {
   height: 3rem;
   background-color: var(--surface-2);
   border-bottom: 1px solid var(--border);
-  padding-block: 0.5rem;
+  padding-inline: 0.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -88,9 +88,28 @@ nav {
   border: 0;
 }
 
-.account-button:hover {
+.account-button:hover,
+.upload-button:hover,
+.new-folder-button:hover {
   cursor: pointer;
   color: var(--text-muted);
+}
+
+.upload-button,
+.new-folder-button {
+  font-size: 1.5rem;
+  background: transparent;
+  border: 0;
+}
+
+.top-folder-menu {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.hidden {
+  display: none;
 }
 
 aside {
@@ -114,6 +133,24 @@ footer {
 .main-title {
   font-weight: 600;
   font-size: 1.25rem;
+}
+
+.breadcrumbs {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  scrollbar-width: thin;
+}
+
+.breadcrumb {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.breadcrumb:hover {
+  color: var(--accent-hover);
 }
 
 .flex {
@@ -182,7 +219,7 @@ select:disabled,
 textarea:disabled {
   background-color: var(--surface-2);
   color: var(--text-muted);
-  border-color: #E2E8F0;
+  border-color: #e2e8f0;
   cursor: not-allowed;
 }
 
@@ -194,15 +231,47 @@ input:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 0 0 3px rgb(220 38 38 / 0.15);
 }
 
-button {
-   background-color: var(--accent);
-   color: var(--surface);
-   padding: 0.5rem 1rem;
-   font-size: 1.125rem;
-   border: 1px solid var(--border);
-   border-radius: 0.375rem;
+.action-button {
+  background-color: var(--accent);
+  color: var(--surface);
+  padding: 0.5rem 1rem;
+  font-size: 1.125rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
 }
 
-button:hover {
+.action-button:hover {
   background-color: var(--accent-hover);
+}
+
+
+#loading-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+
+    background: rgb(0 0 0 / 0.35);
+    backdrop-filter: blur(2px);
+
+    z-index: 1000;
+}
+
+#loading-overlay.hidden {
+    display: none;
+}
+
+.loading-modal {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    text-align: center;
+}
+
+.folder-contents {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
