@@ -35,6 +35,11 @@ router.post(
   browserController.createFolder
 );
 router.post(
+  "/getTree",
+  isAuth,
+  browserController.getTree
+);
+router.post(
   "/browser/folder/:currentFolderId/downloadFolder",
   isAuth,
   loadCurrentFolder,

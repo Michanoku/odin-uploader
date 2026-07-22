@@ -260,11 +260,26 @@ const getFolder = async (req, res, next) => {
       parentId: req.currentFolder.parentId ?? null,
       contents,
       breadcrumbs,
+      formatDate,
     };
 
     res.render("files/browser", context);
   } catch (err) {
     return next(err);
+  }
+};
+
+// Get a folder and its contents to display to the user
+const getTree = async (req, res, next) => {
+  // Contents will have folder contents, breadcrumbs will serve as the tree to go back
+  try {
+    const id = req.body.folderId === "root" ? req.user.rootFolderId : req.body.folderId;
+    const tree = await db.getAllSubfolders(id);
+
+    res.json({ success: true, tree: tree });
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, error: err });
   }
 };
 
@@ -287,7 +302,9 @@ const renameFolder = [
         name: updatedFolderName,
       };
       const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
-      res.json({ success: true, folder: updatedFolder });
+      const folderContents = await getFolderContents(req.currentFolder.id);
+      const response = { success: true, folder: updatedFolder, folderContents: folderContents };
+      res.json(response);
     } catch (err) {
       console.log(err);
       res.json({ success: false, error: err });
@@ -548,6 +565,7 @@ export {
   createFolder,
   downloadFolder,
   getFolder,
+  getTree,
   renameFolder,
   moveFolder,
   deleteFolder,
