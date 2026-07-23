@@ -297,9 +297,10 @@ input:invalid:not(:placeholder-shown):focus {
   align-items: center;
 }
 
-.folder-link > a {
+.folder-link > a,
+.tree > a {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   text-decoration: none;
   color: var(--text);
   align-items: center;

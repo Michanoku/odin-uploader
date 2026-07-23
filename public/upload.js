@@ -16,10 +16,14 @@ const renameFolderId = document.querySelector("#rename-folder-id");
 const renameFolderName = document.querySelector("#rename-folder-name");
 const renameFolder = document.querySelectorAll("button[name='rename-folder']");
 const moveFolderId = document.querySelector("#move-folder-id");
+const moveParentId = document.querySelector("#move-parent-id");
 const moveFolder = document.querySelectorAll("button[name='move-folder']");
+const moveFolderModal = document.querySelector("#move-folder-modal");
 const moveFolderForm = document.querySelector("#move-folder-form");
 const confirmation = document.querySelector("#confirmation");
 const confirmationMessage = document.querySelector("#confirmation-message");
+const treeList = document.querySelector("#tree-list");
+const currentFolderName = document.querySelector("#current-folder-name");
 
 fileInput.addEventListener("change", async () => {
   if (!fileInput.files.length) {
@@ -176,6 +180,35 @@ renameFolderForm.addEventListener("submit", async (e) => {
   }
 });
 
+moveFolderForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(moveFolderForm);
+  const body = new URLSearchParams(formData);
+  try {
+    const response = await fetch(moveFolderForm.action, {
+      method: moveFolderForm.method,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: body,
+    });
+
+    const result = await response.json();
+
+    if (!result.success && result.errors?.length) {
+      alert(result.errors.map((error) => error.msg).join("\n"));
+      return;
+    }
+
+    renderFolderContents(result.folderContents);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    closeModal();
+  }
+});
+
 shareFolder.forEach((button) => {
   button.addEventListener("click", () => {
     shareFolderId.value = button.dataset.id;
@@ -193,13 +226,53 @@ renameFolder.forEach((button) => {
   })
 })
 
+const createFolderDiv = (folder) => {
+  const link = document.createElement("a");
+  link.dataset.id = folder.id;
+  link.dataset.name = folder.name;
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
+const svg = document.createElementNS(SVG_NS, "svg");
+const use = document.createElementNS(SVG_NS, "use");
+  svg.classList.add("folder-icon");
+  svg.setAttribute("width", "24");
+  svg.setAttribute("height", "24");
+  use.setAttribute("href", "#icon-folder");
+  const div = document.createElement("div");
+  div.classList.add("folder-name");
+  div.textContent = folder.name;
+  svg.appendChild(use);
+  link.appendChild(svg);
+  link.appendChild(div);
+  link.addEventListener("click", async () => {
+    moveParentId.value = folder.id;
+    await updateTree(link, folder.id);
+  })
+  return link;
+}
+
+const updateTree = async (button, parent) => {
+    currentFolderName.textContent = button.dataset.name;
+    const tree = await fetchTree(parent);
+    console.log(tree);
+    while (treeList.firstChild) {
+      treeList.removeChild(treeList.firstChild);
+    };
+    tree.forEach((folder) => {
+      const link = createFolderDiv(folder);
+      treeList.appendChild(link)
+    });
+    console.log(moveFolderId.value);
+    console.log(moveParentId.value);
+}
+
 for (const button of moveFolder) {
   button.addEventListener("click", async () => {
-    moveFolderId.value = button.dataset.id;
-    const tree = await fetchTree("root");
-    console.log(tree);
+    moveFolderId.value = button.dataset.id; // The id of the folder we are about to move
+    moveParentId.value = moveParentId.dataset.id; // defaults to root id on first open
+    await updateTree(button, "root");
     modalOverlay.classList.remove("hidden");
-    moveFolderForm.classList.remove("hidden");
+    moveFolderModal.classList.remove("hidden");
   })
 }
 

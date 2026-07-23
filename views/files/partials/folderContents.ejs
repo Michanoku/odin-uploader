@@ -45,13 +45,11 @@
         <div id="move-folder-modal" class="loading hidden">
             <div class="main-logo" id="current-folder-name"></div>
 
-            <form id="browse-tree" action="/getTree/<%=currentFolder.id %>" method="post">
-
-            </form>
+            <div class="tree" id="tree-list"></div>
             <form id="move-folder-form" action="/browser/folder/<%=currentFolder.id %>/moveFolder"
             method="post">
             <input id="move-folder-id" type="hidden" name="folderId" value="">
-            <input id="move-parent-id" type="hidden" name="updatedParentId" value="">
+            <input id="move-parent-id" type="hidden" data-id="<%=currentFolder.id %>" name="updatedParentId" value="">
         
             <div class="flex">
                 <button class="cancel-button" name="close-modal" type="button">Close</button>
@@ -136,7 +134,7 @@
         </svg>
     </button>
 
-    <button class="account-button" name="move-folder" data-id="<%= folder.id %>" type="button">
+    <button class="account-button" name="move-folder" data-name="Root" data-id="<%= folder.id %>" type="button">
         <svg class="folder-icon" width="24" height="24">
             <use href="#icon-scissors"></use>
         </svg>
