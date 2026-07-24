@@ -21,7 +21,7 @@ const uploadFolder =
 // Validators
 // Validate New Folders
 const validateNewFolder = [
-  body("newFolderName")
+  body("folderName")
     .trim()
     .notEmpty()
     .withMessage("Folder name is required")
@@ -46,7 +46,7 @@ const validateNewFolder = [
     .bail()
     .custom(async (_, { req }) => {
       const exists = await db.folderExists({
-        name: req.body.newFolderName,
+        name: req.body.folderName,
         userId: req.user.id,
         parentId: req.currentFolder?.id ?? null,
       });
@@ -63,7 +63,7 @@ const validateNewFolder = [
 
 // Validate Folder on Renaming
 const validateRenameFolder = [
-  body("updatedFolderName")
+  body("folderName")
     .trim()
     .notEmpty()
     .withMessage("Folder name is required")
@@ -106,14 +106,14 @@ const validateRenameFolder = [
 
 // Validate Folder on Moving
 const validateMoveFolder = [
-  check("updatedParentId")
+  check("parentId")
     // Check if a folder of the same name exists at the location
     .custom(async (value, { req }) => {
       const folder = req.targetFolder;
       const exists = await db.folderExists({
         name: folder.name,
         userId: req.user.id,
-        parentId: req.body.updatedParentId,
+        parentId: req.body.parentId,
       });
 
       if (exists) {
@@ -226,11 +226,11 @@ const createFolder = [
         errors: errors.array(),
       });
     }
-    const { newFolderName } = matchedData(req);
+    const { folderName } = matchedData(req);
     try {
       // Create the new folder with the provided data
       const folderData = {
-        name: newFolderName,
+        name: folderName,
         parentId: req.currentFolder.id,
         userId: req.user.id,
       };
@@ -298,12 +298,12 @@ const renameFolder = [
         errors: errors.array(),
       });
     }
-    const { updatedFolderName } = matchedData(req);
+    const { folderName } = matchedData(req);
     // The folder to be renamed
     const folderId = req.targetFolder.id;
     try {
       const updatedfolderData = {
-        name: updatedFolderName,
+        name: folderName,
       };
       const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
       const folderContents = await getFolderContents(req.currentFolder.id);
@@ -331,7 +331,7 @@ const moveFolder = [
     const folderId = req.targetFolder.id;
     try {
       const updatedfolderData = {
-        parentId: req.body.updatedParentId,
+        parentId: req.body.parentId,
       };
       const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
       const folderContents = await getFolderContents(req.currentFolder.id);

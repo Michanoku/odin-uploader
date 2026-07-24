@@ -4,7 +4,7 @@ import app from "../app.js";
 
 // Get the path and parent id of the users root.
 async function getRootPathAndId(agent) {
-  const response = await agent.get("/browser");
+  const response = await agent.get("/");
   const parentId = response.headers.location.split("/").pop();
   return { path: response.headers.location, id: parentId };
 }
@@ -38,37 +38,37 @@ describe("Shared Folder Access", () => {
 
     const rootFolder = await owner
       .post(`${root.path}/createFolder`)
-      .send({ newFolderName: "SharedRoot" });
+      .send({ folderName: "SharedRoot" });
 
     rootId = rootFolder.body.folder.id;
 
     const parentFolder = await owner
       .post(`/browser/folder/${rootId}/createFolder`)
-      .send({ newFolderName: "Parent" });
+      .send({ folderName: "Parent" });
 
     parentId = parentFolder.body.folder.id;
 
     const sharedFolder = await owner
       .post(`/browser/folder/${parentId}/createFolder`)
-      .send({ newFolderName: "Shared Folder" });
+      .send({ folderName: "Shared Folder" });
 
     sharedFolderId = sharedFolder.body.folder.id;
 
     const childFolder = await owner
       .post(`/browser/folder/${sharedFolderId}/createFolder`)
-      .send({ newFolderName: "Child" });
+      .send({ folderName: "Child" });
 
     childId = childFolder.body.folder.id;
 
     const grandChildFolder = await owner
       .post(`/browser/folder/${childId}/createFolder`)
-      .send({ newFolderName: "Grand Child" });
+      .send({ folderName: "Grand Child" });
 
     grandChildId = grandChildFolder.body.folder.id;
 
     const privateFolder = await owner
       .post(`/browser/folder/${rootId}/createFolder`)
-      .send({ newFolderName: "Private Folder" });
+      .send({ folderName: "Private Folder" });
 
     privateFolderId = privateFolder.body.folder.id;
   });

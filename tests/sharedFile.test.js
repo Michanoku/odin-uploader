@@ -6,7 +6,7 @@ import app from "../app.js";
 
 // Get the path and parent id of the users root.
 async function getRootPathAndId(agent) {
-  const response = await agent.get("/browser");
+  const response = await agent.get("/");
   const parentId = response.headers.location.split("/").pop();
   return { path: response.headers.location, id: parentId };
 }
@@ -35,7 +35,7 @@ describe("Shared File Access", () => {
 
     // Create a folder and upload file to it, save the ids
     const folder = await owner.post(`${root.path}/createFolder`).send({
-      newFolderName: "Documents",
+      folderName: "Documents",
     });
     folderId = folder.body.folder.id;
     const upload = await owner

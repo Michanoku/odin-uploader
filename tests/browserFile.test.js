@@ -7,7 +7,7 @@ import app from "../app.js";
 
 // Get the path and parent id of the users root.
 async function getRootPathAndId(agent) {
-  const response = await agent.get("/browser");
+  const response = await agent.get("/");
   const parentId = response.headers.location.split("/").pop();
   return { path: response.headers.location, id: parentId };
 }
@@ -71,7 +71,7 @@ describe("File Operations", () => {
       const createResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "Documents",
+          folderName: "Documents",
         });
       const folderId = createResponse.body.folder.id;
 
@@ -135,7 +135,7 @@ describe("File Operations", () => {
       const createResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "NotRoot",
+          folderName: "NotRoot",
         });
       const folderId = createResponse.body.folder.id;
       const uploadResponse = await agent
@@ -162,7 +162,7 @@ describe("File Operations", () => {
       const createResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "NotRoot2",
+          folderName: "NotRoot2",
         });
       const folderId = createResponse.body.folder.id;
       const uploadResponse = await agent
@@ -196,7 +196,7 @@ describe("File Operations", () => {
       const createResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "NotRoot3",
+          folderName: "NotRoot3",
         });
       const folderId = createResponse.body.folder.id;
 
@@ -366,7 +366,7 @@ describe("Recursive Folder Deletion", () => {
 
     // Root folder
     const rootFolder = await agent.post(`${root.path}/createFolder`).send({
-      newFolderName: "Root",
+      folderName: "Root",
     });
     const rootId = rootFolder.body.folder.id;
 
@@ -374,7 +374,7 @@ describe("Recursive Folder Deletion", () => {
     const child = await agent
       .post(`/browser/folder/${rootId}/createFolder`)
       .send({
-        newFolderName: "Child",
+        folderName: "Child",
       });
     const childId = child.body.folder.id;
 
@@ -382,7 +382,7 @@ describe("Recursive Folder Deletion", () => {
     const grandchild = await agent
       .post(`/browser/folder/${childId}/createFolder`)
       .send({
-        newFolderName: "Grandchild",
+        folderName: "Grandchild",
       });
     const grandChildId = grandchild.body.folder.id;
 

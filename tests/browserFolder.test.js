@@ -6,7 +6,8 @@ import app from "../app.js";
 
 // Get the path and parent id of the users root.
 async function getRootPathAndId(agent) {
-  const response = await agent.get("/browser");
+  const response = await agent.get("/");
+
   const parentId = response.headers.location.split("/").pop();
   return { path: response.headers.location, id: parentId };
 }
@@ -29,7 +30,7 @@ describe("Folder Operations", () => {
 
       // Attempt to create folder without a name
       const response = await agent.post(`${root.path}/createFolder`).send({
-        newFolderName: "",
+        folderName: "",
       });
 
       expect(response.status).toBe(400);
@@ -41,7 +42,7 @@ describe("Folder Operations", () => {
 
       // Create a new folder in the users root folder
       const response = await agent.post(`${root.path}/createFolder`).send({
-        newFolderName: "Documents",
+        folderName: "Documents",
       });
 
       expect(response.status).toBe(200);
@@ -54,7 +55,7 @@ describe("Folder Operations", () => {
 
       // Attempt to create a new folder with the same name of an existing folder
       const response = await agent.post(`${root.path}/createFolder`).send({
-        newFolderName: "Documents",
+        folderName: "Documents",
       });
 
       expect(response.status).toBe(400);
@@ -66,7 +67,7 @@ describe("Folder Operations", () => {
 
       // Create a folder to use as a parent and get the id
       const firstResponse = await agent.post(`${root.path}/createFolder`).send({
-        newFolderName: "ParentFolder",
+        folderName: "ParentFolder",
       });
       const parentId = firstResponse.body.folder.id;
 
@@ -74,7 +75,7 @@ describe("Folder Operations", () => {
       const response = await agent
         .post(`/browser/folder/${parentId}/createFolder`)
         .send({
-          newFolderName: "Pictures",
+          folderName: "Pictures",
         });
 
       expect(response.status).toBe(200);
@@ -91,14 +92,14 @@ describe("Folder Operations", () => {
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "NiceFolder",
+          folderName: "NiceFolder",
         });
       const folderId = creationResponse.body.folder.id;
 
       // Try to rename the folder to blank
       const response = await agent.post(`${root.path}/renameFolder`).send({
         folderId,
-        updatedFolderName: "",
+        folderName: "",
       });
 
       expect(response.status).toBe(400);
@@ -111,7 +112,7 @@ describe("Folder Operations", () => {
       // Try to rename the users root folder
       const response = await agent.post(`${root.path}/renameFolder`).send({
         folderId: root.id,
-        updatedFolderName: "RenamedRoot",
+        folderName: "RenamedRoot",
       });
 
       expect(response.status).toBe(403);
@@ -124,14 +125,14 @@ describe("Folder Operations", () => {
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "NiceFolder2",
+          folderName: "NiceFolder2",
         });
       const folderId = creationResponse.body.folder.id;
 
       // Attempt to rename the folder
       const response = await agent.post(`${root.path}/renameFolder`).send({
         folderId,
-        updatedFolderName: "Photos",
+        folderName: "Photos",
       });
 
       expect(response.status).toBe(200);
@@ -146,14 +147,14 @@ describe("Folder Operations", () => {
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "NiceFolder3",
+          folderName: "NiceFolder3",
         });
       const folderId = creationResponse.body.folder.id;
 
       // Try to rename the folder to name of existing folder
       const response = await agent.post(`${root.path}/renameFolder`).send({
         folderId,
-        updatedFolderName: "Photos",
+        folderName: "Photos",
       });
 
       expect(response.status).toBe(400);
@@ -169,7 +170,7 @@ describe("Folder Operations", () => {
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "MoveThis",
+          folderName: "MoveThis",
         });
       const moveThis = creationResponse.body.folder.id;
 
@@ -177,14 +178,14 @@ describe("Folder Operations", () => {
       const creationResponse2 = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "IntoThis",
+          folderName: "IntoThis",
         });
       const intoThis = creationResponse2.body.folder.id;
 
       // Tryo to moveThis folder into intoThis folder
       const response = await agent.post(`${root.path}/moveFolder`).send({
         folderId: moveThis,
-        updatedParentId: intoThis,
+        parentId: intoThis,
       });
 
       expect(response.status).toBe(200);
@@ -198,18 +199,18 @@ describe("Folder Operations", () => {
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "MoveThis2",
+          folderName: "MoveThis2",
         });
       const moveThis = creationResponse.body.folder.id;
       const creationResponse2 = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "IntoThis2",
+          folderName: "IntoThis2",
         });
       const intoThis = creationResponse2.body.folder.id;
       await agent.post(`${root.path}/moveFolder`).send({
         folderId: moveThis,
-        updatedParentId: intoThis,
+        parentId: intoThis,
       });
 
       // Try to remove one folder out back into the root
@@ -217,7 +218,7 @@ describe("Folder Operations", () => {
         .post(`/browser/folder/${intoThis}/moveFolder`)
         .send({
           folderId: moveThis,
-          updatedParentId: root.id,
+          parentId: root.id,
         });
 
       expect(response.status).toBe(200);
@@ -232,7 +233,7 @@ describe("Folder Operations", () => {
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "ParentFolder2",
+          folderName: "ParentFolder2",
         });
       const parentId = creationResponse.body.folder.id;
 
@@ -240,19 +241,19 @@ describe("Folder Operations", () => {
       const creationResponse2 = await agent
         .post(`/browser/folder/${parentId}/createFolder`)
         .send({
-          newFolderName: "SameName",
+          folderName: "SameName",
         });
       const creationResponse3 = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "SameName",
+          folderName: "SameName",
         });
       const folderId = creationResponse3.body.folder.id;
 
       // Try to remove folder from root to parent, where same name folder already exists
       const response = await agent.post(`${root.path}/moveFolder`).send({
         folderId: folderId,
-        updatedParentId: parentId,
+        parentId: parentId,
       });
 
       expect(response.status).toBe(400);
@@ -266,14 +267,14 @@ describe("Folder Operations", () => {
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "NewRoot",
+          folderName: "NewRoot",
         });
       const newRoot = creationResponse.body.folder.id;
 
       // Try to move the root folder into the folder
       const response = await agent.post(`${root.path}/moveFolder`).send({
         folderId: root.id,
-        updatedParentId: newRoot,
+        parentId: newRoot,
       });
       expect(response.status).toBe(403);
     });
@@ -296,7 +297,7 @@ describe("Folder Operations", () => {
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "ICanGoInHere",
+          folderName: "ICanGoInHere",
         });
       const folderId = creationResponse.body.folder.id;
 
@@ -315,7 +316,7 @@ describe("Folder Operations", () => {
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
-          newFolderName: "ICanBeDeleted",
+          folderName: "ICanBeDeleted",
         });
       const folderId = creationResponse.body.folder.id;
 
@@ -356,7 +357,7 @@ describe("Folder Ownership", () => {
 
     const root1 = await getRootPathAndId(user1);
     const createResponse = await user1.post(`${root1.path}/createFolder`).send({
-      newFolderName: "Secret Folder",
+      folderName: "Secret Folder",
     });
 
     const folderId = createResponse.body.folder.id;
@@ -385,7 +386,7 @@ describe("Folder Ownership", () => {
     });
     const root1 = await getRootPathAndId(user1);
     const createResponse = await user1.post(`${root1.path}/createFolder`).send({
-      newFolderName: "Secret Folder",
+      folderName: "Secret Folder",
     });
     const folderId = createResponse.body.folder.id;
 
@@ -400,7 +401,7 @@ describe("Folder Ownership", () => {
     // Try to maliciously rename the other users folder with the folder id
     const response = await user2.post(`${root2.path}/renameFolder`).send({
       folderId,
-      updatedFolderName: "Hacked",
+      folderName: "Hacked",
     });
 
     expect(response.status).toBe(404);
@@ -422,19 +423,19 @@ describe("Recursive Folder Download", () => {
 
     // Create the root folder for the download, as well as several descendants
     const rootFolder = await agent.post(`${root.path}/createFolder`).send({
-      newFolderName: "Root",
+      folderName: "Root",
     });
     const rootId = rootFolder.body.folder.id;
     const child = await agent
       .post(`/browser/folder/${rootId}/createFolder`)
       .send({
-        newFolderName: "Child",
+        folderName: "Child",
       });
     const childId = child.body.folder.id;
     const grandchild = await agent
       .post(`/browser/folder/${childId}/createFolder`)
       .send({
-        newFolderName: "Grandchild",
+        folderName: "Grandchild",
       });
     const grandchildId = grandchild.body.folder.id;
 
