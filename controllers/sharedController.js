@@ -41,7 +41,7 @@ const shareFolder = [
     // Share the folder by creating a share model referecing it (and all subfolders and files)
     try {
       const sharedFolder = await sharedQueries.shareFolder(folderId, duration);
-      res.json({ success: true, folder: sharedFolder });
+      res.json({ success: true, folder: sharedFolder, shared: true });
     } catch (err) {
       console.log(err);
       res.json({ success: false, error: err });

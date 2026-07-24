@@ -304,6 +304,7 @@ input:invalid:not(:placeholder-shown):focus {
   text-decoration: none;
   color: var(--text);
   align-items: center;
+  cursor: pointer;
 }
 
 .folder-link:hover {
@@ -314,15 +315,11 @@ input:invalid:not(:placeholder-shown):focus {
   margin-inline: 0.5rem;
 }
 
-.loading {
+.modal-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-}
-
-.loading.hidden {
-  display: none;
 }
 
 .text-start {

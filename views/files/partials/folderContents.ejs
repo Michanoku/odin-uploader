@@ -1,159 +1,119 @@
-<div id="modal-overlay" class="hidden">
+<div id="modal-overlay" data-current-folder-id="<%=currentFolder.id %>" class="hidden">
     <div class="modal">
-        <div id="loading" class="loading hidden">
-            <div class="spinner"></div>
-            <p id="loading-message"></p>
+        <div class="modal-content">
+            <div id="modal-spinner" class="spinner" data-style="block"></div>
+            <p id="modal-message" data-style="block"></p>
+            <form id="modal-form" action="" method="post" data-style="flex">
+            <input id="folder-id" type="hidden" value="" name="folderId">
+            <input id="parent-id" type="hidden" value="" name="parentId" >
+            <div class="tree" id="tree-list" data-style="block"></div>
+            <div id="name-field" class="text-start" data-style="block">
+                <label id="name-field-label" class="label" for="name-field-input">Folder name</label>
+                <input type="text" id="name-field-input" name="folderName" maxlength="255">
+            </div>
+            <div id="duration-field" class="text-start" data-style="block">
+                <label id="duration-field-label" class="label" for="duration-field-input">Duration (days)</label>
+                <input id="duration-field-input" type="number" value="1" max="30" min="1" step="1" name="duration">
+            </div>
+        </form>
+        <div class="flex">
+            <button id="modal-action" form="modal-form" class="action-button" type="submit" data-style="block"></button>
+            <button id="modal-close" class="cancel-button" name="close-modal" type="button" data-style="block">Close</button>
         </div>
-        <div id="confirmation" class="loading hidden">
-            <p id="confirmation-message"></p>
-            <button class="cancel-button" name="close-modal" type="button">Close</button>
-        </div>
-        <form id="new-folder-form" class="loading hidden" action="/browser/folder/<%=currentFolder.id %>/createFolder"
-            method="post">
-            <div class="text-start">
-                <label class="label" for="new-folder-name">Folder name</label>
-                <input type="text" id="new-folder-name" name="newFolderName" maxlength="255">
-            </div>
-            <div class="flex">
-                <button class="cancel-button" name="close-modal" type="button">Close</button>
-                <button class="action-button" type="submit">Create</button>
-            </div>
-        </form>
-        <form id="rename-folder-form" class="loading hidden" action="/browser/folder/<%=currentFolder.id %>/renameFolder"
-            method="post">
-            <input id="rename-folder-id" type="hidden" value="" name="folderId">
-            <div class="text-start">
-                <label class="label" for="rename-folder-name">Folder name</label>
-                <input type="text" id="rename-folder-name" name="updatedFolderName" maxlength="255">
-            </div>
-            <div class="flex">
-                <button class="cancel-button" name="close-modal" type="button">Close</button>
-                <button class="action-button" type="submit">Rename</button>
-            </div>
-        </form>
-        <form id="share-folder-form" class="loading hidden" action="/browser/folder/<%=currentFolder.id %>/shareFolder" method="post">
-            <input id="share-folder-id" type="hidden" name="folderId" value="">
-            <div class="text-start">
-                <label class="label" for="duration">Duration (days)</label>
-                <input id="duration" type="number" value="1" max="30" min="1" step="1" name="duration">
-            </div>
-            <div class="flex">
-                <button class="cancel-button" name="close-modal" type="button">Close</button>
-                <button class="action-button" type="submit">Share</button>
-            </div>
-        </form>
-        <div id="move-folder-modal" class="loading hidden">
-            <div class="main-logo" id="current-folder-name"></div>
-
-            <div class="tree" id="tree-list"></div>
-            <form id="move-folder-form" action="/browser/folder/<%=currentFolder.id %>/moveFolder"
-            method="post">
-            <input id="move-folder-id" type="hidden" name="folderId" value="">
-            <input id="move-parent-id" type="hidden" data-id="<%=currentFolder.id %>" name="updatedParentId" value="">
-        
-            <div class="flex">
-                <button class="cancel-button" name="close-modal" type="button">Close</button>
-                <button class="action-button" type="submit">Move</button>
-            </div>
-        </form>
-     </div>
-
     </div>
+</div>
 </div>
 <div class="top-folder-menu">
     <% if (parentId) { %>
         <a href="/browser/folder/<%= parentId %>">UP</a>
-    <% } %>
-    <button id="new-folder" class="new-folder-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="lucide lucide-folder-plus-icon lucide-folder-plus">
-            <path d="M12 10v6" />
-            <path d="M9 13h6" />
-            <path
-                d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
-        </svg>
-    </button>
+        <% } %>
+            <button id="new-folder" class="new-folder-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-folder-plus-icon lucide-folder-plus">
+                    <path d="M12 10v6" />
+                    <path d="M9 13h6" />
+                    <path
+                        d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+                </svg>
+            </button>
 
-    <form id="upload-form" action="/browser/folder/<%=currentFolder.id %>/upload" method="post"
-        enctype="multipart/form-data">
-        <label for="uploadFiles" class="upload-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="lucide lucide-file-plus-icon lucide-file-plus">
-                <path
-                    d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
-                <path d="M14 2v5a1 1 0 0 0 1 1h5" />
-                <path d="M9 15h6" />
-                <path d="M12 18v-6" />
-            </svg>
-        </label>
+            <form id="upload-form" action="/browser/folder/<%=currentFolder.id %>/upload" method="post"
+                enctype="multipart/form-data">
+                <label for="uploadFiles" class="upload-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-file-plus-icon lucide-file-plus">
+                        <path
+                            d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                        <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                        <path d="M9 15h6" />
+                        <path d="M12 18v-6" />
+                    </svg>
+                </label>
 
-        <input id="upload-files" type="file" name="file" class="hidden" />
-    </form>
+                <input id="upload-files" type="file" name="file" class="hidden" />
+            </form>
 
 </div>
 <div class="folder-contents">
     <% contents.folders.forEach((folder)=> { %>
         <div class="folder-link">
-    <a href="/browser/folder/<%= folder.id %>">
-        <svg class="folder-icon" width="24" height="24">
-            <use href="#icon-folder"></use>
-        </svg>
+            <a href="/browser/folder/<%= folder.id %>">
+                <svg class="folder-icon" width="24" height="24">
+                    <use href="#icon-folder"></use>
+                </svg>
 
-        <div class="folder-name">
-            <%= folder.name %>
+                <div class="folder-name">
+                    <%= folder.name %>
+                </div>
+            </a>
+
+            <button name="share-folder" data-id="<%= folder.id %>" class="account-button">
+                <svg class="folder-icon" width="24" height="24">
+                    <use href="#icon-share"></use>
+                </svg>
+            </button>
+
+            <form method="post" action="/browser/folder/<%= currentFolder.id %>/downloadFolder">
+                <input type="hidden" value="<%= folder.id %>" name="folderId">
+
+                <button type="submit" class="account-button">
+                    <svg class="folder-icon" width="24" height="24">
+                        <use href="#icon-download"></use>
+                    </svg>
+                </button>
+            </form>
+
+            <button name="rename-folder" data-name="<%= folder.name %>" data-id="<%= folder.id %>" type="button"
+                class="account-button">
+
+                <svg class="folder-icon" width="24" height="24">
+                    <use href="#icon-edit"></use>
+                </svg>
+            </button>
+
+            <button class="account-button" name="move-folder" data-name="Root" data-id="<%= folder.id %>" type="button">
+                <svg class="folder-icon" width="24" height="24">
+                    <use href="#icon-scissors"></use>
+                </svg>
+            </button>
+
+            <button class="account-button" name="delete-folder" data-id="<%= folder.id %>" type="button">
+                <svg class="folder-icon" width="24" height="24">
+                    <use href="#icon-trash"></use>
+                </svg>
+            </button>
+            <div>
+                <%= formatDate(folder.createdAt) %>
+            </div>
         </div>
-    </a>
-
-    <button name="share-folder" data-id="<%= folder.id %>" class="account-button">
-        <svg class="folder-icon" width="24" height="24">
-            <use href="#icon-share"></use>
-        </svg>
-    </button>
-
-    <form method="post" action="/browser/folder/<%= currentFolder.id %>/downloadFolder">
-        <input type="hidden" value="<%= folder.id %>" name="folderId">
-
-        <button type="submit" class="account-button">
-            <svg class="folder-icon" width="24" height="24">
-                <use href="#icon-download"></use>
-            </svg>
-        </button>
-    </form>
-
-    <button 
-        name="rename-folder" 
-        data-name="<%= folder.name %>" 
-        data-id="<%= folder.id %>" 
-        type="button" 
-        class="account-button">
-
-        <svg class="folder-icon" width="24" height="24">
-            <use href="#icon-edit"></use>
-        </svg>
-    </button>
-
-    <button class="account-button" name="move-folder" data-name="Root" data-id="<%= folder.id %>" type="button">
-        <svg class="folder-icon" width="24" height="24">
-            <use href="#icon-scissors"></use>
-        </svg>
-    </button>
-
-    <svg class="folder-icon" width="24" height="24">
-        <use href="#icon-more"></use>
-    </svg>
-
-    <div>
-        <%= formatDate(folder.createdAt) %>
-    </div>
-</div>
-    <% }) %>
-    <% contents.files.forEach((file)=> { %>
-        <a href="/browser/file/<%= file.id %>">
-            <%= file.originalname %>
-        </a>
-    <% }) %>
+        <% }) %>
+            <% contents.files.forEach((file)=> { %>
+                <a href="/browser/file/<%= file.id %>">
+                    <%= file.originalname %>
+                </a>
+                <% }) %>
 </div>
 
 <script src="/upload.js"></script>
