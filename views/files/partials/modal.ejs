@@ -1,0 +1,26 @@
+<div id="modal-overlay" data-current-folder-id="<%=currentFolder.id %>" class="hidden">
+  <div class="modal">
+    <div class="modal-content">
+      <div id="modal-spinner" class="spinner" data-style="block"></div>
+      <p id="modal-message" data-style="block"></p>
+      <form id="modal-form" action="" method="post" data-style="flex">
+        <input id="folder-id" type="hidden" value="" name="folderId">
+        <input id="parent-id" type="hidden" value="" name="parentId">
+        <div class="tree" id="tree-list" data-style="block"></div>
+        <div id="name-field" class="text-start" data-style="block">
+          <label id="name-field-label" class="label" for="name-field-input">Folder name</label>
+          <input type="text" id="name-field-input" name="folderName" maxlength="255">
+        </div>
+        <div id="duration-field" class="text-start" data-style="block">
+          <label id="duration-field-label" class="label" for="duration-field-input">Duration (days)</label>
+          <input id="duration-field-input" type="number" value="1" max="30" min="1" step="1" name="duration">
+        </div>
+      </form>
+      <div class="flex">
+        <button id="modal-action" form="modal-form" class="action-button" type="submit" data-style="block"></button>
+        <button id="modal-close" class="cancel-button" name="close-modal" type="button"
+          data-style="block">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

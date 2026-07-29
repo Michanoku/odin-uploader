@@ -1,5 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
+import ejs from "ejs";
+import { fileURLToPath } from "url";
 import { register } from "module";
 
 import { ZipArchive } from "archiver";
@@ -15,6 +17,10 @@ import {
   limitExceeded,
 } from "../lib/browserUtils.js";
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const viewsPath = path.join(__dirname, "../views");
 const uploadFolder =
   process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
 
@@ -204,6 +210,28 @@ const validateMoveFile = [
     }),
 ];
 
+// Helper to create HTML from folder and file data
+const renderFolderContents = async (folderContents, currentFolder, formatDate) => {
+  let html = "";
+
+  for (const folder of folderContents.folders) {
+      html += await ejs.renderFile(
+          path.join(viewsPath, "files/partials/folder.ejs"),
+          { folder, currentFolder, formatDate }
+      );
+  }
+
+  for (const file of folderContents.files) {
+      html += await ejs.renderFile(
+          path.join(viewsPath, "files/partials/file.ejs"),
+          { file, currentFolder, formatDate }
+      );
+  }
+
+  return html;
+}
+
+
 // Folder related functions
 // When the user accesses index, they are redirected to their own root folder
 const redirectUser = (req, res) => {
@@ -235,7 +263,8 @@ const createFolder = [
         userId: req.user.id,
       };
       const newFolder = await db.createFolder(folderData);
-      const folderContents = await getFolderContents(req.currentFolder.id);
+      const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
       const response = { success: true, folder: newFolder, folderContents: folderContents };
       res.json(response);
     } catch (err) {
@@ -306,7 +335,8 @@ const renameFolder = [
         name: folderName,
       };
       const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
-      const folderContents = await getFolderContents(req.currentFolder.id);
+      const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
       const response = { success: true, folder: updatedFolder, folderContents: folderContents };
       res.json(response);
     } catch (err) {
@@ -334,7 +364,8 @@ const moveFolder = [
         parentId: req.body.parentId,
       };
       const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
-      const folderContents = await getFolderContents(req.currentFolder.id);
+      const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
       const response = { success: true, folder: updatedFolder, folderContents: folderContents };
       res.json(response);
     } catch (err) {
@@ -445,7 +476,8 @@ const uploadFile = [
         userId: req.user.id,
       };
       const newFile = await db.createFile(fileData);
-      const folderContents = await getFolderContents(req.currentFolder.id);
+      const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
       const response = { success: true, file: newFile, folderContents: folderContents };
       res.json(response);
     } catch (err) {

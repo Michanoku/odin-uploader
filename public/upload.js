@@ -1,10 +1,6 @@
 const uploadForm = document.querySelector("#upload-form");
 const fileInput = document.querySelector("#upload-files");
 const newFolder = document.querySelector("#new-folder");
-const shareFolder = document.querySelectorAll("button[name='share-folder']");
-const renameFolder = document.querySelectorAll("button[name='rename-folder']");
-const moveFolder = document.querySelectorAll("button[name='move-folder']");
-const deleteFolder = document.querySelectorAll("button[name='delete-folder']");
 
 const modalHandler = (() => {
   const elements = {
@@ -296,55 +292,48 @@ fileInput.addEventListener("change", async () => {
   }
 });
 
-function createLink(href, text) {
-  const link = document.createElement("a");
-  link.href = href;
-  link.textContent = text;
-  return link;
-}
-
 function renderFolderContents(contents) {
   const container = document.querySelector(".folder-contents");
-
-  container.replaceChildren();
-
-  for (const folder of contents.folders) {
-    container.appendChild(
-      createLink(`/browser/folder/${folder.id}`, folder.name)
-    );
-  }
-
-  for (const file of contents.files) {
-    container.appendChild(
-      createLink(`/browser/file/${file.id}`, file.originalname)
-    );
-  }
+  container.innerHTML = contents;
+  addEventListeners();
 }
 
-newFolder.addEventListener("click", async () => {
-  modalHandler.newFolder();
-});
+const addEventListeners = () => {
+  const shareFolder = document.querySelectorAll("button[name='share-folder']");
+  const renameFolder = document.querySelectorAll("button[name='rename-folder']");
+  const moveFolder = document.querySelectorAll("button[name='move-folder']");
+  const deleteFolder = document.querySelectorAll("button[name='delete-folder']");
 
-shareFolder.forEach((button) => {
-  button.addEventListener("click", () => {
-    modalHandler.shareFolder(button.dataset.id);
+  shareFolder.forEach((button) => {
+    button.addEventListener("click", () => {
+      modalHandler.shareFolder(button.dataset.id);
+    });
   });
-});
 
-renameFolder.forEach((button) => {
-  button.addEventListener("click", () => {
-    modalHandler.renameFolder(button.dataset.id, button.dataset.name);
+  renameFolder.forEach((button) => {
+    button.addEventListener("click", () => {
+      modalHandler.renameFolder(button.dataset.id, button.dataset.name);
+    });
   });
-});
 
-deleteFolder.forEach((button) => {
-  button.addEventListener("click", () => {
-    modalHandler.deleteFolder(button.dataset.id);
+  deleteFolder.forEach((button) => {
+    button.addEventListener("click", () => {
+      modalHandler.deleteFolder(button.dataset.id);
+    });
   });
-});
 
-for (const button of moveFolder) {
-  button.addEventListener("click", async () => {
-    await modalHandler.moveFolder(button.dataset.id);
+  for (const button of moveFolder) {
+    button.addEventListener("click", async () => {
+      await modalHandler.moveFolder(button.dataset.id);
+    });
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  newFolder.addEventListener("click", async () => {
+    modalHandler.newFolder();
   });
-}
+  addEventListeners();
+})
+
+

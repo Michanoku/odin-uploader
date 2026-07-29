@@ -1,0 +1,59 @@
+<div class="folder-link">
+  <a href="/browser/folder/<%= folder.id %>">
+    <svg class="folder-icon" width="24" height="24">
+      <use href="#icon-folder"></use>
+    </svg>
+
+    <div class="folder-name">
+      <%= folder.name %><% if (folder.shareId) { %>
+        <svg class="folder-icon" width="12" height="12">
+          <use href="#icon-share"></use>
+        </svg>
+      <% } %>
+    </div>
+  </a>
+
+  <button name="share-folder" data-id="<%= folder.id %>" data-share="<%= folder.shareId %>" class="account-button">
+      <svg class="folder-icon" width="24" height="24">
+      <%= folder.name %><% if (folder.shareId) { %>
+          <use href="#icon-unshare"></use>
+      <% } else { %>
+         <use href="#icon-share"></use>
+        <% } %>
+      </svg>
+
+  </button>
+
+  <form method="post" action="/browser/folder/<%= currentFolder.id %>/downloadFolder">
+    <input type="hidden" value="<%= folder.id %>" name="folderId">
+
+    <button type="submit" class="account-button">
+      <svg class="folder-icon" width="24" height="24">
+        <use href="#icon-download"></use>
+      </svg>
+    </button>
+  </form>
+
+  <button name="rename-folder" data-name="<%= folder.name %>" data-id="<%= folder.id %>" type="button"
+    class="account-button">
+
+    <svg class="folder-icon" width="24" height="24">
+      <use href="#icon-edit"></use>
+    </svg>
+  </button>
+
+  <button class="account-button" name="move-folder" data-name="Root" data-id="<%= folder.id %>" type="button">
+    <svg class="folder-icon" width="24" height="24">
+      <use href="#icon-scissors"></use>
+    </svg>
+  </button>
+
+  <button class="account-button" name="delete-folder" data-id="<%= folder.id %>" type="button">
+    <svg class="folder-icon" width="24" height="24">
+      <use href="#icon-trash"></use>
+    </svg>
+  </button>
+  <div>
+    <%= formatDate(folder.createdAt) %>
+  </div>
+</div>
