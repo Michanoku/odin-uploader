@@ -41,7 +41,9 @@ const shareFolder = [
     // Share the folder by creating a share model referecing it (and all subfolders and files)
     try {
       const sharedFolder = await sharedQueries.shareFolder(folderId, duration);
-      res.json({ success: true, folder: sharedFolder, shared: true });
+      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      const sharedUrl = `Your shared folder link: ${baseUrl}/shared/folder/${sharedFolder.id}`;
+      res.json({ success: true, folder: sharedFolder, shared: true, url: sharedUrl });
     } catch (err) {
       console.log(err);
       res.json({ success: false, error: err });
@@ -177,7 +179,9 @@ const shareFile = [
     // Create the share object to connect to the file
     try {
       const sharedFile = await sharedQueries.shareFile(fileId, duration);
-      res.json({ success: true, file: sharedFile });
+      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      const sharedUrl = `Your shared file link: ${baseUrl}/shared/file/${sharedFile.id}`;
+      res.json({ success: true, file: sharedFile, shared: true, url: sharedUrl });
     } catch (err) {
       console.log(err);
       res.json({ success: false, error: err });

@@ -15,7 +15,7 @@
 
   <button name="share-folder" data-id="<%= folder.id %>" data-share="<%= folder.shareId %>" class="account-button">
       <svg class="folder-icon" width="24" height="24">
-      <%= folder.name %><% if (folder.shareId) { %>
+      <% if (folder.shareId) { %>
           <use href="#icon-unshare"></use>
       <% } else { %>
          <use href="#icon-share"></use>

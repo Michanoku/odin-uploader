@@ -10,9 +10,17 @@
     <main>
     <div class="main-title">
     <% if (view === "folder") { %>
-      <%= currentFolder.name %>
+      <%= currentFolder.name %><% if (currentFolder.shareId) { %>
+        <svg class="folder-icon" width="12" height="12">
+          <use href="#icon-share"></use>
+        </svg>
+      <% } %>
     <% } else { %>
-      <%= file.originalname %>
+      <%= file.originalname %><% if (file.shareId) { %>
+        <svg class="folder-icon" width="12" height="12">
+          <use href="#icon-share"></use>
+        </svg>
+        <% } %>
     <% } %>
     </div>
     <div class="breadcrumbs">

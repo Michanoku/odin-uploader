@@ -9,9 +9,11 @@ const modalHandler = (() => {
     modalMessage: document.querySelector("#modal-message"),
     modalForm: document.querySelector("#modal-form"),
     folderId: document.querySelector("#folder-id"),
+    fileId: document.querySelector("#file-id"),
     parentId: document.querySelector("#parent-id"),
     treeList: document.querySelector("#tree-list"),
     nameField: document.querySelector("#name-field"),
+    nameFieldLabel: document.querySelector("#name-field-label"),
     nameFieldInput: document.querySelector("#name-field-input"),
     durationField: document.querySelector("#duration-field"),
     durationFieldInput: document.querySelector("#duration-field-input"),
@@ -32,12 +34,15 @@ const modalHandler = (() => {
     elements.modalClose.style.display = "none";
     // disable folder id and parent id, and inputs
     elements.folderId.disabled = true;
+    elements.fileId.disabled = true;
     elements.parentId.disabled = true;
     elements.nameFieldInput.disabled = true;
     elements.durationFieldInput.disabled = true;
     elements.modalForm.setAttribute("action", "");
     elements.modalAction.textContent = "";
+    elements.nameFieldLabel.textContent = "";
     elements.nameFieldInput.value = "";
+    elements.nameFieldInput.name = "";
     elements.durationFieldInput.value = "1";
     elements.modalMessage.textContent = "";
     elements.modalOverlay.classList.add("hidden");
@@ -62,6 +67,9 @@ const modalHandler = (() => {
     if (options.button) {
       elements.modalAction.textContent = options.button;
     }
+    if (options.fileId) {
+      elements.fileId.value = options.fileId;
+    }
     if (options.folderId) {
       elements.folderId.value = options.folderId;
     }
@@ -71,6 +79,14 @@ const modalHandler = (() => {
     }
     if (options.name) {
       elements.nameFieldInput.value = options.name;
+    }
+
+    if (options.nameFieldLabel) {
+      elements.nameFieldLabel.textContent = options.nameFieldLabel;
+    }
+
+    if (options.nameFieldInput) {
+      elements.nameFieldInput.name = options.nameFieldInput;
     }
 
     elements.modalOverlay.classList.remove("hidden");
@@ -161,6 +177,8 @@ const modalHandler = (() => {
       action: `/browser/folder/${currentFolderId}/createFolder`,
       enable: ["nameFieldInput"],
       button: "Create",
+      nameFieldLabel: "Folder name",
+      nameFieldInput: "folderName",
     };
     return openModal(options);
   };
@@ -171,6 +189,8 @@ const modalHandler = (() => {
       action: `/browser/folder/${currentFolderId}/renameFolder`,
       enable: ["nameFieldInput", "folderId"],
       button: "Rename",
+      nameFieldLabel: "Folder name",
+      nameFieldInput: "folderName",
       folderId: folderId,
       name: folderName,
     };
@@ -218,6 +238,61 @@ const modalHandler = (() => {
     return openModal(options);
   };
 
+  const renameFile = (fileId, fileName) => {
+    const options = {
+      show: ["modalForm", "nameField", "modalAction", "modalClose"],
+      action: `/browser/folder/${currentFolderId}/renameFile`,
+      enable: ["nameFieldInput", "fileId"],
+      button: "Rename",
+      nameFieldLabel: "File name",
+      nameFieldInput: "fileName",
+      fileId: fileId,
+      name: fileName,
+    };
+    return openModal(options);
+  };
+
+  const shareFile = (fileId) => {
+    const options = {
+      show: ["modalForm", "durationField", "modalAction", "modalClose"],
+      action: `/browser/folder/${currentFolderId}/shareFile`,
+      enable: ["durationFieldInput", "fileId"],
+      button: "Share",
+      fileId: fileId,
+    };
+    return openModal(options);
+  };
+
+  const moveFile = async (fileId) => {
+    const options = {
+      show: [
+        "modalForm",
+        "modalMessage",
+        "modalAction",
+        "modalClose",
+        "treeList",
+      ],
+      action: `/browser/folder/${currentFolderId}/moveFile`,
+      enable: ["parentId", "fileId"],
+      button: "Move",
+      fileId: fileId,
+      parentId: currentFolderId,
+    };
+    return await openModal(options);
+  };
+
+  const deleteFile = (fileId) => {
+    const options = {
+      show: ["modalForm", "modalAction", "modalClose", "modalMessage"],
+      action: `/browser/folder/${currentFolderId}/deleteFile`,
+      enable: ["fileId"],
+      button: "Delete",
+      fileId: fileId,
+      message: "Delete this file?",
+    };
+    return openModal(options);
+  };
+
   elements.modalForm.addEventListener("submit", async (e) => {
     elements.modalAction.disabled = true;
     e.preventDefault();
@@ -258,7 +333,17 @@ const modalHandler = (() => {
   });
 
   elements.modalClose.addEventListener("click", closeModal);
-  return { newFolder, renameFolder, shareFolder, moveFolder, deleteFolder };
+  return {
+    newFolder,
+    renameFolder,
+    shareFolder,
+    moveFolder,
+    deleteFolder,
+    renameFile,
+    shareFile,
+    moveFile,
+    deleteFile,
+  };
 })();
 
 fileInput.addEventListener("change", async () => {
@@ -300,9 +385,17 @@ function renderFolderContents(contents) {
 
 const addEventListeners = () => {
   const shareFolder = document.querySelectorAll("button[name='share-folder']");
-  const renameFolder = document.querySelectorAll("button[name='rename-folder']");
+  const renameFolder = document.querySelectorAll(
+    "button[name='rename-folder']"
+  );
   const moveFolder = document.querySelectorAll("button[name='move-folder']");
-  const deleteFolder = document.querySelectorAll("button[name='delete-folder']");
+  const deleteFolder = document.querySelectorAll(
+    "button[name='delete-folder']"
+  );
+  const shareFile = document.querySelectorAll("button[name='share-file']");
+  const renameFile = document.querySelectorAll("button[name='rename-file']");
+  const moveFile = document.querySelectorAll("button[name='move-file']");
+  const deleteFile = document.querySelectorAll("button[name='delete-file']");
 
   shareFolder.forEach((button) => {
     button.addEventListener("click", () => {
@@ -327,6 +420,30 @@ const addEventListeners = () => {
       await modalHandler.moveFolder(button.dataset.id);
     });
   }
+
+  shareFile.forEach((button) => {
+    button.addEventListener("click", () => {
+      modalHandler.shareFile(button.dataset.id);
+    });
+  });
+
+  renameFile.forEach((button) => {
+    button.addEventListener("click", () => {
+      modalHandler.renameFile(button.dataset.id, button.dataset.name);
+    });
+  });
+
+  deleteFile.forEach((button) => {
+    button.addEventListener("click", () => {
+      modalHandler.deleteFile(button.dataset.id);
+    });
+  });
+
+  for (const button of moveFile) {
+    button.addEventListener("click", async () => {
+      await modalHandler.moveFile(button.dataset.id);
+    });
+  }
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -334,6 +451,4 @@ document.addEventListener("DOMContentLoaded", () => {
     modalHandler.newFolder();
   });
   addEventListeners();
-})
-
-
+});

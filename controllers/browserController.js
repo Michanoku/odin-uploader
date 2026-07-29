@@ -169,7 +169,7 @@ const validateNewFile = [
 // Validate file on renaming
 const validateRenameFile = [
   // If no file was provided, return error
-  body("updatedFileName")
+  body("fileName")
     .trim()
     .notEmpty()
     .withMessage("File name is required")
@@ -190,7 +190,7 @@ const validateRenameFile = [
 
 // Validate file on moving
 const validateMoveFile = [
-  body("updatedFolderId")
+  body("folderId")
     .trim()
     .notEmpty()
     .withMessage("Target folder is required.")
@@ -539,14 +539,18 @@ const renameFile = [
         errors: errors.array(),
       });
     }
+    const { fileName } = matchedData(req);
     try {
       // Get the file and rename it.
       const fileId = req.targetFile.id;
       const updatedfileData = {
-        originalname: req.body.updatedFileName,
+        originalname: fileName
       };
       const updatedFile = await db.updateFile(fileId, updatedfileData);
-      res.json({ success: true, file: updatedFile });
+      const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
+      const response = { success: true, file: updatedFile, folderContents: folderContents };
+      res.json(response);
     } catch (err) {
       console.log(err);
       res.json({ success: false, error: err });
@@ -569,10 +573,13 @@ const moveFile = [
     try {
       const fileId = req.body.fileId;
       const updatedfileData = {
-        folderId: req.body.updatedFolderId,
+        folderId: req.body.folderId,
       };
       const updatedFile = await db.updateFile(fileId, updatedfileData);
-      res.json({ success: true, file: updatedFile });
+      const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
+      const response = { success: true, file: updatedFile, folderContents: folderContents };
+      res.json(response);
     } catch (err) {
       console.log(err);
       res.json({ success: false, error: err });
@@ -590,8 +597,11 @@ const deleteFile = async (req, res) => {
     const filePath = path.resolve(uploadFolder, deletedFile.filename);
     // Delete the file
     await fs.unlink(filePath);
-
-    res.json({ success: true, file: deletedFile });
+    
+    const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+    const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
+    const response = { success: true, file: deletedFile, folderContents: folderContents };
+    res.json(response);
   } catch (err) {
     console.log(err);
     res.json({ success: false, error: err });
