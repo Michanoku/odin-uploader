@@ -6,28 +6,54 @@ import { ZipArchive } from "archiver";
 import * as sharedQueries from "../db/sharedQueries.js";
 import {
   getFolderContents,
+  renderFolderContents,
   getBreadcrumbs,
   collectFilesWithPaths,
   formatDate,
   formatFileSize,
 } from "../lib/browserUtils.js";
+import { register } from "module";
 
 const uploadFolder = process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
 
-// Only duration needs to be validated here. All other validations happen in authMiddleware.js
-const durationValidation = [
+// Validators
+const folderShareValidation = [
   body("duration")
     .toInt()
     .isInt({ min: 1, max: 30 })
-    .withMessage("Duration must be an integer between 1 and 30"),
+    .withMessage("Duration must be an integer between 1 and 30")
+    .bail()
+    .custom(async (_, { req }) => {
+      if (req.targetFolder.shareId) {
+        throw new Error(
+          "Folder already part of a shared group."
+        );
+      }
+      return true;
+    }),
+];
+
+const fileShareValidation = [
+  body("duration")
+    .toInt()
+    .isInt({ min: 1, max: 30 })
+    .withMessage("Duration must be an integer between 1 and 30")
+    .bail()
+    .custom(async (_, { req }) => {
+      if (req.targetFile.shareId) {
+        throw new Error(
+          "File already part of a shared group."
+        );
+      }
+      return true;
+    }),
 ];
 
 // Folder related functions
 // Share a folder
 const shareFolder = [
-  durationValidation,
+  folderShareValidation,
   async (req, res, next) => {
-    console.log(req.body)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -43,24 +69,31 @@ const shareFolder = [
       const sharedFolder = await sharedQueries.shareFolder(folderId, duration);
       const baseUrl = `${req.protocol}://${req.get("host")}`;
       const sharedUrl = `Your shared folder link: ${baseUrl}/shared/folder/${sharedFolder.id}`;
-      res.json({ success: true, folder: sharedFolder, shared: true, url: sharedUrl });
+      const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
+      return res.json({ success: true, folder: sharedFolder, shared: true, url: sharedUrl, folderContents: folderContents });
     } catch (err) {
       console.log(err);
-      res.json({ success: false, error: err });
+      return res.json({ success: false, error: err });
     }
   },
 ];
 
 // Unshare a folder
 const unshareFolder = async (req, res, next) => {
+  if (req.targetFolder.shareId && !req.targetFolder.rootShare) {
+    return res.json({ success: false, error: "Folder is not the root of this shared group."})
+  }
   const folderId = req.targetFolder.id;
   // Delete the share reference. That is all.
   try {
     const unsharedFolder = await sharedQueries.unshareFolder(folderId);
-    res.json({ success: true, folder: unsharedFolder });
+    const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+    const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
+    return res.json({ success: true, folder: unsharedFolder, folderContents: folderContents });
   } catch (err) {
     console.log(err);
-    res.json({ success: false, error: err });
+    return res.json({ success: false, error: err });
   }
 };
 
@@ -86,7 +119,7 @@ const getSharedFolder = async (req, res) => {
     parentId: parentId,
   };
 
-  res.render("files/shared", context);
+  return res.render("files/shared", context);
 };
 
 // Download the shared folder with all of its contents
@@ -157,7 +190,7 @@ const getSharedFile = async (req, res, next) => {
       context.breadcrumbs = breadcrumbs;
       context.folderId = folderId;
     }
-    res.render("files/browser", context);
+    return res.render("files/browser", context);
   } catch (err) {
     return next(err);
   }
@@ -165,7 +198,7 @@ const getSharedFile = async (req, res, next) => {
 
 // Share a file after validating the duration. File ownership is validated in middleware
 const shareFile = [
-  durationValidation,
+  fileShareValidation,
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -181,24 +214,27 @@ const shareFile = [
       const sharedFile = await sharedQueries.shareFile(fileId, duration);
       const baseUrl = `${req.protocol}://${req.get("host")}`;
       const sharedUrl = `Your shared file link: ${baseUrl}/shared/file/${sharedFile.id}`;
-      res.json({ success: true, file: sharedFile, shared: true, url: sharedUrl });
+      return res.json({ success: true, file: sharedFile, shared: true, url: sharedUrl });
     } catch (err) {
       console.log(err);
-      res.json({ success: false, error: err });
+      return res.json({ success: false, error: err });
     }
   },
 ];
 
 // Unshare a file
 const unshareFile = async (req, res, next) => {
+  if (req.targetFile.shareId && !req.targetFile.rootShare) {
+    return res.json({ success: false, error: "File is not the root of this shared group."})
+  }
   const fileId = req.targetFile.id;
   // Delete the share object. That is all.
   try {
     const unsharedFile = await sharedQueries.unshareFile(fileId);
-    res.json({ success: true, file: unsharedFile });
+    return res.json({ success: true, file: unsharedFile });
   } catch (err) {
     console.log(err);
-    res.json({ success: false, error: err });
+    return res.json({ success: false, error: err });
   }
 };
 

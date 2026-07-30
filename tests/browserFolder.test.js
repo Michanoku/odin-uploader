@@ -260,6 +260,57 @@ describe("Folder Operations", () => {
       expect(response.body.success).toBe(false);
     });
 
+     test("user can't move folder into same folder", async () => {
+      const root = await getRootPathAndId(agent);
+
+      // Create the parent folder to try to move into
+      const creationResponse = await agent
+        .post(`${root.path}/createFolder`)
+        .send({
+          folderName: "ParentFolderMax",
+        });
+      const parentId = creationResponse.body.folder.id;
+
+
+      // Try to moove the folder into itself
+      const response = await agent.post(`${root.path}/moveFolder`).send({
+        folderId: parentId,
+        parentId: parentId,
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
+  test("user can't move folder into it's own subfolder", async () => {
+      const root = await getRootPathAndId(agent);
+
+      // Create the parent folder to try to move into
+      const creationResponse = await agent
+        .post(`${root.path}/createFolder`)
+        .send({
+          folderName: "MovingParent",
+        });
+      const parentId = creationResponse.body.folder.id;
+
+      // Create two folders with the same name, one in the root and one in the parent
+      const creationResponse2 = await agent
+        .post(`/browser/folder/${parentId}/createFolder`)
+        .send({
+          folderName: "ChildFolder",
+        });
+      const childId = creationResponse2.body.folder.id;
+
+      // Try to remove folder from root to parent, where same name folder already exists
+      const response = await agent.post(`${root.path}/moveFolder`).send({
+        folderId: parentId,
+        parentId: childId,
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
     test("user cannot move rootfolder", async () => {
       const root = await getRootPathAndId(agent);
 

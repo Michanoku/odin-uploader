@@ -1,7 +1,5 @@
 import fs from "fs/promises";
 import path from "path";
-import ejs from "ejs";
-import { fileURLToPath } from "url";
 import { register } from "module";
 
 import { ZipArchive } from "archiver";
@@ -10,6 +8,7 @@ import { body, check, validationResult, matchedData } from "express-validator";
 import * as db from "../db/browserQueries.js";
 import {
   getFolderContents,
+  renderFolderContents,
   getBreadcrumbs,
   formatFileSize,
   formatDate,
@@ -17,10 +16,6 @@ import {
   limitExceeded,
 } from "../lib/browserUtils.js";
 
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const viewsPath = path.join(__dirname, "../views");
 const uploadFolder =
   process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
 
@@ -50,9 +45,9 @@ const validateNewFolder = [
       return true;
     })
     .bail()
-    .custom(async (_, { req }) => {
+    .custom(async (value, { req }) => {
       const exists = await db.folderExists({
-        name: req.body.folderName,
+        name: value,
         userId: req.user.id,
         parentId: req.currentFolder?.id ?? null,
       });
@@ -128,7 +123,28 @@ const validateMoveFolder = [
         );
       }
       return true;
-    }),
+    })
+    .bail()
+    .custom(async (value, { req }) => {
+      const folder = req.targetFolder;
+      if (value === folder.id) {
+        throw new Error(
+          "Can't move folder into itself"
+        );
+      }
+      return true;
+    })
+    .bail()
+    .custom(async (value, { req }) => {
+      const folder = req.targetFolder;
+      const descendant = await db.isDescendant(value, folder.id);
+      if (descendant) {
+        throw new Error(
+          "Can't move folder into subfolder."
+        );
+      }
+      return true;
+    })
 ];
 
 // Validate New Files
@@ -210,26 +226,6 @@ const validateMoveFile = [
     }),
 ];
 
-// Helper to create HTML from folder and file data
-const renderFolderContents = async (folderContents, currentFolder, formatDate) => {
-  let html = "";
-
-  for (const folder of folderContents.folders) {
-      html += await ejs.renderFile(
-          path.join(viewsPath, "files/partials/folder.ejs"),
-          { folder, currentFolder, formatDate }
-      );
-  }
-
-  for (const file of folderContents.files) {
-      html += await ejs.renderFile(
-          path.join(viewsPath, "files/partials/file.ejs"),
-          { file, currentFolder, formatDate }
-      );
-  }
-
-  return html;
-}
 
 
 // Folder related functions
@@ -248,7 +244,6 @@ const createFolder = [
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log(errors.array())
       return res.status(400).json({
         success: false,
         errors: errors.array(),
@@ -261,6 +256,7 @@ const createFolder = [
         name: folderName,
         parentId: req.currentFolder.id,
         userId: req.user.id,
+        shareId: req.currentFolder.shareId || null,
       };
       const newFolder = await db.createFolder(folderData);
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
@@ -304,12 +300,14 @@ const getTree = async (req, res, next) => {
   console.log(req.body)
   try {
     const id = req.body.folderId === "root" ? req.user.rootFolderId : req.body.folderId;
+    const targetId = req.body.targetFolderId;
     const folder = db.getFolder({ folderId: id, userId: req.user.id})
     if (!folder) return res.json({ success: false, error: "Not found." });
     
     const tree = await db.getAllSubfolders(id);
+    const filteredTree = tree.filter(folder => folder.id !== targetId);
 
-    res.json({ success: true, tree: tree });
+    res.json({ success: true, tree: filteredTree });
   } catch (err) {
     console.log(err);
     res.json({ success: false, error: err });
@@ -352,6 +350,7 @@ const moveFolder = [
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log(errors.array())
       return res.status(400).json({
         success: false,
         errors: errors.array(),
@@ -474,6 +473,7 @@ const uploadFile = [
         size: req.file.size,
         folderId: req.currentFolder.id,
         userId: req.user.id,
+        shareId: req.currentFolder.shareId || null,
       };
       const newFile = await db.createFile(fileData);
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);

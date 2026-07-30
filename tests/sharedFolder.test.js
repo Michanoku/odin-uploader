@@ -1,3 +1,5 @@
+import path from "path";
+
 import request from "supertest";
 
 import app from "../app.js";
@@ -185,12 +187,99 @@ describe("Shared Folder Access", () => {
       expect(download.headers["content-disposition"]).toContain(".zip");
     });
 
+    test("cannot share child folder if a share already exists", async () => {
+      const response = await owner
+        .post(`/browser/folder/${sharedFolderId}/shareFolder`)
+        .send({
+          folderId: childId,
+          duration: 7,
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
+    test("parent folder can be shared as a separate share group", async () => {
+      const response = await owner
+        .post(`/browser/folder/${rootId}/shareFolder`)
+        .send({
+          folderId: parentId,
+          duration: 7,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+    });
+
+    test("new folder created inside shared folder is automatically shared", async () => {
+      const newFolder = await owner
+        .post(`/browser/folder/${sharedFolderId}/createFolder`)
+        .send({
+          folderName: "Future Shared Folder",
+        });
+
+      const newFolderId = newFolder.body.folder.id;
+
+      expect(newFolder.status).toBe(200);
+      expect(newFolder.body.folder.shareId).toBeTruthy();
+
+      const response = await guest.get(`/shared/folder/${newFolderId}`);
+
+      expect(response.status).toBe(200);
+      expect(response.text).toContain("Future Shared Folder");
+    });
+
+    test("new file created inside shared folder is automatically shared", async () => {
+      const upload = await owner
+        .post(`/browser/folder/${sharedFolderId}/upload`)
+        .attach(
+          "file",
+          path.resolve("tests/files/test.txt"),
+          "future-file.txt"
+        );
+
+      const newFileId = upload.body.file.id;
+
+      expect(upload.status).toBe(200);
+      expect(upload.body.file.shareId).toBeTruthy();
+
+      const response = await guest.get(`/shared/file/${newFileId}`);
+
+      expect(response.status).toBe(200);
+      expect(response.text).toContain("future-file.txt");
+    });
+
+    test("cannot separately share file that is already part of a share", async () => {
+      const upload = await owner
+        .post(`/browser/folder/${sharedFolderId}/upload`)
+        .attach(
+          "file",
+          path.resolve("tests/files/test.txt"),
+          "already-shared.txt"
+        );
+
+      const fileId = upload.body.file.id;
+
+      expect(upload.status).toBe(200);
+      expect(upload.body.file.shareId).toBeTruthy();
+
+      const response = await owner
+        .post(`/browser/folder/${sharedFolderId}/shareFile`)
+        .send({
+          fileId,
+          duration: 7,
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
     test("owner can unshare folder", async () => {
       // Unshare the folder
       const response = await owner
-        .post(`/browser/folder/${parentId}/unshareFolder`)
+        .post(`/browser/folder/${rootId}/unshareFolder`)
         .send({
-          folderId: sharedFolderId,
+          folderId: parentId,
         });
 
       expect(response.status).toBe(200);
@@ -199,7 +288,7 @@ describe("Shared Folder Access", () => {
 
     test("guest loses access after folder is unshared", async () => {
       // Attempt to access the unshared folder
-      const response = await guest.get(`/shared/folder/${sharedFolderId}`);
+      const response = await guest.get(`/shared/folder/${parentId}`);
 
       expect(response.status).toBe(404);
     });

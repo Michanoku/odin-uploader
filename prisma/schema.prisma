@@ -44,8 +44,8 @@ model File {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
   shareId      String?
-  share       Share?   @relation("SharedFiles", fields: [shareId], references: [id], onDelete: SetNull)
-  rootShare Share?   @relation("ShareRootFile")
+  share        Share?   @relation("SharedFiles", fields: [shareId], references: [id], onDelete: SetNull)
+  rootShare    Share?   @relation("ShareRootFile")
 
   @@index([userId])
 }
@@ -63,7 +63,7 @@ model Folder {
   userId    String
   rootOwner User?    @relation("RootFolder")
   shareId   String?
-  share    Share?   @relation("SharedFolders", fields: [shareId], references: [id], onDelete: SetNull)
+  share     Share?   @relation("SharedFolders", fields: [shareId], references: [id], onDelete: SetNull)
   rootShare Share?   @relation("ShareRootFolder")
 
   @@unique([userId, parentId, name])
@@ -74,11 +74,11 @@ model Share {
   id           String   @id @default(cuid())
   rootFolder   Folder?  @relation("ShareRootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
   rootFolderId String?  @unique
-  rootFile   File?  @relation("ShareRootFile", fields: [rootFileId], references: [id], onDelete: Cascade)
-  rootFileId String?  @unique
+  rootFile     File?    @relation("ShareRootFile", fields: [rootFileId], references: [id], onDelete: Cascade)
+  rootFileId   String?  @unique
   folders      Folder[] @relation("SharedFolders")
   files        File[]   @relation("SharedFiles")
 
   createdAt DateTime @default(now())
-  expiresAt DateTime 
+  expiresAt DateTime
 }

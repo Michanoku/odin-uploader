@@ -13,11 +13,11 @@
     </div>
   </a>
 
-  <button name="share-folder" data-id="<%= folder.id %>" data-share="<%= folder.shareId %>" class="account-button">
+  <button name="share-folder" data-id="<%= folder.id %>" data-share="<%= !!(folder.shareId && folder.rootShare) %>" class="account-button">
       <svg class="folder-icon" width="24" height="24">
-      <% if (folder.shareId) { %>
+      <% if (folder.shareId && folder.rootShare) { %>
           <use href="#icon-unshare"></use>
-      <% } else { %>
+      <% } else if (!folder.shareId) { %>
          <use href="#icon-share"></use>
         <% } %>
       </svg>

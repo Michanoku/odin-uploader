@@ -11,7 +11,7 @@ const getFolder = async ({ folderId, userId = null }) => {
     // If a userid is passed, include it in the query
     where.userId = userId;
   }
-  return await prisma.folder.findFirst({ where });
+  return await prisma.folder.findFirst({ where, include: {rootShare: true} });
 };
 
 // Check if a folder of the same name exists in the same folder
@@ -52,6 +52,9 @@ const getAllSubfolders = async (folderId) => {
     where: {
       parentId: folderId,
     },
+    include: {
+      rootShare: true,
+    },
   });
 };
 
@@ -60,6 +63,9 @@ const getAllFiles = async (folderId) => {
   return prisma.file.findMany({
     where: {
       folderId: folderId,
+    },
+    include: {
+      rootShare: true,
     },
   });
 };
@@ -114,6 +120,30 @@ const collectFolderIds = async (folderId) => {
   return ids;
 };
 
+// Check if a folder is a descendant of another folder
+const isDescendant = async (folderId, targetId) => {
+  const children = await prisma.folder.findMany({
+    where: {
+      parentId: targetId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  for (const child of children) {
+    if (child.id === folderId) {
+      return true;
+    }
+
+    if (await isDescendant(child.id, targetId)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 // Queries for files
 // Get a single file
 const getFile = async ({ fileId, userId }) => {
@@ -121,7 +151,7 @@ const getFile = async ({ fileId, userId }) => {
     id: fileId,
     userId: userId,
   };
-  return await prisma.file.findFirst({ where });
+  return await prisma.file.findFirst({ where, include: {rootShare: true} });
 };
 
 // Create a new file using the data
@@ -217,6 +247,7 @@ export {
   updateFolder,
   deleteFolder,
   collectFolderIds,
+  isDescendant,
   getFile,
   createFile,
   updateFile,

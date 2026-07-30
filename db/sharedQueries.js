@@ -14,6 +14,12 @@ const shareFolder = async (folderId, duration) => {
   // Get folder ids from all subfolders and then get the files within the folders
   const folderIds = await collectFolderIds(folderId);
   const fileIds = await getAllFilesFromSubfolders(folderIds);
+  
+  // Since we are creating a new share, check for existing shares within and unshare if found
+  await Promise.all([
+    ...folderIds.map(id => unshareFolder(id)),
+    ...fileIds.map(id => unshareFile(id)),
+  ]);
 
   const share = await prisma.share.create({
     data: {
@@ -32,7 +38,6 @@ const shareFolder = async (folderId, duration) => {
 
 // Unshare a folder
 const unshareFolder = async (folderId) => {
-  // Get the share from the folder we are about to unshare.
   const share = await prisma.share.findFirst({
     where: {
       folders: {
@@ -43,22 +48,14 @@ const unshareFolder = async (folderId) => {
     },
   });
 
-  if (!share) {
-    return null;
-  }
+  if (!share) return;
 
-  // Delete the share.
-  return prisma.share.delete({
+  // Avoid race conditions
+  await prisma.share.deleteMany({
     where: {
       id: share.id,
     },
   });
-
-  /* 
-    TODO CONSIDERATION: Currently, if a user wants to unshare a child folder, all initially shared folders
-    will be unshared (including files). In the scope of this project, there is no solution for this problem 
-    at the time. I could simply force the user to unshare the previously shared root folder.
-  */
 };
 
 // Get the share object associated with a folder
@@ -121,12 +118,10 @@ const unshareFile = async (fileId) => {
     },
   });
 
-  if (!share) {
-    return null;
-  }
+  if (!share) return;
 
-  // Simply delete the share object
-  return prisma.share.delete({
+  // Avoid race conditions
+  await prisma.share.deleteMany({
     where: {
       id: share.id,
     },

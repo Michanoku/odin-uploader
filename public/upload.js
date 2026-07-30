@@ -75,7 +75,7 @@ const modalHandler = (() => {
     }
     if (options.parentId) {
       elements.parentId.value = options.parentId;
-      await updateTree("Root", "root");
+      await updateTree("Root", "root", options.folderId);
     }
     if (options.name) {
       elements.nameFieldInput.value = options.name;
@@ -92,9 +92,10 @@ const modalHandler = (() => {
     elements.modalOverlay.classList.remove("hidden");
   };
 
-  const fetchTree = async (id) => {
+  const fetchTree = async (id, targetFolderId) => {
     const body = new URLSearchParams();
     body.append("folderId", id);
+    body.append("targetFolderId", targetFolderId)
     try {
       const response = await fetch("/getTree", {
         method: "post",
@@ -117,20 +118,20 @@ const modalHandler = (() => {
     }
   };
 
-  const updateTree = async (name, parent) => {
+  const updateTree = async (name, parent, target) => {
     elements.modalMessage.textContent = name;
-    const tree = await fetchTree(parent);
+    const tree = await fetchTree(parent, target);
     while (elements.treeList.firstChild) {
       elements.treeList.removeChild(elements.treeList.firstChild);
     }
     if (!tree) return;
     tree.forEach((folder) => {
-      const link = createFolderDiv(folder);
+      const link = createFolderDiv(folder, target);
       elements.treeList.appendChild(link);
     });
   };
 
-  const createFolderDiv = (folder) => {
+  const createFolderDiv = (folder, targetFolderId) => {
     const link = document.createElement("a");
     link.dataset.id = folder.id;
     link.dataset.name = folder.name;
@@ -150,7 +151,7 @@ const modalHandler = (() => {
     link.appendChild(div);
     link.addEventListener("click", async () => {
       elements.parentId.value = folder.id;
-      await updateTree(folder.name, folder.id);
+      await updateTree(folder.name, folder.id, targetFolderId);
     });
     return link;
   };
@@ -208,6 +209,18 @@ const modalHandler = (() => {
     return openModal(options);
   };
 
+  const unshareFolder = (folderId) => {
+    const options = {
+      show: ["modalForm", "modalMessage", "modalAction", "modalClose"],
+      action: `/browser/folder/${currentFolderId}/unshareFolder`,
+      enable: ["folderId"],
+      button: "Unshare",
+      message: "Stop sharing this folder?",
+      folderId: folderId,
+    };
+    return openModal(options);
+  };
+
   const moveFolder = async (folderId) => {
     const options = {
       show: [
@@ -248,6 +261,18 @@ const modalHandler = (() => {
       nameFieldInput: "fileName",
       fileId: fileId,
       name: fileName,
+    };
+    return openModal(options);
+  };
+
+  const unshareFile = (fileId) => {
+    const options = {
+      show: ["modalForm", "modalMessage", "modalAction", "modalClose"],
+      action: `/browser/folder/${currentFolderId}/unshareFile`,
+      enable: ["fileId"],
+      button: "Unshare",
+      message: "Stop sharing this file?",
+      fileId: fileId,
     };
     return openModal(options);
   };
@@ -337,10 +362,12 @@ const modalHandler = (() => {
     newFolder,
     renameFolder,
     shareFolder,
+    unshareFolder,
     moveFolder,
     deleteFolder,
     renameFile,
     shareFile,
+    unshareFile,
     moveFile,
     deleteFile,
   };
@@ -399,7 +426,11 @@ const addEventListeners = () => {
 
   shareFolder.forEach((button) => {
     button.addEventListener("click", () => {
-      modalHandler.shareFolder(button.dataset.id);
+      if (button.dataset.share === "true") {
+        modalHandler.unshareFolder(button.dataset.id);
+      } else {
+        modalHandler.shareFolder(button.dataset.id);
+      }
     });
   });
 
@@ -423,7 +454,11 @@ const addEventListeners = () => {
 
   shareFile.forEach((button) => {
     button.addEventListener("click", () => {
-      modalHandler.shareFile(button.dataset.id);
+      if (button.dataset.share === "true") {
+        modalHandler.unshareFile(button.dataset.id);
+      } else {
+        modalHandler.shareFile(button.dataset.id);
+      }
     });
   });
 
