@@ -14,6 +14,7 @@ import {
   formatDate,
   collectFilesWithPaths,
   limitExceeded,
+  shareManager,
 } from "../lib/browserUtils.js";
 
 const uploadFolder =
@@ -128,9 +129,7 @@ const validateMoveFolder = [
     .custom(async (value, { req }) => {
       const folder = req.targetFolder;
       if (value === folder.id) {
-        throw new Error(
-          "Can't move folder into itself"
-        );
+        throw new Error("Can't move folder into itself");
       }
       return true;
     })
@@ -139,12 +138,10 @@ const validateMoveFolder = [
       const folder = req.targetFolder;
       const descendant = await db.isDescendant(value, folder.id);
       if (descendant) {
-        throw new Error(
-          "Can't move folder into subfolder."
-        );
+        throw new Error("Can't move folder into subfolder.");
       }
       return true;
-    })
+    }),
 ];
 
 // Validate New Files
@@ -226,8 +223,6 @@ const validateMoveFile = [
     }),
 ];
 
-
-
 // Folder related functions
 // When the user accesses index, they are redirected to their own root folder
 const redirectUser = (req, res) => {
@@ -260,8 +255,16 @@ const createFolder = [
       };
       const newFolder = await db.createFolder(folderData);
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
-      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
-      const response = { success: true, folder: newFolder, folderContents: folderContents };
+      const folderContents = await renderFolderContents(
+        folderContentsRaw,
+        req.currentFolder,
+        formatDate
+      );
+      const response = {
+        success: true,
+        folder: newFolder,
+        folderContents: folderContents,
+      };
       res.json(response);
     } catch (err) {
       console.log(err);
@@ -297,15 +300,15 @@ const getFolder = async (req, res, next) => {
 // Get a folder and its contents to display to the user
 const getTree = async (req, res, next) => {
   // Contents will have folder contents, breadcrumbs will serve as the tree to go back
-  console.log(req.body)
   try {
-    const id = req.body.folderId === "root" ? req.user.rootFolderId : req.body.folderId;
+    const id =
+      req.body.folderId === "root" ? req.user.rootFolderId : req.body.folderId;
     const targetId = req.body.targetFolderId;
-    const folder = db.getFolder({ folderId: id, userId: req.user.id})
+    const folder = db.getFolder({ folderId: id, userId: req.user.id });
     if (!folder) return res.json({ success: false, error: "Not found." });
-    
+
     const tree = await db.getAllSubfolders(id);
-    const filteredTree = tree.filter(folder => folder.id !== targetId);
+    const filteredTree = tree.filter((folder) => folder.id !== targetId);
 
     res.json({ success: true, tree: filteredTree });
   } catch (err) {
@@ -334,8 +337,16 @@ const renameFolder = [
       };
       const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
-      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
-      const response = { success: true, folder: updatedFolder, folderContents: folderContents };
+      const folderContents = await renderFolderContents(
+        folderContentsRaw,
+        req.currentFolder,
+        formatDate
+      );
+      const response = {
+        success: true,
+        folder: updatedFolder,
+        folderContents: folderContents,
+      };
       res.json(response);
     } catch (err) {
       console.log(err);
@@ -350,22 +361,32 @@ const moveFolder = [
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log(errors.array())
       return res.status(400).json({
         success: false,
         errors: errors.array(),
       });
     }
     // The folder to be moved
+    const { parentId } = matchedData(req);
     const folderId = req.targetFolder.id;
     try {
+      const parentFolder = await db.getFolder(parentId);
+      await shareManager(req.targetFolder, parentFolder, "folder");
       const updatedfolderData = {
-        parentId: req.body.parentId,
+        parentId: parentId,
       };
       const updatedFolder = await db.updateFolder(folderId, updatedfolderData);
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
-      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
-      const response = { success: true, folder: updatedFolder, folderContents: folderContents };
+      const folderContents = await renderFolderContents(
+        folderContentsRaw,
+        req.currentFolder,
+        formatDate
+      );
+      const response = {
+        success: true,
+        folder: updatedFolder,
+        folderContents: folderContents,
+      };
       res.json(response);
     } catch (err) {
       console.log(err);
@@ -477,8 +498,16 @@ const uploadFile = [
       };
       const newFile = await db.createFile(fileData);
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
-      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
-      const response = { success: true, file: newFile, folderContents: folderContents };
+      const folderContents = await renderFolderContents(
+        folderContentsRaw,
+        req.currentFolder,
+        formatDate
+      );
+      const response = {
+        success: true,
+        file: newFile,
+        folderContents: folderContents,
+      };
       res.json(response);
     } catch (err) {
       return next(err);
@@ -544,12 +573,20 @@ const renameFile = [
       // Get the file and rename it.
       const fileId = req.targetFile.id;
       const updatedfileData = {
-        originalname: fileName
+        originalname: fileName,
       };
       const updatedFile = await db.updateFile(fileId, updatedfileData);
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
-      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
-      const response = { success: true, file: updatedFile, folderContents: folderContents };
+      const folderContents = await renderFolderContents(
+        folderContentsRaw,
+        req.currentFolder,
+        formatDate
+      );
+      const response = {
+        success: true,
+        file: updatedFile,
+        folderContents: folderContents,
+      };
       res.json(response);
     } catch (err) {
       console.log(err);
@@ -570,15 +607,25 @@ const moveFile = [
       });
     }
     // Move the file
+    const { parentId } = matchedData(req);
+    const fileId = req.body.fileId;
     try {
-      const fileId = req.body.fileId;
+      await shareManager(fileId, parentId, "file");
       const updatedfileData = {
         folderId: req.body.folderId,
       };
       const updatedFile = await db.updateFile(fileId, updatedfileData);
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
-      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
-      const response = { success: true, file: updatedFile, folderContents: folderContents };
+      const folderContents = await renderFolderContents(
+        folderContentsRaw,
+        req.currentFolder,
+        formatDate
+      );
+      const response = {
+        success: true,
+        file: updatedFile,
+        folderContents: folderContents,
+      };
       res.json(response);
     } catch (err) {
       console.log(err);
@@ -597,10 +644,18 @@ const deleteFile = async (req, res) => {
     const filePath = path.resolve(uploadFolder, deletedFile.filename);
     // Delete the file
     await fs.unlink(filePath);
-    
+
     const folderContentsRaw = await getFolderContents(req.currentFolder.id);
-    const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
-    const response = { success: true, file: deletedFile, folderContents: folderContents };
+    const folderContents = await renderFolderContents(
+      folderContentsRaw,
+      req.currentFolder,
+      formatDate
+    );
+    const response = {
+      success: true,
+      file: deletedFile,
+      folderContents: folderContents,
+    };
     res.json(response);
   } catch (err) {
     console.log(err);

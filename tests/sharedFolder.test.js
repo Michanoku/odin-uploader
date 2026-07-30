@@ -274,6 +274,120 @@ describe("Shared Folder Access", () => {
       expect(response.body.success).toBe(false);
     });
 
+    describe("when moving folders", () => {
+      test("private folder moved into shared folder becomes shared", async () => {
+        const response = await owner
+          .post(`/browser/folder/${rootId}/moveFolder`)
+          .send({
+            folderId: privateFolderId,
+            parentId: sharedFolderId,
+          });
+
+        console.log("test 1", response.body)
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.folder.shareId).toBeTruthy();
+
+        const guestResponse = await guest.get(
+          `/shared/folder/${privateFolderId}`
+        );
+
+        expect(guestResponse.status).toBe(200);
+        expect(guestResponse.text).toContain("Private Folder");
+      });
+
+      test("shared child folder moved into private folder loses its share", async () => {
+        const response = await owner
+          .post(`/browser/folder/${privateFolderId}/moveFolder`)
+          .send({
+            folderId: childId,
+            parentId: privateFolderId,
+          });
+
+        console.log("test 2", response.body)
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.folder.shareId).toBeNull();
+
+        const guestResponse = await guest.get(`/shared/folder/${childId}`);
+
+        expect(guestResponse.status).toBe(404);
+      });
+
+      test("shared root folder moved into private folder keeps its share", async () => {
+        const response = await owner
+          .post(`/browser/folder/${privateFolderId}/moveFolder`)
+          .send({
+            folderId: parentId,
+            parentId: privateFolderId,
+          });
+
+        console.log("test 3", response.body)
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.folder.shareId).toBeTruthy();
+
+        const guestResponse = await guest.get(`/shared/folder/${parentId}`);
+
+        expect(guestResponse.status).toBe(200);
+        expect(guestResponse.text).toContain("Parent");
+      });
+
+      test("moving private folder into shared folder shares all descendants", async () => {
+        const subtree = await owner
+          .post(`/browser/folder/${privateFolderId}/createFolder`)
+          .send({
+            folderName: "Subtree Root",
+          });
+
+        const subtreeId = subtree.body.folder.id;
+
+        const child = await owner
+          .post(`/browser/folder/${subtreeId}/createFolder`)
+          .send({
+            folderName: "Subtree Child",
+          });
+
+        const childFolderId = child.body.folder.id;
+
+        await owner.post(`/browser/folder/${sharedFolderId}/moveFolder`).send({
+          folderId: subtreeId,
+          parentId: sharedFolderId,
+        });
+
+        const guestResponse = await guest.get(
+          `/shared/folder/${childFolderId}`
+        );
+
+        console.log("test 4", response.body)
+        expect(guestResponse.status).toBe(200);
+        expect(guestResponse.text).toContain("Subtree Child");
+      });
+
+      test("moving shared subtree into private folder unshares descendants", async () => {
+        const response = await owner
+          .post(`/browser/folder/${privateFolderId}/moveFolder`)
+          .send({
+            folderId: sharedFolderId,
+            parentId: privateFolderId,
+          });
+        
+        console.log("test 5", response.body)
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+
+        const guestShared = await guest.get(`/shared/folder/${sharedFolderId}`);
+        const guestChild = await guest.get(`/shared/folder/${childId}`);
+        const guestGrandChild = await guest.get(
+          `/shared/folder/${grandChildId}`
+        );
+
+        expect(guestShared.status).toBe(404);
+        expect(guestChild.status).toBe(404);
+        expect(guestGrandChild.status).toBe(404);
+      });
+    });
+
     test("owner can unshare folder", async () => {
       // Unshare the folder
       const response = await owner

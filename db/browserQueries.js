@@ -58,7 +58,7 @@ const getAllSubfolders = async (folderId) => {
   });
 };
 
-// Get all files  of a folder, but only direct children
+// Get all files of a folder, but only direct children
 const getAllFiles = async (folderId) => {
   return prisma.file.findMany({
     where: {
