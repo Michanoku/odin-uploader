@@ -615,7 +615,7 @@ const moveFile = [
     const fileId = req.targetFile.id;
 
     try {
-      const parentFolder = db.getFolder({ folderId, userId: req.user.id });
+      const parentFolder = await db.getFolder({ folderId, userId: req.user.id });
       await shareManager(req.targetFile, parentFolder, "file");
       const updatedfileData = {
         folderId,
@@ -642,7 +642,7 @@ const moveFile = [
 
 // Delete a file from the users database and the disk
 const deleteFile = async (req, res) => {
-  const fileId = req.body.fileId;
+  const fileId = req.targetFile.id;
   try {
     // Delete file in database
     const deletedFile = await db.deleteFile(fileId);

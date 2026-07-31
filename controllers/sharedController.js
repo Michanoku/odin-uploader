@@ -4,6 +4,7 @@ import { body, validationResult, matchedData } from "express-validator";
 import { ZipArchive } from "archiver";
 
 import * as sharedQueries from "../db/sharedQueries.js";
+import { getFolder } from "../db/browserQueries.js";
 import {
   getFolderContents,
   renderFolderContents,
@@ -63,7 +64,8 @@ const shareFolder = [
 
     // Share the folder by creating a share model referecing it (and all subfolders and files)
     try {
-      const sharedFolder = await sharedQueries.shareFolder(folderId, duration);
+      await sharedQueries.shareFolder(folderId, duration);
+      const sharedFolder = await getFolder({folderId, userId: req.user.id});
       const baseUrl = `${req.protocol}://${req.get("host")}`;
       const sharedUrl = `Your shared folder link: ${baseUrl}/shared/folder/${sharedFolder.id}`;
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
@@ -97,7 +99,8 @@ const unshareFolder = async (req, res, next) => {
   const folderId = req.targetFolder.id;
   // Delete the share reference. That is all.
   try {
-    const unsharedFolder = await sharedQueries.unshareFolder(folderId);
+    await sharedQueries.unshareFolder(folderId);
+    const unsharedFolder = await getFolder({folderId, userId: req.user.id});
     const folderContentsRaw = await getFolderContents(req.currentFolder.id);
     const folderContents = await renderFolderContents(
       folderContentsRaw,
@@ -232,10 +235,17 @@ const shareFile = [
       const sharedFile = await sharedQueries.shareFile(fileId, duration);
       const baseUrl = `${req.protocol}://${req.get("host")}`;
       const sharedUrl = `Your shared file link: ${baseUrl}/shared/file/${sharedFile.id}`;
+      const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+      const folderContents = await renderFolderContents(
+        folderContentsRaw,
+        req.currentFolder,
+        formatDate
+      );
       return res.json({
         success: true,
         file: sharedFile,
         shared: true,
+        folderContents: folderContents,
         url: sharedUrl,
       });
     } catch (err) {
@@ -257,7 +267,13 @@ const unshareFile = async (req, res, next) => {
   // Delete the share object. That is all.
   try {
     const unsharedFile = await sharedQueries.unshareFile(fileId);
-    return res.json({ success: true, file: unsharedFile });
+    const folderContentsRaw = await getFolderContents(req.currentFolder.id);
+    const folderContents = await renderFolderContents(
+      folderContentsRaw,
+      req.currentFolder,
+      formatDate
+    );
+    return res.json({ success: true, file: unsharedFile, folderContents: folderContents });
   } catch (err) {
     console.log(err);
     return res.json({ success: false, error: err });

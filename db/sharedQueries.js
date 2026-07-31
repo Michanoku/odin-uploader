@@ -13,7 +13,8 @@ const shareFolder = async (folderId, duration) => {
 
   // Get folder ids from all subfolders and then get the files within the folders
   const folderIds = await collectFolderIds(folderId);
-  const fileIds = await getAllFilesFromSubfolders(folderIds);
+  const files = await getAllFilesFromSubfolders(folderIds);
+  const fileIds = files.map((file) => file.id);
 
   // Since we are creating a new share, check for existing shares within and unshare if found
   await Promise.all([
@@ -21,7 +22,7 @@ const shareFolder = async (folderId, duration) => {
     ...fileIds.map((id) => unshareFile(id)),
   ]);
 
-  const share = await prisma.share.create({
+  await prisma.share.create({
     data: {
       rootFolderId: folderId,
       expiresAt,
@@ -29,11 +30,11 @@ const shareFolder = async (folderId, duration) => {
         connect: folderIds.map((id) => ({ id })),
       },
       files: {
-        connect: fileIds,
+        connect: fileIds.map((id) => ({ id })),
       },
     },
   });
-  return share;
+  return;
 };
 
 // Unshare a folder
@@ -56,6 +57,7 @@ const unshareFolder = async (folderId) => {
       id: share.id,
     },
   });
+  return;
 };
 
 // Get the share object associated with a folder
