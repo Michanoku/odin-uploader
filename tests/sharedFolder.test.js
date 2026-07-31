@@ -455,6 +455,109 @@ describe("Shared Folder Access", () => {
         expect(guestChild.status).toBe(404);
         expect(guestGrandChild.status).toBe(404);
       });
+      
+      test("shared root moved into another shared folder joins target share and deletes old share", async () => {
+        // Share the first folder
+        await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+          folderId: sharedFolderId,
+          duration: 7,
+        });
+
+        // Create and share another folder
+        const secondFolder = await owner
+          .post(`/browser/folder/${parentId}/createFolder`)
+          .send({
+            folderName: "Second Shared Folder",
+          });
+
+        const secondFolderId = secondFolder.body.folder.id;
+
+        await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+          folderId: secondFolderId,
+          duration: 7,
+        });
+
+        const sourceFolder = await prisma.folder.findUnique({
+          where: { id: sharedFolderId },
+          include: { rootShare: true },
+        });
+
+        const targetFolder = await prisma.folder.findUnique({
+          where: { id: secondFolderId },
+        });
+
+        const oldShareId = sourceFolder.shareId;
+        const newShareId = targetFolder.shareId;
+
+        const response = await owner
+          .post(`/browser/folder/${parentId}/moveFolder`)
+          .send({
+            folderId: sharedFolderId,
+            parentId: secondFolderId,
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.folder.shareId).toBe(newShareId);
+        expect(response.body.folder.shareId).not.toBe(oldShareId);
+
+        const deletedShare = await prisma.share.findUnique({
+          where: { id: oldShareId },
+        });
+
+        expect(deletedShare).toBeNull();
+      });
+
+      test("shared child moved into another shared folder joins target share but keeps original share", async () => {
+        // Share the first folder
+        await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+          folderId: sharedFolderId,
+          duration: 7,
+        });
+
+        // Create and share another folder
+        const secondFolder = await owner
+          .post(`/browser/folder/${parentId}/createFolder`)
+          .send({
+            folderName: "Second Shared Folder",
+          });
+
+        const secondFolderId = secondFolder.body.folder.id;
+
+        await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+          folderId: secondFolderId,
+          duration: 7,
+        });
+
+        const childBefore = await prisma.folder.findUnique({
+          where: { id: childId },
+        });
+
+        const targetFolder = await prisma.folder.findUnique({
+          where: { id: secondFolderId },
+        });
+
+        const originalShareId = childBefore.shareId;
+        const targetShareId = targetFolder.shareId;
+
+        const response = await owner
+          .post(`/browser/folder/${sharedFolderId}/moveFolder`)
+          .send({
+            folderId: childId,
+            parentId: secondFolderId,
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.folder.shareId).toBe(targetShareId);
+        expect(response.body.folder.shareId).not.toBe(originalShareId);
+
+        const originalShare = await prisma.share.findUnique({
+          where: { id: originalShareId },
+        });
+
+        expect(originalShare).toBeTruthy();
+      });
     });
 
     test("owner can unshare folder", async () => {
