@@ -14,7 +14,8 @@ import {
 } from "../lib/browserUtils.js";
 import { register } from "module";
 
-const uploadFolder = process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
+const uploadFolder =
+  process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
 
 // Validators
 const folderShareValidation = [
@@ -25,9 +26,7 @@ const folderShareValidation = [
     .bail()
     .custom(async (_, { req }) => {
       if (req.targetFolder.shareId) {
-        throw new Error(
-          "Folder already part of a shared group."
-        );
+        throw new Error("Folder already part of a shared group.");
       }
       return true;
     }),
@@ -41,9 +40,7 @@ const fileShareValidation = [
     .bail()
     .custom(async (_, { req }) => {
       if (req.targetFile.shareId) {
-        throw new Error(
-          "File already part of a shared group."
-        );
+        throw new Error("File already part of a shared group.");
       }
       return true;
     }),
@@ -70,8 +67,18 @@ const shareFolder = [
       const baseUrl = `${req.protocol}://${req.get("host")}`;
       const sharedUrl = `Your shared folder link: ${baseUrl}/shared/folder/${sharedFolder.id}`;
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
-      const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
-      return res.json({ success: true, folder: sharedFolder, shared: true, url: sharedUrl, folderContents: folderContents });
+      const folderContents = await renderFolderContents(
+        folderContentsRaw,
+        req.currentFolder,
+        formatDate
+      );
+      return res.json({
+        success: true,
+        folder: sharedFolder,
+        shared: true,
+        url: sharedUrl,
+        folderContents: folderContents,
+      });
     } catch (err) {
       console.log(err);
       return res.json({ success: false, error: err });
@@ -82,15 +89,26 @@ const shareFolder = [
 // Unshare a folder
 const unshareFolder = async (req, res, next) => {
   if (req.targetFolder.shareId && !req.targetFolder.rootShare) {
-    return res.json({ success: false, error: "Folder is not the root of this shared group."})
+    return res.json({
+      success: false,
+      error: "Folder is not the root of this shared group.",
+    });
   }
   const folderId = req.targetFolder.id;
   // Delete the share reference. That is all.
   try {
     const unsharedFolder = await sharedQueries.unshareFolder(folderId);
     const folderContentsRaw = await getFolderContents(req.currentFolder.id);
-    const folderContents = await renderFolderContents(folderContentsRaw, req.currentFolder, formatDate);
-    return res.json({ success: true, folder: unsharedFolder, folderContents: folderContents });
+    const folderContents = await renderFolderContents(
+      folderContentsRaw,
+      req.currentFolder,
+      formatDate
+    );
+    return res.json({
+      success: true,
+      folder: unsharedFolder,
+      folderContents: folderContents,
+    });
   } catch (err) {
     console.log(err);
     return res.json({ success: false, error: err });
@@ -214,7 +232,12 @@ const shareFile = [
       const sharedFile = await sharedQueries.shareFile(fileId, duration);
       const baseUrl = `${req.protocol}://${req.get("host")}`;
       const sharedUrl = `Your shared file link: ${baseUrl}/shared/file/${sharedFile.id}`;
-      return res.json({ success: true, file: sharedFile, shared: true, url: sharedUrl });
+      return res.json({
+        success: true,
+        file: sharedFile,
+        shared: true,
+        url: sharedUrl,
+      });
     } catch (err) {
       console.log(err);
       return res.json({ success: false, error: err });
@@ -225,7 +248,10 @@ const shareFile = [
 // Unshare a file
 const unshareFile = async (req, res, next) => {
   if (req.targetFile.shareId && !req.targetFile.rootShare) {
-    return res.json({ success: false, error: "File is not the root of this shared group."})
+    return res.json({
+      success: false,
+      error: "File is not the root of this shared group.",
+    });
   }
   const fileId = req.targetFile.id;
   // Delete the share object. That is all.

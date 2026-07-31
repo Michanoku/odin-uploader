@@ -108,7 +108,7 @@ const validateRenameFolder = [
 
 // Validate Folder on Moving
 const validateMoveFolder = [
-  check("parentId")
+  body("parentId")
     // Check if a folder of the same name exists at the location
     .custom(async (value, { req }) => {
       const folder = req.targetFolder;
@@ -136,7 +136,7 @@ const validateMoveFolder = [
     .bail()
     .custom(async (value, { req }) => {
       const folder = req.targetFolder;
-      const descendant = await db.isDescendant(value, folder.id);
+      const descendant = await db.isDescendant(folder.id, value);
       if (descendant) {
         throw new Error("Can't move folder into subfolder.");
       }
@@ -368,9 +368,13 @@ const moveFolder = [
     }
     // The folder to be moved
     const { parentId } = matchedData(req);
+
     const folderId = req.targetFolder.id;
     try {
-      const parentFolder = await db.getFolder(parentId);
+      const parentFolder = await db.getFolder({
+        folderId: parentId,
+        userId: req.user.id,
+      });
       await shareManager(req.targetFolder, parentFolder, "folder");
       const updatedfolderData = {
         parentId: parentId,
@@ -607,12 +611,14 @@ const moveFile = [
       });
     }
     // Move the file
-    const { parentId } = matchedData(req);
-    const fileId = req.body.fileId;
+    const { folderId } = matchedData(req);
+    const fileId = req.targetFile.id;
+
     try {
-      await shareManager(fileId, parentId, "file");
+      const parentFolder = db.getFolder({ folderId, userId: req.user.id });
+      await shareManager(req.targetFile, parentFolder, "file");
       const updatedfileData = {
-        folderId: req.body.folderId,
+        folderId,
       };
       const updatedFile = await db.updateFile(fileId, updatedfileData);
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);

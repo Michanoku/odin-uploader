@@ -3,6 +3,8 @@ import path from "path";
 import request from "supertest";
 
 import app from "../app.js";
+import "../config/env.js";
+import { prisma } from "../lib/prisma.js";
 
 // Get the path and parent id of the users root.
 async function getRootPathAndId(agent) {
@@ -12,8 +14,8 @@ async function getRootPathAndId(agent) {
 }
 
 describe("Shared Folder Access", () => {
-  const owner = request.agent(app);
-  const guest = request.agent(app);
+  let owner;
+  let guest;
 
   let rootId;
   let parentId;
@@ -22,7 +24,15 @@ describe("Shared Folder Access", () => {
   let grandChildId;
   let privateFolderId;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    owner = request.agent(app);
+    guest = request.agent(app);
+
+    await prisma.share.deleteMany();
+    await prisma.file.deleteMany();
+    await prisma.folder.deleteMany();
+    await prisma.user.deleteMany();
+
     // Create owner and guest and all folders required and save their ids
     await owner.post("/register").type("form").send({
       username: "sharedFolderOwner",
@@ -129,6 +139,10 @@ describe("Shared Folder Access", () => {
 
   describe("after folder is shared", () => {
     test("guest can access shared folder", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
       // Attempt to access the folder as a guest
       const response = await guest.get(`/shared/folder/${sharedFolderId}`);
 
@@ -137,6 +151,10 @@ describe("Shared Folder Access", () => {
     });
 
     test("guest can access child folder", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
       // Attempt to access child folder
       const response = await guest.get(`/shared/folder/${childId}`);
 
@@ -145,6 +163,10 @@ describe("Shared Folder Access", () => {
     });
 
     test("guest can access grandchild folder", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
       // Attempt to access grandchild folder
       const response = await guest.get(`/shared/folder/${grandChildId}`);
 
@@ -167,6 +189,10 @@ describe("Shared Folder Access", () => {
     });
 
     test("guest cannot access unrelated private folder", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
       // Attempt to access an entirely different folder
       const response = await guest.get(`/shared/folder/${privateFolderId}`);
 
@@ -174,7 +200,10 @@ describe("Shared Folder Access", () => {
     });
 
     test("guest can download shared folder", async () => {
-      const agent = request.agent(app);
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
       // Download the shared folder
       const download = await guest
         .post(`/shared/folder/${sharedFolderId}/downloadFolder`)
@@ -188,6 +217,11 @@ describe("Shared Folder Access", () => {
     });
 
     test("cannot share child folder if a share already exists", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
+
       const response = await owner
         .post(`/browser/folder/${sharedFolderId}/shareFolder`)
         .send({
@@ -200,6 +234,11 @@ describe("Shared Folder Access", () => {
     });
 
     test("parent folder can be shared as a separate share group", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
+
       const response = await owner
         .post(`/browser/folder/${rootId}/shareFolder`)
         .send({
@@ -212,6 +251,10 @@ describe("Shared Folder Access", () => {
     });
 
     test("new folder created inside shared folder is automatically shared", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
       const newFolder = await owner
         .post(`/browser/folder/${sharedFolderId}/createFolder`)
         .send({
@@ -230,6 +273,10 @@ describe("Shared Folder Access", () => {
     });
 
     test("new file created inside shared folder is automatically shared", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
       const upload = await owner
         .post(`/browser/folder/${sharedFolderId}/upload`)
         .attach(
@@ -250,6 +297,10 @@ describe("Shared Folder Access", () => {
     });
 
     test("cannot separately share file that is already part of a share", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
       const upload = await owner
         .post(`/browser/folder/${sharedFolderId}/upload`)
         .attach(
@@ -276,14 +327,17 @@ describe("Shared Folder Access", () => {
 
     describe("when moving folders", () => {
       test("private folder moved into shared folder becomes shared", async () => {
+        await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+          folderId: sharedFolderId,
+          duration: 7,
+        });
         const response = await owner
-          .post(`/browser/folder/${rootId}/moveFolder`)
+          .post(`/browser/folder/${parentId}/moveFolder`)
           .send({
             folderId: privateFolderId,
             parentId: sharedFolderId,
           });
 
-        console.log("test 1", response.body)
         expect(response.status).toBe(200);
         expect(response.body.success).toBe(true);
         expect(response.body.folder.shareId).toBeTruthy();
@@ -297,14 +351,18 @@ describe("Shared Folder Access", () => {
       });
 
       test("shared child folder moved into private folder loses its share", async () => {
+        await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+          folderId: sharedFolderId,
+          duration: 7,
+        });
+
         const response = await owner
-          .post(`/browser/folder/${privateFolderId}/moveFolder`)
+          .post(`/browser/folder/${sharedFolderId}/moveFolder`)
           .send({
             folderId: childId,
             parentId: privateFolderId,
           });
 
-        console.log("test 2", response.body)
         expect(response.status).toBe(200);
         expect(response.body.success).toBe(true);
         expect(response.body.folder.shareId).toBeNull();
@@ -315,25 +373,33 @@ describe("Shared Folder Access", () => {
       });
 
       test("shared root folder moved into private folder keeps its share", async () => {
+        await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+          folderId: sharedFolderId,
+          duration: 7,
+        });
         const response = await owner
-          .post(`/browser/folder/${privateFolderId}/moveFolder`)
+          .post(`/browser/folder/${parentId}/moveFolder`)
           .send({
-            folderId: parentId,
+            folderId: sharedFolderId,
             parentId: privateFolderId,
           });
-
-        console.log("test 3", response.body)
         expect(response.status).toBe(200);
         expect(response.body.success).toBe(true);
         expect(response.body.folder.shareId).toBeTruthy();
 
-        const guestResponse = await guest.get(`/shared/folder/${parentId}`);
+        const guestResponse = await guest.get(
+          `/shared/folder/${sharedFolderId}`
+        );
 
         expect(guestResponse.status).toBe(200);
-        expect(guestResponse.text).toContain("Parent");
+        expect(guestResponse.text).toContain("Shared Folder");
       });
 
       test("moving private folder into shared folder shares all descendants", async () => {
+        await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+          folderId: sharedFolderId,
+          duration: 7,
+        });
         const subtree = await owner
           .post(`/browser/folder/${privateFolderId}/createFolder`)
           .send({
@@ -350,29 +416,32 @@ describe("Shared Folder Access", () => {
 
         const childFolderId = child.body.folder.id;
 
-        await owner.post(`/browser/folder/${sharedFolderId}/moveFolder`).send({
-          folderId: subtreeId,
-          parentId: sharedFolderId,
-        });
-
+        const moveResponse = await owner
+          .post(`/browser/folder/${privateFolderId}/moveFolder`)
+          .send({
+            folderId: subtreeId,
+            parentId: sharedFolderId,
+          });
         const guestResponse = await guest.get(
           `/shared/folder/${childFolderId}`
         );
 
-        console.log("test 4", response.body)
         expect(guestResponse.status).toBe(200);
         expect(guestResponse.text).toContain("Subtree Child");
       });
 
       test("moving shared subtree into private folder unshares descendants", async () => {
+        await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+          folderId: sharedFolderId,
+          duration: 7,
+        });
         const response = await owner
-          .post(`/browser/folder/${privateFolderId}/moveFolder`)
+          .post(`/browser/folder/${sharedFolderId}/moveFolder`)
           .send({
-            folderId: sharedFolderId,
+            folderId: childId,
             parentId: privateFolderId,
           });
-        
-        console.log("test 5", response.body)
+
         expect(response.status).toBe(200);
         expect(response.body.success).toBe(true);
 
@@ -382,18 +451,22 @@ describe("Shared Folder Access", () => {
           `/shared/folder/${grandChildId}`
         );
 
-        expect(guestShared.status).toBe(404);
+        expect(guestShared.status).toBe(200);
         expect(guestChild.status).toBe(404);
         expect(guestGrandChild.status).toBe(404);
       });
     });
 
     test("owner can unshare folder", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
       // Unshare the folder
       const response = await owner
-        .post(`/browser/folder/${rootId}/unshareFolder`)
+        .post(`/browser/folder/${parentId}/unshareFolder`)
         .send({
-          folderId: parentId,
+          folderId: sharedFolderId,
         });
 
       expect(response.status).toBe(200);
@@ -401,8 +474,15 @@ describe("Shared Folder Access", () => {
     });
 
     test("guest loses access after folder is unshared", async () => {
+      await owner.post(`/browser/folder/${parentId}/shareFolder`).send({
+        folderId: sharedFolderId,
+        duration: 7,
+      });
+      await owner.post(`/browser/folder/${parentId}/unshareFolder`).send({
+        folderId: sharedFolderId,
+      });
       // Attempt to access the unshared folder
-      const response = await guest.get(`/shared/folder/${parentId}`);
+      const response = await guest.get(`/shared/folder/${sharedFolderId}`);
 
       expect(response.status).toBe(404);
     });

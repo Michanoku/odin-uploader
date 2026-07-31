@@ -16,7 +16,7 @@ describe("Authentication", () => {
     expect(registerResponse.status).toBe(302);
     expect(registerResponse.headers.location).toBe("/");
 
-    // See if the user can access the protected route 
+    // See if the user can access the protected route
     const protectedResponse = await agent.get("/protected");
 
     expect(protectedResponse.status).toBe(200);

@@ -12,7 +12,8 @@ import * as browserController from "../controllers/browserController.js";
 
 const router = express.Router();
 // Multer is configured to only allow 1MB at this point (user max 5MB)
-const uploadFolder = process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
+const uploadFolder =
+  process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
 const upload = multer({
   dest: uploadFolder,
   limits: {
@@ -34,11 +35,7 @@ router.post(
   loadCurrentFolder,
   browserController.createFolder
 );
-router.post(
-  "/getTree",
-  isAuth,
-  browserController.getTree
-);
+router.post("/getTree", isAuth, browserController.getTree);
 router.post(
   "/browser/folder/:currentFolderId/downloadFolder",
   isAuth,
@@ -102,12 +99,14 @@ router.post(
 router.post(
   "/browser/folder/:currentFolderId/moveFile",
   isAuth,
+  loadCurrentFolder,
   loadTargetFile,
   browserController.moveFile
 );
 router.post(
   "/browser/folder/:currentFolderId/deleteFile",
   isAuth,
+  loadCurrentFolder,
   loadTargetFile,
   browserController.deleteFile
 );

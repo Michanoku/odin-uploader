@@ -3,6 +3,8 @@ import path from "path";
 import request from "supertest";
 
 import app from "../app.js";
+import "../config/env.js";
+import { prisma } from "../lib/prisma.js";
 
 // Get the path and parent id of the users root.
 async function getRootPathAndId(agent) {
@@ -13,10 +15,16 @@ async function getRootPathAndId(agent) {
 }
 
 describe("Folder Operations", () => {
-  const agent = request.agent(app);
+  let agent;
 
   // Register the user for the test
-  beforeAll(async () => {
+  beforeEach(async () => {
+    agent = request.agent(app);
+
+    await prisma.file.deleteMany();
+    await prisma.folder.deleteMany();
+    await prisma.user.deleteMany();
+
     await agent.post("/register").type("form").send({
       username: "foldertestuser",
       password: "supersecurepassword",
@@ -53,6 +61,9 @@ describe("Folder Operations", () => {
     test("user cannot create two folders with the same name in the same parent folder", async () => {
       const root = await getRootPathAndId(agent);
 
+      await agent.post(`${root.path}/createFolder`).send({
+        folderName: "Documents",
+      });
       // Attempt to create a new folder with the same name of an existing folder
       const response = await agent.post(`${root.path}/createFolder`).send({
         folderName: "Documents",
@@ -144,6 +155,9 @@ describe("Folder Operations", () => {
       const root = await getRootPathAndId(agent);
 
       // Create folder to rename and get the id
+      await agent.post(`${root.path}/createFolder`).send({
+        folderName: "Photos",
+      });
       const creationResponse = await agent
         .post(`${root.path}/createFolder`)
         .send({
@@ -260,7 +274,7 @@ describe("Folder Operations", () => {
       expect(response.body.success).toBe(false);
     });
 
-     test("user can't move folder into same folder", async () => {
+    test("user can't move folder into same folder", async () => {
       const root = await getRootPathAndId(agent);
 
       // Create the parent folder to try to move into
@@ -270,7 +284,6 @@ describe("Folder Operations", () => {
           folderName: "ParentFolderMax",
         });
       const parentId = creationResponse.body.folder.id;
-
 
       // Try to moove the folder into itself
       const response = await agent.post(`${root.path}/moveFolder`).send({
@@ -282,7 +295,7 @@ describe("Folder Operations", () => {
       expect(response.body.success).toBe(false);
     });
 
-  test("user can't move folder into it's own subfolder", async () => {
+    test("user can't move folder into it's own subfolder", async () => {
       const root = await getRootPathAndId(agent);
 
       // Create the parent folder to try to move into
@@ -293,7 +306,7 @@ describe("Folder Operations", () => {
         });
       const parentId = creationResponse.body.folder.id;
 
-      // Create two folders with the same name, one in the root and one in the parent
+      // Create the Child of the parent
       const creationResponse2 = await agent
         .post(`/browser/folder/${parentId}/createFolder`)
         .send({

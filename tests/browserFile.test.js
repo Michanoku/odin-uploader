@@ -4,6 +4,8 @@ import path from "path";
 import request from "supertest";
 
 import app from "../app.js";
+import "../config/env.js";
+import { prisma } from "../lib/prisma.js";
 
 // Get the path and parent id of the users root.
 async function getRootPathAndId(agent) {
@@ -13,10 +15,15 @@ async function getRootPathAndId(agent) {
 }
 
 describe("File Operations", () => {
-  const agent = request.agent(app);
+  let agent;
 
   // Register a user to use
-  beforeAll(async () => {
+  beforeEach(async () => {
+    await prisma.file.deleteMany();
+    await prisma.folder.deleteMany();
+    await prisma.user.deleteMany();
+
+    agent = request.agent(app);
     await agent.post("/register").type("form").send({
       username: "filetestuser",
       password: "supersecurepassword",
@@ -44,7 +51,10 @@ describe("File Operations", () => {
       expect(response.body.success).toBe(true);
 
       // Check that Multer created the file on disk
-      const uploadedPath = path.resolve("uploads/test", response.body.file.filename);
+      const uploadedPath = path.resolve(
+        "uploads/test",
+        response.body.file.filename
+      );
 
       expect(fs.existsSync(uploadedPath)).toBe(true);
       const stats = fs.statSync(uploadedPath);
@@ -54,6 +64,10 @@ describe("File Operations", () => {
 
     test("user cannot upload duplicate filenames into the same folder", async () => {
       const root = await getRootPathAndId(agent);
+      await agent
+        .post(`${root.path}/upload`)
+        .attach("file", path.resolve("tests/files/test.txt"), "upload1.txt");
+
       const response = await agent
         .post(`${root.path}/upload`)
         .attach("file", path.resolve("tests/files/test.txt"), "upload1.txt");
@@ -99,7 +113,7 @@ describe("File Operations", () => {
       // Rename the file
       const response = await agent.post(`${root.path}/renameFile`).send({
         fileId,
-        updatedFileName: "renamed.txt",
+        fileName: "renamed.txt",
       });
 
       expect(response.status).toBe(200);
@@ -175,7 +189,7 @@ describe("File Operations", () => {
         .post(`/browser/folder/${folderId}/moveFile`)
         .send({
           fileId,
-          updatedFolderId: root.id,
+          folderId: root.id,
         });
 
       expect(response.status).toBe(200);
@@ -203,7 +217,7 @@ describe("File Operations", () => {
       // Try to move the file into the folder
       const response = await agent.post(`${root.path}/moveFile`).send({
         fileId,
-        updatedFolderId: folderId,
+        folderId: folderId,
       });
 
       expect(response.status).toBe(200);
@@ -243,13 +257,15 @@ describe("File Operations", () => {
       const response = await agent.post(`${root.path}/deleteFile`).send({
         fileId,
       });
-
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.file.id).toBe(fileId);
 
       // See if the file was deleted
-      const uploadedPath = path.resolve("uploads/test", response.body.file.filename);
+      const uploadedPath = path.resolve(
+        "uploads/test",
+        response.body.file.filename
+      );
 
       expect(fs.existsSync(uploadedPath)).toBe(false);
     });

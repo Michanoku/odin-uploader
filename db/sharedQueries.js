@@ -14,11 +14,11 @@ const shareFolder = async (folderId, duration) => {
   // Get folder ids from all subfolders and then get the files within the folders
   const folderIds = await collectFolderIds(folderId);
   const fileIds = await getAllFilesFromSubfolders(folderIds);
-  
+
   // Since we are creating a new share, check for existing shares within and unshare if found
   await Promise.all([
-    ...folderIds.map(id => unshareFolder(id)),
-    ...fileIds.map(id => unshareFile(id)),
+    ...folderIds.map((id) => unshareFolder(id)),
+    ...fileIds.map((id) => unshareFile(id)),
   ]);
 
   const share = await prisma.share.create({
