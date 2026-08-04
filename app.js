@@ -17,6 +17,7 @@ import { prisma } from "./lib/prisma.js";
 import browserRoutes from "./routes/browserRoutes.js";
 import sharedRoutes from "./routes/sharedRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import { formatFileSize } from "./lib/browserUtils.js";
 
 const app = express();
 
@@ -67,8 +68,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Store user in locals (if any)
-app.use((req, res, next) => {
-  res.locals.user = req.user || null;
+app.use(async (req, res, next) => {
+  if (req.user) {
+    res.locals.user = req.user;
+    const result = await prisma.file.aggregate({
+      where: {
+        userId: req.user.id,
+      },
+      _sum: {
+        size: true,
+      },
+    });
+    res.locals.storage = formatFileSize(result._sum.size);
+  } else {
+    res.locals.user = null;
+    res.locals.storage = null;
+  }
   next();
 });
 

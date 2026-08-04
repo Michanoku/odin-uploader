@@ -534,25 +534,19 @@ const downloadFile = (req, res, next) => {
 // Open file details for the user to view
 const getFile = async (req, res, next) => {
   const file = req.targetFile;
-  // TODO currently the app is not made to serve targetfolder here. I do want breadcrumbs maybe so I
-  // will have to check how to best implement this. could be that simply using the same method as in
-  // getFolder is enough.
-  const folder = req.targetFolder ?? null;
-  const folderId = folder?.id ?? null;
+  const folderId = req.targetFile.folderId;
   let breadcrumbs = [];
   try {
-    if (folder) {
-      breadcrumbs = await getBreadcrumbs({ folderId: folderId });
+    if (folderId) {
+      breadcrumbs = await getBreadcrumbs({ folderId });
     }
     const context = {
       title: "Browser",
       view: "file",
-      parentId: folder?.parentId ?? null,
       fileSize: formatFileSize(file.size),
       date: formatDate(file.createdAt),
       file,
       breadcrumbs,
-      folderId,
     };
 
     res.render("files/browser", context);

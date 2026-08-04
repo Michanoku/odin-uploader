@@ -3,8 +3,6 @@
 <%- include('../partials/head') %>
 <%- include('../partials/icons') %>
   <body class="browser">
-
-  </div>
     <%- include('../partials/nav') %>
     <%- include('../partials/aside') %>
     <main>
@@ -31,6 +29,9 @@
         <%= folder.name %>
       </a>
     <% }}) %>
+    <% if (typeof file !== "undefined" && file)  { %>
+      > <%= file.originalname %>
+   <% } %>
     </div>
     <hr>
     <% if (view === "folder") { %>

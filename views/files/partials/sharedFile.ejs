@@ -1,0 +1,23 @@
+<div class="folder-link">
+  <a href="/shared/file/<%= file.id %>">
+    <svg class="folder-icon" width="24" height="24">
+      <use href="#icon-file"></use>
+    </svg>
+
+    <div class="folder-name">
+      <%= file.originalname %>
+    </div>
+  </a>
+
+  <form method="post" action="/shared/folder/<%= sharedFolder.id %>/downloadFile">
+    <input type="hidden" value="<%= file.id %>" name="fileId">
+
+    <button type="submit" class="account-button">
+      <svg class="folder-icon" width="24" height="24">
+        <use href="#icon-download"></use>
+      </svg>
+    </button>
+  </form>
+  <div>
+  </div>
+</div>

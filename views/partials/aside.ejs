@@ -1,1 +1,40 @@
-    <aside>Menu</aside>
+<aside>
+    <div class="site-links">
+        <a class="site-link" href="/browser/folder/<%= user.rootFolderId %>">
+            <svg class="folder-icon" width="24" height="24">
+                <use href="#icon-folder"></use>
+            </svg>
+            <div class="folder-name">
+                All Content
+            </div>
+        </a>
+        <a class="site-link" href="/shared/all/">
+            <svg class="folder-icon" width="24" height="24">
+                <use href="#icon-share"></use>
+            </svg>
+            <div class="folder-name">
+                Shared Content
+            </div>
+        </a>
+    </div>
+    <div class="site-links">
+        <div class="info"><b><%= user.username %></b></div>
+        <div class="info"><b>Storage used:</b> <%= storage %> of 5 MB.</div>
+        <a class="site-link" href="/profile">
+            <svg class="folder-icon" width="24" height="24">
+                <use href="#icon-user"></use>
+            </svg>
+            <div class="folder-name">
+                Profile
+            </div>
+        </a>
+        <a class="site-link" href="/logout">
+            <svg class="folder-icon" width="24" height="24">
+                <use href="#icon-logout"></use>
+            </svg>
+            <div class="folder-name">
+                Logout
+            </div>
+        </a>
+    </div>
+</aside>

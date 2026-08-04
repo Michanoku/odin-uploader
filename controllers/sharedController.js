@@ -122,8 +122,7 @@ const unshareFolder = async (req, res, next) => {
 const getSharedFolder = async (req, res) => {
   const sharedFolder = req.sharedFolder;
   const sharedRootId = req.sharedRootId;
-  const parentId =
-    sharedFolder.parentId === sharedRootId ? null : sharedFolder.parentId;
+  const parentId = sharedFolder.rootShare ? null :  sharedFolder.parentId;
 
   // Get the breadcrumbs of any and the contents of the folder
   const [contents, breadcrumbs] = await Promise.all([
@@ -133,11 +132,14 @@ const getSharedFolder = async (req, res) => {
 
   const context = {
     title: "Shared folder",
+    view: "folder",
     contents,
     breadcrumbs,
     folderId: sharedFolder.id,
     sharedFolder,
     parentId: parentId,
+    sharedRootId: sharedRootId,
+    formatDate,
   };
 
   return res.render("files/shared", context);
@@ -195,23 +197,25 @@ const getSharedFile = async (req, res, next) => {
     breadcrumbs: [],
     parentId: null,
     folderId: null,
+    sharedRootId: null,
     file,
   };
   // If the file is part of a sharedfolder, also get breadcrumbs and so on
   try {
     if (req.sharedFolder) {
       const sharedRootId = req.sharedRootId;
-      const parentId =
-        file.folderId === sharedRootId ? null : req.sharedFolder.parentId;
+      console.log(sharedRootId)
+      const parentId = file.rootShare ? null : file.folderId;
       const [contents, breadcrumbs] = await Promise.all([
         getFolderContents(req.sharedFolder.id),
         getBreadcrumbs({ folderId: req.sharedFolder.id, rootId: sharedRootId }),
       ]);
       context.parentId = parentId;
       context.breadcrumbs = breadcrumbs;
-      context.folderId = folderId;
+      context.folderId = req.sharedFolder.id;
+      context.sharedRootId = sharedRootId;
     }
-    return res.render("files/browser", context);
+    return res.render("files/shared", context);
   } catch (err) {
     return next(err);
   }

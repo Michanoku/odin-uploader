@@ -75,6 +75,9 @@ const getFolderShare = async (folderId) => {
         where: {
           id: folderId,
         },
+        include: {
+          rootShare: true,
+        },
       },
     },
   });
@@ -144,6 +147,9 @@ const getFileShare = async (fileId) => {
       files: {
         where: {
           id: fileId,
+        },
+        include: {
+          rootShare: true,
         },
       },
     },

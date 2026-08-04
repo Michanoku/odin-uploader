@@ -359,6 +359,7 @@ const modalHandler = (() => {
 
   elements.modalClose.addEventListener("click", closeModal);
   return {
+    loading,
     newFolder,
     renameFolder,
     shareFolder,
@@ -370,6 +371,7 @@ const modalHandler = (() => {
     unshareFile,
     moveFile,
     deleteFile,
+    closeModal,
   };
 })();
 
@@ -377,9 +379,7 @@ fileInput.addEventListener("change", async () => {
   if (!fileInput.files.length) {
     return;
   }
-  loadingMessage.textContent = "Uploading files...";
-  modalOverlay.classList.remove("hidden");
-  loading.classList.remove("hidden");
+  modalHandler.loading("Uploading files...");
 
   const formData = new FormData(uploadForm);
 
@@ -400,7 +400,7 @@ fileInput.addEventListener("change", async () => {
   } catch (err) {
     console.log(err);
   } finally {
-    closeModal();
+    modalHandler.closeModal();
   }
 });
 
