@@ -174,8 +174,6 @@ describe("Shared File Access", () => {
         duration: 7,
       });
 
-      console.log(shareResponse.body)
-
       const privateFolder = await owner.post(`${root.path}/createFolder`).send({
         folderName: "Private Folder",
       });
@@ -194,15 +192,12 @@ describe("Shared File Access", () => {
           fileId: privateFileId,
           folderId: secondFolderId,
         });
-
-      console.log(response.body);
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.file.shareId).toBeTruthy();
 
       const guestResponse = await guest.get(`/shared/file/${privateFileId}`);
 
-      console.log(response.body);
       expect(guestResponse.status).toBe(200);
       expect(guestResponse.text).toContain("private.txt");
     });
@@ -213,11 +208,9 @@ describe("Shared File Access", () => {
         duration: 7,
       });
 
-      const privateFolder = await owner
-        .post(`/browser/folder/${folderId}/createFolder`)
-        .send({
-          folderName: "Private Folder",
-        });
+      const privateFolder = await owner.post(`${root.path}/createFolder`).send({
+        folderName: "Private Folder",
+      });
 
       const privateFolderId = privateFolder.body.folder.id;
 
@@ -231,7 +224,7 @@ describe("Shared File Access", () => {
         .post(`/browser/folder/${folderId}/moveFile`)
         .send({
           fileId,
-          parentId: privateFolderId,
+          folderId: privateFolderId,
         });
 
       expect(response.status).toBe(200);
@@ -246,7 +239,7 @@ describe("Shared File Access", () => {
       });
 
       const parent = await owner
-        .post(`/browser/folder/${folderId}/createFolder`)
+        .post(`${root.path}/createFolder`)
         .send({ folderName: "Private Folder" });
       const parentId = parent.body.folder.id;
 
@@ -254,7 +247,7 @@ describe("Shared File Access", () => {
         .post(`/browser/folder/${folderId}/moveFile`)
         .send({
           fileId,
-          parentId,
+          folderId: parentId,
         });
 
       expect(response.status).toBe(200);
@@ -301,7 +294,7 @@ describe("Shared File Access", () => {
         .post(`/browser/folder/${folderId}/moveFile`)
         .send({
           fileId,
-          parentId: destinationId,
+          folderId: destinationId,
         });
 
       expect(response.status).toBe(200);
@@ -328,15 +321,13 @@ describe("Shared File Access", () => {
         })
       ).shareId;
 
-      const destination = await owner
-        .post(`/browser/folder/${folderId}/createFolder`)
-        .send({
-          folderName: "Destination",
-        });
+      const destination = await owner.post(`${root.path}/createFolder`).send({
+        folderName: "Destination",
+      });
 
       const destinationId = destination.body.folder.id;
 
-      await owner.post(`/browser/folder/${folderId}/shareFolder`).send({
+      await owner.post(`${root.path}/shareFolder`).send({
         folderId: destinationId,
         duration: 7,
       });
@@ -351,7 +342,7 @@ describe("Shared File Access", () => {
         .post(`/browser/folder/${folderId}/moveFile`)
         .send({
           fileId,
-          parentId: destinationId,
+          folderId: destinationId,
         });
 
       expect(response.status).toBe(200);
