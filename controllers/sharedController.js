@@ -14,6 +14,7 @@ import {
   formatFileSize,
 } from "../lib/browserUtils.js";
 import { register } from "module";
+import { DbNull } from "../generated/prisma/runtime/client.js";
 
 const uploadFolder =
   process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
@@ -48,6 +49,18 @@ const fileShareValidation = [
 ];
 
 // Folder related functions
+// Get all Shares
+const getAllShares = async (req, res, next) => {
+  const contents = await sharedQueries.getAllSharedRoots(req.user.id);
+  const context = {
+    title: "Shared Content",
+    view: "shared",
+    contents,
+    formatDate,
+  };
+  return res.render("files/shared", context);
+};
+
 // Share a folder
 const shareFolder = [
   folderShareValidation,
@@ -65,7 +78,7 @@ const shareFolder = [
     // Share the folder by creating a share model referecing it (and all subfolders and files)
     try {
       await sharedQueries.shareFolder(folderId, duration);
-      const sharedFolder = await getFolder({folderId, userId: req.user.id});
+      const sharedFolder = await getFolder({ folderId, userId: req.user.id });
       const baseUrl = `${req.protocol}://${req.get("host")}`;
       const sharedUrl = `Your shared folder link: ${baseUrl}/shared/folder/${sharedFolder.id}`;
       const folderContentsRaw = await getFolderContents(req.currentFolder.id);
@@ -100,7 +113,7 @@ const unshareFolder = async (req, res, next) => {
   // Delete the share reference. That is all.
   try {
     await sharedQueries.unshareFolder(folderId);
-    const unsharedFolder = await getFolder({folderId, userId: req.user.id});
+    const unsharedFolder = await getFolder({ folderId, userId: req.user.id });
     const folderContentsRaw = await getFolderContents(req.currentFolder.id);
     const folderContents = await renderFolderContents(
       folderContentsRaw,
@@ -122,7 +135,7 @@ const unshareFolder = async (req, res, next) => {
 const getSharedFolder = async (req, res) => {
   const sharedFolder = req.sharedFolder;
   const sharedRootId = req.sharedRootId;
-  const parentId = sharedFolder.rootShare ? null :  sharedFolder.parentId;
+  const parentId = sharedFolder.rootShare ? null : sharedFolder.parentId;
 
   // Get the breadcrumbs of any and the contents of the folder
   const [contents, breadcrumbs] = await Promise.all([
@@ -204,7 +217,7 @@ const getSharedFile = async (req, res, next) => {
   try {
     if (req.sharedFolder) {
       const sharedRootId = req.sharedRootId;
-      console.log(sharedRootId)
+      console.log(sharedRootId);
       const parentId = file.rootShare ? null : file.folderId;
       const [contents, breadcrumbs] = await Promise.all([
         getFolderContents(req.sharedFolder.id),
@@ -277,7 +290,11 @@ const unshareFile = async (req, res, next) => {
       req.currentFolder,
       formatDate
     );
-    return res.json({ success: true, file: unsharedFile, folderContents: folderContents });
+    return res.json({
+      success: true,
+      file: unsharedFile,
+      folderContents: folderContents,
+    });
   } catch (err) {
     console.log(err);
     return res.json({ success: false, error: err });
@@ -297,6 +314,7 @@ const downloadSharedFile = async (req, res, next) => {
 };
 
 export {
+  getAllShares,
   shareFolder,
   unshareFolder,
   getSharedFolder,

@@ -10,10 +10,13 @@
     <div class="main-title">
     <% if (view === "folder") { %>
       <%= sharedFolder.name %>
-    <% } else { %>
+    <% } else if (view === "file") { %>
       <%= file.originalname %>
+    <% } else { %>
+      Shared Content
     <% } %>
     </div>
+    <% if (view === "folder" || view === "file") { %>
     <div class="breadcrumbs">
     <a class="breadcrumb" href="/shared/folder/<%= sharedRootId %>">Root</a>
     <% breadcrumbs.forEach((folder, index, breadcrumbs) => { if (folder.id !== sharedRootId) { %>
@@ -26,11 +29,14 @@
       > <%= file.originalname %>
    <% } %>
     </div>
+    <% } %>
     <hr>
     <% if (view === "folder") { %>
       <%- include("./partials/sharedFolderContents") %>
-    <% } else { %>
+    <% } else if (view === "file") { %>
       <%- include("./partials/sharedFileDetails") %>
+    <% } else { %>
+      <%- include("./partials/sharedAll") %>
     <% } %>
     </main>
     <%- include('../partials/footer') %>

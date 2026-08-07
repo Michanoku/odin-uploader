@@ -169,6 +169,49 @@ const getFileShare = async (fileId) => {
   return result;
 };
 
+const getAllSharedRoots = async (userId) => {
+  // Get all roots shares of folders and files
+  const [rootFoldersData, rootFilesData] = await Promise.all([
+    prisma.share.findMany({
+      where: {
+        rootFolder: {
+          userId,
+        },
+      },
+      include: {
+        rootFolder: {
+          include: {
+            rootShare: true,
+          },
+        },
+      },
+    }),
+
+    prisma.share.findMany({
+      where: {
+        rootFile: {
+          userId,
+        },
+      },
+      include: {
+        rootFile: {
+          include: {
+            rootShare: true,
+          },
+        },
+      },
+    }),
+  ]);
+
+  const rootFolders = rootFoldersData.map(({ rootFolder }) => rootFolder);
+  const rootFiles = rootFilesData.map(({ rootFile }) => rootFile);
+
+  return {
+    rootFolders,
+    rootFiles,
+  };
+};
+
 export {
   shareFolder,
   unshareFolder,
@@ -176,4 +219,5 @@ export {
   shareFile,
   unshareFile,
   getFileShare,
+  getAllSharedRoots,
 };

@@ -15,6 +15,7 @@ import * as sharedController from "../controllers/sharedController.js";
 const router = express.Router();
 
 // Shared folder routes
+router.get("/shared/all", isAuth, sharedController.getAllShares);
 router.get(
   "/shared/folder/:sharedFolderId",
   isAuth,
