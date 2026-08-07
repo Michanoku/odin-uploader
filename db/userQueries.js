@@ -33,20 +33,20 @@ const createUser = async (email, hash) => {
 };
 
 const updateUser = async (id, email, hash) => {
-   const data = {};
+  const data = {};
 
-    if (email) {
-      data.email = email;
-    }
+  if (email) {
+    data.email = email;
+  }
 
-    if (hash) {
-      data.hash = hash;
-    }
+  if (hash) {
+    data.hash = hash;
+  }
   return await prisma.user.update({
     where: { id },
     data,
-  })
-}
+  });
+};
 
 // Look up a user by their name
 const lookupUserByName = async (email) => {

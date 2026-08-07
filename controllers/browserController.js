@@ -609,7 +609,10 @@ const moveFile = [
     const fileId = req.targetFile.id;
 
     try {
-      const parentFolder = await db.getFolder({ folderId, userId: req.user.id });
+      const parentFolder = await db.getFolder({
+        folderId,
+        userId: req.user.id,
+      });
       await shareManager(req.targetFile, parentFolder, "file");
       const updatedfileData = {
         folderId,

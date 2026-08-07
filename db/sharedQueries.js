@@ -5,7 +5,6 @@ import {
   getAllFilesFromSubfolders,
 } from "./browserQueries.js";
 
-
 // Delete Shares
 const deleteShare = async (shareId) => {
   await prisma.share.deleteMany({
@@ -13,7 +12,7 @@ const deleteShare = async (shareId) => {
       id: shareId,
     },
   });
-}
+};
 
 // Queries for shared folders
 // Share a folder and add all of its children and contained files to the share model object
