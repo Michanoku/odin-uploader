@@ -1,12 +1,12 @@
 // All prisma queries that have to do with the user
 import { prisma } from "../lib/prisma.js";
 
-// Create a new user with the username and the hash provided
-const createUser = async (username, hash) => {
+// Create a new user with the email and the hash provided
+const createUser = async (email, hash) => {
   return await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: {
-        username,
+        email,
         hash,
       },
     });
@@ -33,10 +33,10 @@ const createUser = async (username, hash) => {
 };
 
 // Look up a user by their name
-const lookupUserByName = async (username) => {
+const lookupUserByName = async (email) => {
   return await prisma.user.findUnique({
     where: {
-      username,
+      email,
     },
   });
 };

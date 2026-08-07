@@ -4,9 +4,9 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { validatePassword } from "../lib/passwordUtils.js";
 import { lookupUserByName, lookupUserById } from "../db/userQueries.js";
 
-const verifyCallback = async (username, password, done) => {
+const verifyCallback = async (email, password, done) => {
   try {
-    const user = await lookupUserByName(username);
+    const user = await lookupUserByName(email);
     if (!user) {
       return done(null, false);
     }

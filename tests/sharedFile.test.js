@@ -32,13 +32,13 @@ describe("Shared File Access", () => {
 
     // Register two users, one for sharing and one for accessing
     await owner.post("/register").type("form").send({
-      username: "sharedFileOwner",
+      email: "sharedFileOwner@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
 
     await guest.post("/register").type("form").send({
-      username: "sharedFileGuest",
+      email: "sharedFileGuest@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });

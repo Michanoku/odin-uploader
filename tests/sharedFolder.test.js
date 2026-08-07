@@ -35,13 +35,13 @@ describe("Shared Folder Access", () => {
 
     // Create owner and guest and all folders required and save their ids
     await owner.post("/register").type("form").send({
-      username: "sharedFolderOwner",
+      email: "sharedFolderOwner@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
 
     await guest.post("/register").type("form").send({
-      username: "sharedGuest",
+      email: "sharedGuest@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });

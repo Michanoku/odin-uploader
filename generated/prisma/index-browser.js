@@ -129,7 +129,7 @@ exports.Prisma.SessionScalarFieldEnum = {
 
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
-  username: 'username',
+  email: 'email',
   hash: 'hash',
   createdAt: 'createdAt',
   rootFolderId: 'rootFolderId'

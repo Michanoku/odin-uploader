@@ -8,7 +8,7 @@ describe("Authentication", () => {
   test("user can register and access protected route", async () => {
     // Create a user and see if they are redirected correctly
     const registerResponse = await agent.post("/register").type("form").send({
-      username: "testuser",
+      email: "testuser@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });

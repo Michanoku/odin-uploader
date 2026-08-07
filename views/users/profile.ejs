@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %>
+<%- include('../partials/icons') %>
+  <body class="browser">
+    <%- include('../partials/nav') %>
+    <%- include('../partials/aside') %>
+    <main class="flex">
+        <div class="column">
+    <div class="main-title">
+      Profile
+        <svg class="folder-icon" width="12" height="12">
+          <use href="#icon-user"></use>
+        </svg>
+    </div>
+    <hr>
+    <%- include("../partials/errors.ejs") %>
+    <form class="form-column" action="/update" method="post">
+        <label class="form-label" for="email">Email</label>
+        <input id="email" type="text" name="email" minlength="2" maxlength="32" value="<%= user.email %>">
+        <label class="form-label" for="password">Password</label>
+        <input id="password" type="password" name="password" minlength="12" maxlength="72">
+        <label class="form-label" for="confirmation">Confirmation</label>
+        <input id="confirmation" type="password" name="confirmation" minlength="12" maxlength="72">
+        <button class="action-button" type="submit">Update</button>
+    </form>
+</div>
+    </main>
+    <%- include('../partials/footer') %>
+  </body>
+
+</html>

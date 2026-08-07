@@ -25,7 +25,7 @@ describe("File Operations", () => {
 
     agent = request.agent(app);
     await agent.post("/register").type("form").send({
-      username: "filetestuser",
+      email: "filetestuser@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -313,7 +313,7 @@ describe("File Ownership", () => {
 
     // Register a new user and upload the file we want to check later, get its id
     await user1.post("/register").type("form").send({
-      username: "ownerfile",
+      email: "ownerfile@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -325,7 +325,7 @@ describe("File Ownership", () => {
 
     // Register the second user to try to access the file
     await user2.post("/register").type("form").send({
-      username: "intruderfile",
+      email: "intruderfile@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -342,7 +342,7 @@ describe("File Ownership", () => {
 
     // Register a new user and upload a file for the second user to try to rename, get its id
     await user1.post("/register").type("form").send({
-      username: "ownerfile2",
+      email: "ownerfile2@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -354,7 +354,7 @@ describe("File Ownership", () => {
 
     // Register the second user and try to rename the file from their own root with malicious id
     await user2.post("/register").type("form").send({
-      username: "intruderfile2",
+      email: "intruderfile2@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -374,7 +374,7 @@ describe("Recursive Folder Deletion", () => {
 
     // Register user, and create a bunch of nested folders and files
     await agent.post("/register").type("form").send({
-      username: "recursiveuser",
+      email: "recursiveuser@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });

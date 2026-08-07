@@ -2348,7 +2348,7 @@ export namespace Prisma {
 
   export type UserMinAggregateOutputType = {
     id: string | null
-    username: string | null
+    email: string | null
     hash: string | null
     createdAt: Date | null
     rootFolderId: string | null
@@ -2356,7 +2356,7 @@ export namespace Prisma {
 
   export type UserMaxAggregateOutputType = {
     id: string | null
-    username: string | null
+    email: string | null
     hash: string | null
     createdAt: Date | null
     rootFolderId: string | null
@@ -2364,7 +2364,7 @@ export namespace Prisma {
 
   export type UserCountAggregateOutputType = {
     id: number
-    username: number
+    email: number
     hash: number
     createdAt: number
     rootFolderId: number
@@ -2374,7 +2374,7 @@ export namespace Prisma {
 
   export type UserMinAggregateInputType = {
     id?: true
-    username?: true
+    email?: true
     hash?: true
     createdAt?: true
     rootFolderId?: true
@@ -2382,7 +2382,7 @@ export namespace Prisma {
 
   export type UserMaxAggregateInputType = {
     id?: true
-    username?: true
+    email?: true
     hash?: true
     createdAt?: true
     rootFolderId?: true
@@ -2390,7 +2390,7 @@ export namespace Prisma {
 
   export type UserCountAggregateInputType = {
     id?: true
-    username?: true
+    email?: true
     hash?: true
     createdAt?: true
     rootFolderId?: true
@@ -2471,7 +2471,7 @@ export namespace Prisma {
 
   export type UserGroupByOutputType = {
     id: string
-    username: string
+    email: string
     hash: string
     createdAt: Date
     rootFolderId: string | null
@@ -2496,7 +2496,7 @@ export namespace Prisma {
 
   export type UserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    username?: boolean
+    email?: boolean
     hash?: boolean
     createdAt?: boolean
     rootFolderId?: boolean
@@ -2508,7 +2508,7 @@ export namespace Prisma {
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    username?: boolean
+    email?: boolean
     hash?: boolean
     createdAt?: boolean
     rootFolderId?: boolean
@@ -2517,7 +2517,7 @@ export namespace Prisma {
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    username?: boolean
+    email?: boolean
     hash?: boolean
     createdAt?: boolean
     rootFolderId?: boolean
@@ -2526,13 +2526,13 @@ export namespace Prisma {
 
   export type UserSelectScalar = {
     id?: boolean
-    username?: boolean
+    email?: boolean
     hash?: boolean
     createdAt?: boolean
     rootFolderId?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "hash" | "createdAt" | "rootFolderId", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "hash" | "createdAt" | "rootFolderId", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     rootFolder?: boolean | User$rootFolderArgs<ExtArgs>
     folders?: boolean | User$foldersArgs<ExtArgs>
@@ -2555,7 +2555,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      username: string
+      email: string
       hash: string
       createdAt: Date
       rootFolderId: string | null
@@ -2986,7 +2986,7 @@ export namespace Prisma {
    */
   interface UserFieldRefs {
     readonly id: FieldRef<"User", 'String'>
-    readonly username: FieldRef<"User", 'String'>
+    readonly email: FieldRef<"User", 'String'>
     readonly hash: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly rootFolderId: FieldRef<"User", 'String'>
@@ -7155,7 +7155,7 @@ export namespace Prisma {
 
   export const UserScalarFieldEnum: {
     id: 'id',
-    username: 'username',
+    email: 'email',
     hash: 'hash',
     createdAt: 'createdAt',
     rootFolderId: 'rootFolderId'
@@ -7344,7 +7344,7 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     id?: StringFilter<"User"> | string
-    username?: StringFilter<"User"> | string
+    email?: StringFilter<"User"> | string
     hash?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     rootFolderId?: StringNullableFilter<"User"> | string | null
@@ -7355,7 +7355,7 @@ export namespace Prisma {
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
-    username?: SortOrder
+    email?: SortOrder
     hash?: SortOrder
     createdAt?: SortOrder
     rootFolderId?: SortOrderInput | SortOrder
@@ -7366,7 +7366,7 @@ export namespace Prisma {
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    username?: string
+    email?: string
     rootFolderId?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
@@ -7376,11 +7376,11 @@ export namespace Prisma {
     rootFolder?: XOR<FolderNullableScalarRelationFilter, FolderWhereInput> | null
     folders?: FolderListRelationFilter
     files?: FileListRelationFilter
-  }, "id" | "username" | "rootFolderId">
+  }, "id" | "email" | "rootFolderId">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
-    username?: SortOrder
+    email?: SortOrder
     hash?: SortOrder
     createdAt?: SortOrder
     rootFolderId?: SortOrderInput | SortOrder
@@ -7394,7 +7394,7 @@ export namespace Prisma {
     OR?: UserScalarWhereWithAggregatesInput[]
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"User"> | string
-    username?: StringWithAggregatesFilter<"User"> | string
+    email?: StringWithAggregatesFilter<"User"> | string
     hash?: StringWithAggregatesFilter<"User"> | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     rootFolderId?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -7690,7 +7690,7 @@ export namespace Prisma {
 
   export type UserCreateInput = {
     id?: string
-    username: string
+    email: string
     hash: string
     createdAt?: Date | string
     rootFolder?: FolderCreateNestedOneWithoutRootOwnerInput
@@ -7700,7 +7700,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateInput = {
     id?: string
-    username: string
+    email: string
     hash: string
     createdAt?: Date | string
     rootFolderId?: string | null
@@ -7710,7 +7710,7 @@ export namespace Prisma {
 
   export type UserUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rootFolder?: FolderUpdateOneWithoutRootOwnerNestedInput
@@ -7720,7 +7720,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rootFolderId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -7730,7 +7730,7 @@ export namespace Prisma {
 
   export type UserCreateManyInput = {
     id?: string
-    username: string
+    email: string
     hash: string
     createdAt?: Date | string
     rootFolderId?: string | null
@@ -7738,14 +7738,14 @@ export namespace Prisma {
 
   export type UserUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rootFolderId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8114,7 +8114,7 @@ export namespace Prisma {
 
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
-    username?: SortOrder
+    email?: SortOrder
     hash?: SortOrder
     createdAt?: SortOrder
     rootFolderId?: SortOrder
@@ -8122,7 +8122,7 @@ export namespace Prisma {
 
   export type UserMaxOrderByAggregateInput = {
     id?: SortOrder
-    username?: SortOrder
+    email?: SortOrder
     hash?: SortOrder
     createdAt?: SortOrder
     rootFolderId?: SortOrder
@@ -8130,7 +8130,7 @@ export namespace Prisma {
 
   export type UserMinOrderByAggregateInput = {
     id?: SortOrder
-    username?: SortOrder
+    email?: SortOrder
     hash?: SortOrder
     createdAt?: SortOrder
     rootFolderId?: SortOrder
@@ -9186,7 +9186,7 @@ export namespace Prisma {
 
   export type UserCreateWithoutFilesInput = {
     id?: string
-    username: string
+    email: string
     hash: string
     createdAt?: Date | string
     rootFolder?: FolderCreateNestedOneWithoutRootOwnerInput
@@ -9195,7 +9195,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutFilesInput = {
     id?: string
-    username: string
+    email: string
     hash: string
     createdAt?: Date | string
     rootFolderId?: string | null
@@ -9303,7 +9303,7 @@ export namespace Prisma {
 
   export type UserUpdateWithoutFilesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rootFolder?: FolderUpdateOneWithoutRootOwnerNestedInput
@@ -9312,7 +9312,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutFilesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rootFolderId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9482,7 +9482,7 @@ export namespace Prisma {
 
   export type UserCreateWithoutFoldersInput = {
     id?: string
-    username: string
+    email: string
     hash: string
     createdAt?: Date | string
     rootFolder?: FolderCreateNestedOneWithoutRootOwnerInput
@@ -9491,7 +9491,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutFoldersInput = {
     id?: string
-    username: string
+    email: string
     hash: string
     createdAt?: Date | string
     rootFolderId?: string | null
@@ -9505,7 +9505,7 @@ export namespace Prisma {
 
   export type UserCreateWithoutRootFolderInput = {
     id?: string
-    username: string
+    email: string
     hash: string
     createdAt?: Date | string
     folders?: FolderCreateNestedManyWithoutUserInput
@@ -9514,7 +9514,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutRootFolderInput = {
     id?: string
-    username: string
+    email: string
     hash: string
     createdAt?: Date | string
     folders?: FolderUncheckedCreateNestedManyWithoutUserInput
@@ -9654,7 +9654,7 @@ export namespace Prisma {
 
   export type UserUpdateWithoutFoldersInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rootFolder?: FolderUpdateOneWithoutRootOwnerNestedInput
@@ -9663,7 +9663,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutFoldersInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rootFolderId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9683,7 +9683,7 @@ export namespace Prisma {
 
   export type UserUpdateWithoutRootFolderInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     folders?: FolderUpdateManyWithoutUserNestedInput
@@ -9692,7 +9692,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutRootFolderInput = {
     id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
     hash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     folders?: FolderUncheckedUpdateManyWithoutUserNestedInput

@@ -9,8 +9,8 @@
           <div class="main-title">Login</div>
           <%- include("../partials/errors.ejs") %>
             <form class="form-column" action="/login" method="post">
-              <label for="username" class="form-label">Username</label>
-              <input id="username" type="text" name="username" minlength="2" maxlength="32">
+              <label for="email" class="form-label">Email</label>
+              <input id="email" type="email" name="email" maxlength="255">
               <label for="password" class="form-label">Password</label>
               <input id="password" type="password" name="password" minlength="12" maxlength="72">
               <button class="action-button" type="submit">Login</button>

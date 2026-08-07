@@ -20,7 +20,7 @@ model Session {
 // User model
 model User {
   id           String   @id @default(cuid())
-  username     String   @unique @db.VarChar(32)
+  email        String   @unique
   hash         String
   createdAt    DateTime @default(now())
   rootFolderId String?  @unique

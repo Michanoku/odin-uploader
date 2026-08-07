@@ -26,7 +26,7 @@ describe("Folder Operations", () => {
     await prisma.user.deleteMany();
 
     await agent.post("/register").type("form").send({
-      username: "foldertestuser",
+      email: "foldertestuser@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -414,7 +414,7 @@ describe("Folder Ownership", () => {
 
     // Register user1 and create folder
     await user1.post("/register").type("form").send({
-      username: "owner",
+      email: "owner@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -428,7 +428,7 @@ describe("Folder Ownership", () => {
 
     // Register user2 and try to access the folder
     await user2.post("/register").type("form").send({
-      username: "intruder",
+      email: "intruder@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -444,7 +444,7 @@ describe("Folder Ownership", () => {
 
     // Register user and create folder and get id
     await user1.post("/register").type("form").send({
-      username: "owner2",
+      email: "owner2@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -456,7 +456,7 @@ describe("Folder Ownership", () => {
 
     // Register second user
     await user2.post("/register").type("form").send({
-      username: "intruder2",
+      email: "intruder2@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });
@@ -478,7 +478,7 @@ describe("Recursive Folder Download", () => {
 
     // Register a new user
     await agent.post("/register").type("form").send({
-      username: "downloaduser",
+      email: "downloaduser@example.com",
       password: "supersecurepassword",
       confirmation: "supersecurepassword",
     });

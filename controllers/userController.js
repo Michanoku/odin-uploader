@@ -6,13 +6,16 @@ import * as db from "../db/userQueries.js";
 
 // Validation for user registration
 const validateRegister = [
-  body("username")
+  body("email")
     .trim()
     .notEmpty()
-    .withMessage("Username is required.")
+    .withMessage("Email is required.")
     .bail()
-    .isLength({ min: 2, max: 32 })
-    .withMessage(`Username must be between 2 and 32 characters.`),
+    .isEmail()
+    .withMessage("Please enter a valid email address")
+    .bail()
+    .isLength({ max: 255 })
+    .withMessage("Email must be 255 characters or fewer"),
   body("password")
     .trim()
     .notEmpty()
@@ -36,7 +39,7 @@ const validateRegister = [
 
 // Validation for login
 const validateLogin = [
-  body("username").trim().notEmpty().withMessage("Username is required."),
+  body("email").trim().notEmpty().withMessage("Email is required."),
   body("password").trim().notEmpty().withMessage("Password is required."),
 ];
 
@@ -81,11 +84,11 @@ const postRegister = [
       });
     }
     // If the validation passed, generate a hash with the user password
-    const { username, password } = matchedData(req);
+    const { email, password } = matchedData(req);
     const hash = generateHash(password);
 
-    // Create the user with the username and hash
-    const newUser = await db.createUser(username, hash);
+    // Create the user with the email and hash
+    const newUser = await db.createUser(email, hash);
     req.login(newUser, (err) => {
       if (err) {
         return next(err);
