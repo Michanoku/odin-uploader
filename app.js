@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import compression from "compression";
 import express from "express";
 import session from "express-session";
+import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import morgan from "morgan";
 import multer from "multer";
@@ -40,6 +41,7 @@ app.use(express.json());
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
+app.use(cookieParser(process.env.SECRET));
 
 // Configure the session and cookie
 const sessionConfig = {
@@ -87,10 +89,27 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// Get theme from cookie, if any.
+app.use((req, res, next) => {
+  res.locals.theme = req.cookies.theme || "light";
+  next();
+});
+
 // Routes
 app.use("/", userRoutes);
 app.use("/", browserRoutes);
 app.use("/", sharedRoutes);
+
+app.post("/theme/toggle", (req, res) => {
+  const current = req.cookies.theme || "light";
+  const next = current === "dark" ? "light" : "dark";
+
+  res.cookie("theme", next, {
+    maxAge: 1000 * 60 * 60 * 24 * 365,
+  });
+
+  res.json({ theme: next });
+});
 
 // 404
 app.use((req, res) => {

@@ -19,7 +19,27 @@
   --danger: #dc2626;
 }
 
-:root.dark {
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-2: #334155;
+
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+
+    --accent: #3b82f6;
+    --accent-hover: #60a5fa;
+
+    --border: #334155;
+
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+  }
+}
+
+:root[data-theme="dark"] {
   --background: #0f172a;
   --surface: #1e293b;
   --surface-2: #334155;
@@ -60,16 +80,18 @@ body {
   grid-template-rows: auto 1fr auto;
   grid-template-columns: 1fr;
   grid-template-areas: "nav" "main" "footer";
+  position: relative;
 }
 
 body.browser {
-  grid-template-columns: 1fr 4fr;
-  grid-template-areas: "nav nav" "aside main" "aside footer";
+  grid-template-columns: 1fr;
+  grid-template-areas: "nav" "main" "footer";
 }
 
 nav {
   grid-area: nav;
   height: 3rem;
+  color: var(--text);
   background-color: var(--surface-2);
   border-bottom: 1px solid var(--border);
   padding-inline: 0.5rem;
@@ -83,6 +105,7 @@ nav {
 }
 
 .account-button {
+  color: var(--text);
   font-size: 2rem;
   background: transparent;
   border: 0;
@@ -112,13 +135,54 @@ nav {
   display: none;
 }
 
-aside {
-  grid-area: aside;
-  background-color: var(--surface-2);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-block: 1rem;
+@media (min-width: 992px) {
+
+.mobile {
+    display: none;
+  }
+  body.browser {
+    grid-template-columns: 1fr 4fr;
+    grid-template-areas:
+      "nav nav"
+      "aside main"
+      "aside footer";
+  }
+
+  aside {
+    grid-area: aside;
+    background-color: var(--surface-2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-block: 1rem;
+  }
+}
+
+@media (max-width: 991px) {
+  aside {
+    background-color: var(--surface-2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-block: 1rem;
+    /* Mobile */
+    height: 100%;
+    position: absolute;
+    z-index: 10;
+    top: 3rem;
+    left: 0;
+    opacity: 0;
+    width: 80vw;
+    transform: translateX(-80vw);
+    transition:
+      opacity 350ms ease-in-out,
+      transform 250ms ease-in-out;
+  }
+
+  aside.open {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 main {
@@ -329,6 +393,7 @@ input:invalid:not(:placeholder-shown):focus {
 }
 
 .folder-icon {
+  color: var(--text);
   margin-inline: 0.5rem;
 }
 
