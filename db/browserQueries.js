@@ -1,5 +1,6 @@
 // All prisma queries that have to do with the users own files and folders
 import { prisma } from "../lib/prisma.js";
+import { checkShare } from "../lib/browserUtils.js";
 
 // Queries for folders
 // Get a single folder
@@ -15,10 +16,11 @@ const getFolder = async ({ folderId, userId = null }) => {
     },
     include: {
       rootShare: true,
+      share: true,
     },
   });
 
-  return folder;
+  return await checkShare(folder);
 };
 
 // Check if a folder of the same name exists in the same folder
@@ -55,26 +57,40 @@ const fileExists = async ({ originalname, userId, folderId }) => {
 
 // Get all subfolders of a folder, but only direct children
 const getAllSubfolders = async (folderId) => {
-  return prisma.folder.findMany({
+  const folders = await prisma.folder.findMany({
     where: {
       parentId: folderId,
     },
     include: {
       rootShare: true,
+      share: true,
     },
   });
+
+  return await Promise.all(
+    folders.map(async (folder) => {
+      return await checkShare(folder);
+    })
+  );
 };
 
 // Get all files of a folder, but only direct children
 const getAllFiles = async (folderId) => {
-  return prisma.file.findMany({
+  const files = await prisma.file.findMany({
     where: {
       folderId: folderId,
     },
     include: {
       rootShare: true,
+      share: true,
     },
   });
+
+  return await Promise.all(
+    files.map(async (file) => {
+      return await checkShare(file);
+    })
+  );
 };
 
 // Create a new folder from the provided data
@@ -158,7 +174,11 @@ const getFile = async ({ fileId, userId }) => {
     id: fileId,
     userId: userId,
   };
-  return await prisma.file.findFirst({ where, include: { rootShare: true } });
+  const file = await prisma.file.findFirst({
+    where,
+    include: { rootShare: true, share: true },
+  });
+  return await checkShare(file);
 };
 
 // Create a new file using the data

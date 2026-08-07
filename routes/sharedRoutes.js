@@ -18,13 +18,11 @@ const router = express.Router();
 router.get("/shared/all", isAuth, sharedController.getAllShares);
 router.get(
   "/shared/folder/:sharedFolderId",
-  isAuth,
   loadSharedCurrentFolder,
   sharedController.getSharedFolder
 );
 router.post(
   "/shared/folder/:sharedFolderId/downloadFolder",
-  isAuth,
   loadSharedCurrentFolder,
   loadSharedTargetFolder,
   sharedController.downloadSharedFolder
@@ -47,19 +45,16 @@ router.post(
 // Shared file routes
 router.get(
   "/shared/file/:sharedFileId",
-  isAuth,
   loadSharedFile,
   sharedController.getSharedFile
 );
 router.post(
   "/shared/file/:sharedFileId/downloadFile",
-  isAuth,
   loadSharedTargetFile,
   sharedController.downloadSharedFile
 );
 router.post(
   "/shared/folder/:sharedFolderId/downloadFile",
-  isAuth,
   loadSharedCurrentFolder,
   loadSharedTargetFile,
   sharedController.downloadSharedFile

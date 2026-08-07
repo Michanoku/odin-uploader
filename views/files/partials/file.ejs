@@ -12,6 +12,7 @@
       <% } %>
     </div>
   </a>
+  <% if (view === "folder" || view === "file") { %>
   <% if (file.shareId && file.rootShare) { %>
   <button name="share-file" data-id="<%= file.id %>" data-share="<%= file.shareId %>" class="account-button">
       <svg class="folder-icon" width="24" height="24">
@@ -25,7 +26,7 @@
       </svg>
   </button>
   <% } %>
-  <% if (view === "folder" || view === "file") { %>
+
   <form method="post" action="/browser/folder/<%= currentFolder.id %>/downloadFile">
     <input type="hidden" value="<%= file.id %>" name="fileId">
 

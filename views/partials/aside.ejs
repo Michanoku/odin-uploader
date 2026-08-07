@@ -1,5 +1,6 @@
 <aside>
     <div class="site-links">
+        <% if (user) {  %> 
         <a class="site-link" href="/browser/folder/<%= user.rootFolderId %>">
             <svg class="folder-icon" width="24" height="24">
                 <use href="#icon-folder"></use>
@@ -16,8 +17,10 @@
                 Shared Content
             </div>
         </a>
+        <% } %>
     </div>
     <div class="site-links">
+        <% if (user) {  %> 
         <div class="info"><b><%= user.username %></b></div>
         <div class="info"><b>Storage used:</b> <%= storage %> of 5 MB.</div>
         <a class="site-link" href="/profile">
@@ -36,5 +39,24 @@
                 Logout
             </div>
         </a>
+        <% } else { %>
+        <div class="info"><b>Anonymous User</b></div>    
+        <a class="site-link" href="/register">
+            <svg class="folder-icon" width="24" height="24">
+                <use href="#icon-register"></use>
+            </svg>
+            <div class="folder-name">
+                Register
+            </div>
+        </a>
+        <a class="site-link" href="/login">
+            <svg class="folder-icon" width="24" height="24">
+                <use href="#icon-login"></use>
+            </svg>
+            <div class="folder-name">
+                Login
+            </div>
+        </a>
+        <% } %>
     </div>
 </aside>
