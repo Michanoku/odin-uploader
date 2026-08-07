@@ -10,6 +10,8 @@ router.post("/login", userController.postLogin);
 router.get("/register", userController.getRegister);
 router.post("/register", userController.postRegister);
 router.get("/logout", userController.getLogout);
+router.get("/profile", userController.getProfile);
+router.post("/profile", userController.postProfile);
 
 // Test auth
 router.get("/protected", isAuth, userController.getProtected);

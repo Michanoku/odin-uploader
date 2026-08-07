@@ -9,12 +9,12 @@
         <div class="main-title">Register</div>
         <%- include("../partials/errors.ejs") %>
         <form class="form-column" action="/register" method="post">
-          <label class="form-label" for="email">Email</label>
+          <label class="form-label" for="email" autocomplete="email">Email</label>
           <input id="email" type="email" name="email" maxlength="255">
           <label class="form-label" for="password">Password</label>
-          <input id="password" type="password" name="password" minlength="12" maxlength="72">
+          <input id="password" type="password" name="password" minlength="12" maxlength="72" autocomplete="new-password">
           <label class="form-label" for="confirmation">Confirmation</label>
-          <input id="confirmation" type="password" name="confirmation" minlength="12" maxlength="72">
+          <input id="confirmation" type="password" name="confirmation" minlength="12" maxlength="72" autocomplete="new-password">
           <button class="action-button" type="submit">Register</button>
         </form>
         <span>Already a member? <a href="/login">Login</a>

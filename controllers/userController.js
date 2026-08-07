@@ -1,7 +1,7 @@
 import passport from "passport";
 import { body, validationResult, matchedData } from "express-validator";
 
-import { generateHash } from "../lib/passwordUtils.js";
+import { validatePassword, generateHash } from "../lib/passwordUtils.js";
 import * as db from "../db/userQueries.js";
 
 // Validation for user registration
@@ -11,6 +11,7 @@ const validateRegister = [
     .notEmpty()
     .withMessage("Email is required.")
     .bail()
+    .normalizeEmail()
     .isEmail()
     .withMessage("Please enter a valid email address")
     .bail()
@@ -35,6 +36,40 @@ const validateRegister = [
       }
       return true;
     }),
+];
+
+const validateUpdate = [
+  body("email")
+    .trim()
+    .optional({ checkFalsy: true })
+    .normalizeEmail()
+    .isEmail()
+    .withMessage("Please enter a valid email address")
+    .bail()
+    .isLength({ max: 255 })
+    .withMessage("Email must be 255 characters or fewer"),
+  body("password")
+    .trim()
+    .optional({ checkFalsy: true })
+    .isLength({ min: 12, max: 72 })
+    .withMessage(`Password must be between 12 and 72 characters.`),
+  body("confirmation")
+    .trim()
+    .optional({ checkFalsy: true })
+    .custom((value, { req }) => {
+      const confirmation = req.body.password === value;
+      if (!confirmation) {
+        throw new Error("Confirmation does not match password.");
+      }
+      return true;
+    }),
+  body("current-password").custom((value, { req }) => {
+    const validation = validatePassword(value, req.user.hash);
+    if (!validation) {
+      throw new Error("Current password is incorrect.");
+    }
+    return true;
+  }),
 ];
 
 // Validation for login
@@ -109,6 +144,38 @@ const getLogout = (req, res, next) => {
   });
 };
 
+// Get route for profile
+const getProfile = (req, res) => {
+  res.render("users/profile", { title: "Profile" });
+};
+
+// Post route for profile
+const postProfile = [
+  validateUpdate,
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).render("users/profile", {
+        title: "Profile",
+        errors: errors.array(),
+      });
+    }
+    // If the validation passed, generate a hash with the user password
+    const { email, password } = matchedData(req);
+    const hash = password ? generateHash(password) : null;
+
+    // Create the user with the email and hash
+    const updatedUser = await db.updateUser(req.user.id, email, hash);
+    req.login(updatedUser, (err) => {
+      if (err) {
+        return next(err);
+      }
+
+      res.redirect("/");
+    });
+  },
+];
+
 // Test your auth, remove if no longer needed
 const getProtected = async (req, res) => {
   res.send("User authenticated.");
@@ -120,5 +187,7 @@ export {
   getRegister,
   postRegister,
   getLogout,
+  getProfile,
+  postProfile,
   getProtected,
 };

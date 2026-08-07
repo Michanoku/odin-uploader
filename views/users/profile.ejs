@@ -9,19 +9,18 @@
         <div class="column">
     <div class="main-title">
       Profile
-        <svg class="folder-icon" width="12" height="12">
-          <use href="#icon-user"></use>
-        </svg>
     </div>
     <hr>
     <%- include("../partials/errors.ejs") %>
-    <form class="form-column" action="/update" method="post">
-        <label class="form-label" for="email">Email</label>
-        <input id="email" type="text" name="email" minlength="2" maxlength="32" value="<%= user.email %>">
-        <label class="form-label" for="password">Password</label>
-        <input id="password" type="password" name="password" minlength="12" maxlength="72">
-        <label class="form-label" for="confirmation">Confirmation</label>
-        <input id="confirmation" type="password" name="confirmation" minlength="12" maxlength="72">
+    <form class="form-column" action="/profile" method="post">
+        <label class="form-label" for="email">Email (current: <%= user.email %>)</label>
+        <input id="email" type="text" name="email" minlength="2" maxlength="32" autocomplete="username">
+        <label class="form-label" for="password">New Password</label>
+        <input id="password" type="password" name="password" minlength="12" maxlength="72" autocomplete="new-password">
+        <label class="form-label" for="confirmation">New Confirmation</label>
+        <input id="confirmation" type="password" name="confirmation" minlength="12" maxlength="72" autocomplete="new-password">
+        <label class="form-label" for="current-password">Current Password</label>
+        <input id="current-password" type="password" name="current-password" minlength="12" maxlength="72" autocomplete="current-password">
         <button class="action-button" type="submit">Update</button>
     </form>
 </div>
