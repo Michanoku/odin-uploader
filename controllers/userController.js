@@ -86,20 +86,46 @@ const getLogin = (req, res) => {
 // Post route for Login page
 const postLogin = [
   validateLogin,
+
   async (req, res, next) => {
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
       return res.status(400).render("users/login", {
         title: "Login",
         errors: errors.array(),
       });
     }
+
     next();
   },
-  passport.authenticate("local", {
-    failureRedirect: "/login",
-    successRedirect: "/",
-  }),
+
+  (req, res, next) => {
+    passport.authenticate("local", (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
+
+      if (!user) {
+        return res.status(401).render("users/login", {
+          title: "Login",
+          errors: [
+            {
+              msg: info?.message || "Invalid email or password.",
+            },
+          ],
+        });
+      }
+
+      req.logIn(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+
+        res.redirect("/");
+      });
+    })(req, res, next);
+  },
 ];
 
 // Get route for register page

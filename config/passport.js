@@ -8,7 +8,7 @@ const verifyCallback = async (email, password, done) => {
   try {
     const user = await lookupUserByName(email);
     if (!user) {
-      return done(null, false);
+      return done(null, false, { message: "Incorrect email or password." });
     }
 
     const isValid = validatePassword(password, user.hash);
@@ -16,14 +16,20 @@ const verifyCallback = async (email, password, done) => {
     if (isValid) {
       return done(null, user);
     } else {
-      return done(null, false);
+      return done(null, false, { message: "Incorrect email or password." });
     }
   } catch (err) {
     return done(err);
   }
 };
 
-const strategy = new LocalStrategy(verifyCallback);
+const strategy = new LocalStrategy(
+  {
+    usernameField: "email",
+    passwordField: "password",
+  },
+  verifyCallback
+);
 
 passport.use(strategy);
 
