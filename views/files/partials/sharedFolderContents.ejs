@@ -1,17 +1,17 @@
 <div class="top-folder-menu">
-    <% if (parentId) { %>
-        <a href="/shared/folder/<%= parentId %>">
-            <svg class="folder-icon" width="24" height="24">
-            <use href="#icon-back"></use>
-            </svg>
-        </a>
-        <% } %>
+  <% if (parentId) { %>
+    <a href="/shared/folder/<%= parentId %>">
+      <svg class="folder-icon" width="24" height="24">
+        <use href="#icon-back"></use>
+      </svg>
+    </a>
+  <% } %>
 </div>
 <div class="folder-contents">
-    <% contents.folders.forEach((folder)=> { %>
-            <%- include("sharedFolder", { folder, sharedFolder, formatDate }) %> 
-        <% }) %>
-            <% contents.files.forEach((file)=> { %>
-                <%- include("sharedFile", { file, sharedFolder, formatDate }) %> 
-                <% }) %>
+  <% contents.folders.forEach((folder)=> { %>
+    <%- include("sharedFolder", { folder, sharedFolder, formatDate }) %>
+  <% }) %>
+  <% contents.files.forEach((file)=> { %>
+    <%- include("sharedFile", { file, sharedFolder, formatDate }) %>
+  <% }) %>
 </div>

@@ -1,9 +1,9 @@
 <div class="top-folder-menu"></div>
 <div class="folder-contents">
-    <% contents.rootFolders.forEach((folder)=> { %>
-            <%- include("folder", { folder, currentFolder: {id: folder.parentId}, formatDate }) %> 
-        <% }) %>
-            <% contents.rootFiles.forEach((file)=> { %>
-                <%- include("file", { file, currentFolder: {id: file.folderId}, formatDate }) %> 
-                <% }) %>
+  <% contents.rootFolders.forEach((folder)=> { %>
+    <%- include("folder", { folder, currentFolder: {id: folder.parentId}, formatDate }) %>
+  <% }) %>
+  <% contents.rootFiles.forEach((file)=> { %>
+    <%- include("file", { file, currentFolder: {id: file.folderId}, formatDate }) %>
+  <% }) %>
 </div>

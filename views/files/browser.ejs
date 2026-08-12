@@ -1,44 +1,59 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="<%= theme %>">
-<%- include('../partials/head') %>
-<%- include('../partials/icons') %>
+  <%- include('../partials/head') %>
+  <%- include('../partials/icons') %>
   <body class="browser">
     <%- include('../partials/nav') %>
     <%- include('../partials/aside') %>
     <main>
-    <div class="main-title">
-    <% if (view === "folder") { %>
-      <%= currentFolder.name %><% if (currentFolder.shareId) { %>
-        <svg class="folder-icon" width="12" height="12">
-          <use href="#icon-share"></use>
-        </svg>
-      <% } %>
-    <% } else { %>
-      <%= file.originalname %><% if (file.shareId) { %>
-        <svg class="folder-icon" width="12" height="12">
-          <use href="#icon-share"></use>
-        </svg>
+
+      <% if (view === "folder") { %>
+        <div class="main-title">
+          <%= currentFolder.name %>
+          <% if (currentFolder.shareId) { %>
+            <svg class="folder-icon" width="12" height="12">
+              <use href="#icon-share"></use>
+            </svg>
+          <% } %>
+        </div>
+        <% if (currentFolder.shareId) { %>
+          <a href="/shared/folder/<%= currentFolder.id %>">
+              /shared/folder/<%= currentFolder.id %>
+          </a>
         <% } %>
-    <% } %>
-    </div>
-    <div class="breadcrumbs">
-    <a class="breadcrumb" href="/browser/folder/<%= user.rootFolderId %>">Root</a>
-    <% breadcrumbs.forEach((folder, index, breadcrumbs) => { if (folder.id !== user.rootFolderId) { %>
-      >
-      <a class="breadcrumb" href="/browser/folder/<%= folder.id %>">
-        <%= folder.name %>
-      </a>
-    <% }}) %>
-    <% if (typeof file !== "undefined" && file)  { %>
-      > <%= file.originalname %>
-   <% } %>
-    </div>
-    <hr>
-    <% if (view === "folder") { %>
-      <%- include("./partials/folderContents") %>
-    <% } else { %>
-      <%- include("./partials/fileDetails") %>
-    <% } %>
+      <% } else { %>
+        <div class="main-title">
+          <%= file.originalname %>
+          <% if (file.shareId) { %>
+            <svg class="folder-icon" width="12" height="12">
+              <use href="#icon-share"></use>
+            </svg>
+          <% } %>
+        </div>
+        <% if (file.shareId) { %>
+          <a href="/shared/file/<%= file.id %>">
+              /shared/file/<%= file.id %>
+          </a>
+        <% } %>
+      <% } %>
+      <div class="breadcrumbs">
+        <a class="breadcrumb" href="/browser/folder/<%= user.rootFolderId %>">Root</a>
+        <% breadcrumbs.forEach((folder, index, breadcrumbs) => { if (folder.id !== user.rootFolderId) { %>
+          >
+          <a class="breadcrumb" href="/browser/folder/<%= folder.id %>">
+            <%= folder.name %>
+          </a>
+        <% }}) %>
+        <% if (typeof file !== "undefined" && file)  { %>
+          > <%= file.originalname %>
+        <% } %>
+      </div>
+      <hr>
+      <% if (view === "folder") { %>
+        <%- include("./partials/folderContents") %>
+      <% } else { %>
+        <%- include("./partials/fileDetails") %>
+      <% } %>
     </main>
     <%- include('../partials/footer') %>
   </body>

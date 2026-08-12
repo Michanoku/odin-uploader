@@ -1,15 +1,22 @@
 <div class="top-folder-menu">
-    <a href="/browser/folder/<%= file.folderId %>">
-        <svg class="folder-icon" width="24" height="24">
-        <use href="#icon-back"></use>
-        </svg>
-    </a>
+  <a href="/browser/folder/<%= file.folderId %>">
+    <svg class="folder-icon" width="24" height="24">
+      <use href="#icon-back"></use>
+    </svg>
+  </a>
 </div>
 <div class="folder-contents">
-    <div class="main-title">File Details</div>
-    <div><b>Filename:</b> <%= file.originalname %></div>
-    <div><b>Type:</b> <%= file.mimetype %></div>
-    <div><b>Size:</b> <%= fileSize %></div>
-    <div><b>Upload date:</b> <%= date %></div>
+  <div class="main-title">File Details</div>
+  <div><b>Filename:</b>
+    <%= file.originalname %>
+  </div>
+  <div><b>Type:</b>
+    <%= file.mimetype %>
+  </div>
+  <div><b>Size:</b>
+    <%= fileSize %>
+  </div>
+  <div><b>Upload date:</b>
+    <%= date %>
+  </div>
 </div>
-

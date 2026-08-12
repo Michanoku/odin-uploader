@@ -74,6 +74,19 @@ input {
   font: inherit;
 }
 
+a {
+  color: var(--accent);
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 body {
   background-color: var(--background);
   color: var(--text);
@@ -432,10 +445,12 @@ input:invalid:not(:placeholder-shown):focus {
 }
 
 .site-link:hover {
+  color: var(--text);
   background-color: var(--surface);
 }
 
 .folder-link:hover {
+  color: var(--text);
   background-color: var(--surface-2);
 }
 

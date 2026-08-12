@@ -1,37 +1,35 @@
 <%- include('modal') %>
 <div class="top-folder-menu">
-    <% if (parentId) { %>
-        <a href="/browser/folder/<%= parentId %>">
-            <svg class="folder-icon" width="24" height="24">
-            <use href="#icon-back"></use>
-            </svg>
-        </a>
-        <% } %>
-            <button id="new-folder" class="new-folder-button">
-                <svg class="folder-icon" width="24" height="24">
-                <use href="#icon-new-folder"></use>
-                </svg>
-            </button>
+  <% if (parentId) { %>
+    <a href="/browser/folder/<%= parentId %>">
+      <svg class="folder-icon" width="24" height="24">
+        <use href="#icon-back"></use>
+      </svg>
+    </a>
+  <% } %>
+  <button id="new-folder" class="new-folder-button">
+    <svg class="folder-icon" width="24" height="24">
+      <use href="#icon-new-folder"></use>
+    </svg>
+  </button>
+  <form id="upload-form" action="/browser/folder/<%=currentFolder.id %>/upload" method="post"
+    enctype="multipart/form-data">
+    <label for="upload-files" class="upload-button">
+      <svg class="folder-icon" width="24" height="24">
+        <use href="#icon-upload"></use>
+      </svg>
+    </label>
 
-            <form id="upload-form" action="/browser/folder/<%=currentFolder.id %>/upload" method="post"
-                enctype="multipart/form-data">
-                <label for="upload-files" class="upload-button">
-                    <svg class="folder-icon" width="24" height="24">
-                        <use href="#icon-upload"></use>
-                    </svg>
-                </label>
-
-                <input id="upload-files" type="file" name="file" class="hidden" />
-            </form>
-
+    <input id="upload-files" type="file" name="file" class="hidden" />
+  </form>
 </div>
 <div class="folder-contents">
-    <% contents.folders.forEach((folder)=> { %>
-            <%- include("folder", { folder, currentFolder, formatDate }) %> 
-        <% }) %>
-            <% contents.files.forEach((file)=> { %>
-                <%- include("file", { file, currentFolder, formatDate }) %> 
-                <% }) %>
+  <% contents.folders.forEach((folder)=> { %>
+    <%- include("folder", { folder, currentFolder, formatDate }) %>
+  <% }) %>
+  <% contents.files.forEach((file)=> { %>
+    <%- include("file", { file, currentFolder, formatDate }) %>
+  <% }) %>
 </div>
 
 <script src="/upload.js" type="module"></script>
