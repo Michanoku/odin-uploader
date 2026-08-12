@@ -15,60 +15,60 @@
   </a>
   
   <% if (view === "folder" || view === "file") { %>
-    <div class="menu-container">
+  <div class="menu-container">
     <button class="mobile account-button" name="dropdown-button" data-target="menu-<%= folder.id %>">
       <svg class="folder-icon" width="24" height="24">
         <use href="#icon-dots"></use>
       </svg>
     </button>
     <div class="menu-items" id="menu-<%= folder.id %>">
-  <% if (folder.shareId && folder.rootShare) { %>
-    <button name="share-folder" data-id="<%= folder.id %>" data-share="<%= !!(folder.shareId && folder.rootShare) %>"
-      class="account-button">
-      <svg class="folder-icon" width="24" height="24">
-        <use href="#icon-unshare"></use>
-      </svg>
-    </button>
-  <% } else if (!folder.shareId) { %>
-    <button name="share-folder" data-id="<%= folder.id %>" data-share="<%= !!(folder.shareId && folder.rootShare) %>"
-      class="account-button">
-      <svg class="folder-icon" width="24" height="24">
-        <use href="#icon-share"></use>
-      </svg>
-    </button>
-  <% } %>
-
-    <form method="post" action="/browser/folder/<%= currentFolder.id %>/downloadFolder">
-      <input type="hidden" value="<%= folder.id %>" name="folderId">
-
-      <button type="submit" class="account-button">
+      <% if (folder.shareId && folder.rootShare) { %>
+      <button name="share-folder" data-id="<%= folder.id %>" data-share="<%= !!(folder.shareId && folder.rootShare) %>"
+        class="account-button">
         <svg class="folder-icon" width="24" height="24">
-          <use href="#icon-download"></use>
+          <use href="#icon-unshare"></use>
         </svg>
       </button>
-    </form>
+      <% } else if (!folder.shareId) { %>
+      <button name="share-folder" data-id="<%= folder.id %>" data-share="<%= !!(folder.shareId && folder.rootShare) %>"
+        class="account-button">
+        <svg class="folder-icon" width="24" height="24">
+          <use href="#icon-share"></use>
+        </svg>
+      </button>
+      <% } %>
 
-    <button name="rename-folder" data-name="<%= folder.name %>" data-id="<%= folder.id %>" type="button"
-      class="account-button">
+      <form method="post" action="/browser/folder/<%= currentFolder.id %>/downloadFolder">
+        <input type="hidden" value="<%= folder.id %>" name="folderId">
 
-      <svg class="folder-icon" width="24" height="24">
-        <use href="#icon-edit"></use>
-      </svg>
-    </button>
+        <button type="submit" class="account-button">
+          <svg class="folder-icon" width="24" height="24">
+            <use href="#icon-download"></use>
+          </svg>
+        </button>
+      </form>
 
-    <button class="account-button" name="move-folder" data-name="Root" data-id="<%= folder.id %>" type="button">
-      <svg class="folder-icon" width="24" height="24">
-        <use href="#icon-scissors"></use>
-      </svg>
-    </button>
+      <button name="rename-folder" data-name="<%= folder.name %>" data-id="<%= folder.id %>" type="button"
+        class="account-button">
 
-    <button class="account-button" name="delete-folder" data-id="<%= folder.id %>" type="button">
-      <svg class="folder-icon" width="24" height="24">
-        <use href="#icon-trash"></use>
-      </svg>
-    </button>
+        <svg class="folder-icon" width="24" height="24">
+          <use href="#icon-edit"></use>
+        </svg>
+      </button>
+
+      <button class="account-button" name="move-folder" data-name="Root" data-id="<%= folder.id %>" type="button">
+        <svg class="folder-icon" width="24" height="24">
+          <use href="#icon-scissors"></use>
+        </svg>
+      </button>
+
+      <button class="account-button" name="delete-folder" data-id="<%= folder.id %>" type="button">
+        <svg class="folder-icon" width="24" height="24">
+          <use href="#icon-trash"></use>
+        </svg>
+      </button>
     </div>
-    </div>
+  </div>
   <% } %>
   
   <div>

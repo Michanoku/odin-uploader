@@ -13,49 +13,58 @@
     </div>
   </a>
   <% if (view === "folder" || view === "file") { %>
-  <% if (file.shareId && file.rootShare) { %>
-  <button name="share-file" data-id="<%= file.id %>" data-share="<%= file.shareId %>" class="account-button">
+  <div class="menu-container">
+    <button class="mobile account-button" name="dropdown-button" data-target="menu-<%= file.id %>">
       <svg class="folder-icon" width="24" height="24">
-          <use href="#icon-unshare"></use>
-      </svg>
-  </button>
-  <% } else if (!file.shareId) { %>
-  <button name="share-file" data-id="<%= file.id %>" data-share="<%= file.shareId %>" class="account-button">
-      <svg class="folder-icon" width="24" height="24">
-          <use href="#icon-share"></use>
-      </svg>
-  </button>
-  <% } %>
-
-  <form method="post" action="/browser/folder/<%= currentFolder.id %>/downloadFile">
-    <input type="hidden" value="<%= file.id %>" name="fileId">
-
-    <button type="submit" class="account-button">
-      <svg class="folder-icon" width="24" height="24">
-        <use href="#icon-download"></use>
+        <use href="#icon-dots"></use>
       </svg>
     </button>
-  </form>
+    <div class="menu-items" id="menu-<%= file.id %>">
+      <% if (file.shareId && file.rootShare) { %>
+      <button name="share-file" data-id="<%= file.id %>" data-share="<%= file.shareId %>" class="account-button">
+          <svg class="folder-icon" width="24" height="24">
+              <use href="#icon-unshare"></use>
+          </svg>
+      </button>
+      <% } else if (!file.shareId) { %>
+      <button name="share-file" data-id="<%= file.id %>" data-share="<%= file.shareId %>" class="account-button">
+          <svg class="folder-icon" width="24" height="24">
+              <use href="#icon-share"></use>
+          </svg>
+      </button>
+      <% } %>
 
-  <button name="rename-file" data-name="<%= file.originalname %>" data-id="<%= file.id %>" type="button"
-    class="account-button">
+      <form method="post" action="/browser/folder/<%= currentFolder.id %>/downloadFile">
+        <input type="hidden" value="<%= file.id %>" name="fileId">
 
-    <svg class="folder-icon" width="24" height="24">
-      <use href="#icon-edit"></use>
-    </svg>
-  </button>
+        <button type="submit" class="account-button">
+          <svg class="folder-icon" width="24" height="24">
+            <use href="#icon-download"></use>
+          </svg>
+        </button>
+      </form>
 
-  <button class="account-button" name="move-file" data-name="Root" data-id="<%= file.id %>" type="button">
-    <svg class="folder-icon" width="24" height="24">
-      <use href="#icon-scissors"></use>
-    </svg>
-  </button>
+      <button name="rename-file" data-name="<%= file.originalname %>" data-id="<%= file.id %>" type="button"
+        class="account-button">
 
-  <button class="account-button" name="delete-file" data-id="<%= file.id %>" type="button">
-    <svg class="folder-icon" width="24" height="24">
-      <use href="#icon-trash"></use>
-    </svg>
-  </button>
+        <svg class="folder-icon" width="24" height="24">
+          <use href="#icon-edit"></use>
+        </svg>
+      </button>
+
+      <button class="account-button" name="move-file" data-name="Root" data-id="<%= file.id %>" type="button">
+        <svg class="folder-icon" width="24" height="24">
+          <use href="#icon-scissors"></use>
+        </svg>
+      </button>
+
+      <button class="account-button" name="delete-file" data-id="<%= file.id %>" type="button">
+        <svg class="folder-icon" width="24" height="24">
+          <use href="#icon-trash"></use>
+        </svg>
+      </button>
+    </div>
+  </div>
   <% } %>
   <div>
     <%= formatDate(file.createdAt) %>

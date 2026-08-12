@@ -5,8 +5,14 @@ const dropdowns = document.querySelectorAll(".menu-items");
 
 dropdownButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    const dropdown = document.querySelector(`#${button.dataset.target}`);
-    dropdown.classList.toggle("open");
+    const targetDropdown = document.querySelector(`#${button.dataset.target}`);
+    dropdowns.forEach((dropdown) => {
+        if (dropdown === targetDropdown) {
+            dropdown.classList.toggle("open");
+        } else {
+            dropdown.classList.remove("open");
+        }   
+    });
   });
 });
 
