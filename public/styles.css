@@ -136,8 +136,7 @@ nav {
 }
 
 @media (min-width: 992px) {
-
-.mobile {
+  .mobile {
     display: none;
   }
   body.browser {
@@ -155,6 +154,18 @@ nav {
     flex-direction: column;
     justify-content: space-between;
     padding-block: 1rem;
+  }
+
+  .menu-container {
+    display: grid;
+    grid-template-rows: 2rem;
+    grid-template-columns: repeat(2, auto);
+    align-items: center;
+  }
+  .menu-items {
+    display: grid;
+    grid-template-columns: repeat(5, auto);
+    align-items: center;
   }
 }
 
@@ -182,6 +193,35 @@ nav {
   aside.open {
     opacity: 1;
     transform: translateX(0);
+  }
+
+  .menu-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .menu-items {
+    position: absolute;
+    pointer-events: none;
+    display: grid;
+    grid-template-columns: repeat(5, auto);
+    align-items: center;
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    transform: translateY(0rem);
+    opacity: 0;
+    transition:
+      transform 300ms ease-in-out,
+      opacity 300ms ease-in-out;
+  }
+
+  .menu-items.open {
+    opacity: 1;
+    transform: translateY(2.5rem);
+    pointer-events: auto;
   }
 }
 
@@ -364,7 +404,7 @@ input:invalid:not(:placeholder-shown):focus {
 .folder-link {
   display: grid;
   grid-template-rows: 2rem;
-  grid-template-columns: 1fr auto auto auto auto auto auto;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
 }
 
