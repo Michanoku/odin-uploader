@@ -12,10 +12,8 @@ import * as browserController from "../controllers/browserController.js";
 
 const router = express.Router();
 // Multer is configured to only allow 1MB at this point (user max 5MB)
-const uploadFolder =
-  process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
 const upload = multer({
-  dest: uploadFolder,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 1024 * 1024, // 1 MB
   },

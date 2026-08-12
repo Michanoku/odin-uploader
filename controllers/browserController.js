@@ -479,10 +479,6 @@ const uploadFile = [
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      if (req.file) {
-        const filePath = path.resolve(uploadFolder, req.file.filename);
-        await fs.unlink(filePath);
-      }
       return res.status(400).json({
         success: false,
         errors: errors.array(),
@@ -491,10 +487,20 @@ const uploadFile = [
 
     // Create the file in the database
     try {
+      const filename = crypto.randomUUID();
+      const { error } = await supabase.storage
+        .from("User Files")
+        .upload(filename, req.file.buffer, {
+            contentType: req.file.mimetype
+        });
+
+      if (error) {
+          return next(error);
+      }
       const fileData = {
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
-        filename: req.file.filename,
+        filename: filename,
         size: req.file.size,
         folderId: req.currentFolder.id,
         userId: req.user.id,
@@ -520,15 +526,28 @@ const uploadFile = [
 ];
 
 // Allows the user to download single files
-const downloadFile = (req, res, next) => {
-  // Get the file and send it to the download with the original filename
-  const filePath = path.resolve(uploadFolder, req.targetFile.filename);
+const downloadFile = async (req, res, next) => {
+  try {
+    const { data, error } = await supabase.storage
+      .from("User Files")
+      .download(req.targetFile.filename);
 
-  res.download(filePath, req.targetFile.originalname, (err) => {
-    if (err) {
-      next(err);
+    if (error) {
+      return next(error);
     }
-  });
+
+    const buffer = Buffer.from(await data.arrayBuffer());
+
+    res.setHeader("Content-Type", req.targetFile.mimetype);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${req.targetFile.originalname}"`
+    );
+
+    res.send(buffer);
+  } catch (err) {
+    return next(err);
+  }
 };
 
 // Open file details for the user to view
@@ -641,12 +660,16 @@ const moveFile = [
 const deleteFile = async (req, res) => {
   const fileId = req.targetFile.id;
   try {
-    // Delete file in database
-    const deletedFile = await db.deleteFile(fileId);
-    // Get file path for the actual file on disk
-    const filePath = path.resolve(uploadFolder, deletedFile.filename);
     // Delete the file
-    await fs.unlink(filePath);
+    const { data, error } = await supabase.storage
+      .from("User Files")
+      .remove([req.targetFile.filename]);
+
+    if (error) {
+      return next(error);
+    }
+    // Delete file in database
+    const deletedFile = await db.deleteFile(req.targetFile.id);
 
     const folderContentsRaw = await getFolderContents(req.currentFolder.id);
     const folderContents = await renderFolderContents(
