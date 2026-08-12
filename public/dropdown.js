@@ -7,11 +7,11 @@ dropdownButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const targetDropdown = document.querySelector(`#${button.dataset.target}`);
     dropdowns.forEach((dropdown) => {
-        if (dropdown === targetDropdown) {
-            dropdown.classList.toggle("open");
-        } else {
-            dropdown.classList.remove("open");
-        }   
+      if (dropdown === targetDropdown) {
+        dropdown.classList.toggle("open");
+      } else {
+        dropdown.classList.remove("open");
+      }
     });
   });
 });
