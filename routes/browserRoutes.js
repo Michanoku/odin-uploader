@@ -8,6 +8,7 @@ import {
   isTargetRoot,
   loadTargetFile,
 } from "../lib/authMiddleware.js";
+import { MAX_FILE_SIZE } from "../config/filesize.js";
 import * as browserController from "../controllers/browserController.js";
 
 const router = express.Router();
@@ -15,7 +16,7 @@ const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 1024 * 1024, // 1 MB
+    fileSize: MAX_FILE_SIZE, // 1 MB
   },
 });
 

@@ -515,12 +515,21 @@ describe("Recursive Folder Download", () => {
       .attach("file", path.resolve("tests/files/test.txt"), "grandchild.txt");
 
     // Try to download the folders
-    const download = await agent.post(`${root.path}/downloadFolder`).send({
-      folderId: rootId,
-    });
+    const download = await agent
+      .post(`${root.path}/downloadFolder`)
+      .send({
+        folderId: rootId,
+      })
+      .buffer(true)
+      .parse((res, callback) => {
+        const chunks = [];
+
+        res.on("data", (chunk) => chunks.push(chunk));
+        res.on("end", () => callback(null, Buffer.concat(chunks)));
+      });
 
     expect(download.status).toBe(200);
     expect(download.headers["content-type"]).toMatch(/zip/);
     expect(download.headers["content-disposition"]).toContain(".zip");
-  });
+  }, 30000);
 });

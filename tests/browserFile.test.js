@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import request from "supertest";
+import { supabase } from "../config/supabase.js";
 
 import app from "../app.js";
 import "../config/env.js";
@@ -50,15 +51,18 @@ describe("File Operations", () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
 
-      // Check that Multer created the file on disk
-      const uploadedPath = path.resolve(
-        "uploads/test",
-        response.body.file.filename
+      const { data: files, error } = await supabase.storage
+        .from("User Files")
+        .list("Test");
+
+      expect(error).toBeNull();
+
+      const uploadedFile = files.find(
+        (file) => file.name === response.body.file.filename.split("/").pop()
       );
 
-      expect(fs.existsSync(uploadedPath)).toBe(true);
-      const stats = fs.statSync(uploadedPath);
-      expect(stats.size).toBe(response.body.file.size);
+      expect(uploadedFile).toBeDefined();
+      expect(uploadedFile.metadata.size).toBe(response.body.file.size);
       fileId = response.body.file.id;
     });
 
@@ -262,12 +266,12 @@ describe("File Operations", () => {
       expect(response.body.file.id).toBe(fileId);
 
       // See if the file was deleted
-      const uploadedPath = path.resolve(
-        "uploads/test",
-        response.body.file.filename
-      );
+      const { data, error } = await supabase.storage
+        .from("User Files")
+        .download(response.body.file.filename);
 
-      expect(fs.existsSync(uploadedPath)).toBe(false);
+      expect(data).toBeNull();
+      expect(error).not.toBeNull();
     });
   });
   describe("File Download", () => {
@@ -411,10 +415,13 @@ describe("Recursive Folder Deletion", () => {
     expect(upload.status).toBe(200);
 
     const filename = upload.body.file.filename;
-    const uploadedPath = path.resolve("uploads/test", filename);
 
-    // Verify the files are there
-    expect(fs.existsSync(uploadedPath)).toBe(true);
+    const { data, error } = await supabase.storage
+      .from("User Files")
+      .download(filename);
+
+    expect(error).toBeNull();
+    expect(data).toBeDefined();
 
     // Delete the root folder
     const deletion = await agent.post(`${root.path}/deleteFolder`).send({
@@ -426,7 +433,15 @@ describe("Recursive Folder Deletion", () => {
     expect(deletion.body.success).toBe(true);
 
     // Verify file was deleted
-    expect(fs.existsSync(uploadedPath)).toBe(false);
+    const { data: files, error: listError } = await supabase.storage
+      .from("User Files")
+      .list("Test");
+
+    expect(listError).toBeNull();
+
+    const splitFilename = upload.body.file.filename.split("/").pop();
+
+    expect(files.some((file) => file.name === splitFilename)).toBe(false);
 
     // Check all folders to see if they have been deleted
     const rootResponse = await agent.get(`/browser/folder/${rootId}`);

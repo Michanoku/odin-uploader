@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { register } from "module";
+import { supabase } from "../config/supabase.js";
 
 import { ZipArchive } from "archiver";
 import { body, check, validationResult, matchedData } from "express-validator";
@@ -16,9 +17,6 @@ import {
   limitExceeded,
   shareManager,
 } from "../lib/browserUtils.js";
-
-const uploadFolder =
-  process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
 
 // Validators
 // Validate New Folders
@@ -407,23 +405,20 @@ const deleteFolder = async (req, res) => {
     // Get the filenames of all files we are about to delete
     const folderIds = await db.collectFolderIds(folderId);
     const filesToDelete = await db.getAllFilesFromSubfolders(folderIds);
-    // Delete the database entries for the folder (cascades to subfolders and files)
-    const deletedFolder = await db.deleteFolder(folderId);
 
     // Delete the files from disk
-    await Promise.all(
-      filesToDelete.map(async (file) => {
-        try {
-          // Apparantly unlink means delete in this. Learned something new.
-          await fs.unlink(path.resolve(uploadFolder, file.filename));
-        } catch (err) {
-          // If there is any other error other than file no longer exists, throw the error.
-          if (err.code !== "ENOENT") {
-            throw err;
-          }
-        }
-      })
-    );
+    if (filesToDelete.length > 0) {
+      const { error } = await supabase.storage
+        .from("User Files")
+        .remove(filesToDelete.map((file) => file.filename));
+
+      if (error) {
+        return next(error);
+      }
+    }
+
+    // Delete the database entries for the folder (cascades to subfolders and files)
+    const deletedFolder = await db.deleteFolder(folderId);
 
     res.json({ success: true, folder: deletedFolder });
   } catch (err) {
@@ -434,19 +429,16 @@ const deleteFolder = async (req, res) => {
 
 // Download an entire folder including subfolders and files
 const downloadFolder = async (req, res, next) => {
-  // Get a list of all files and all paths
   try {
     const results = await collectFilesWithPaths(
       req.targetFolder.id,
       req.targetFolder.name
     );
 
-    // Create a new zip archive with a medium compression
     const archive = new ZipArchive("zip", {
       zlib: { level: 6 },
     });
 
-    // Add some safeguards for errors
     archive.on("warning", (err) => {
       console.warn(err);
     });
@@ -455,13 +447,11 @@ const downloadFolder = async (req, res, next) => {
       next(err);
     });
 
-    // Attach the zip file and pipe it to the user
     res.attachment(`${req.targetFolder.name}.zip`);
     archive.pipe(res);
 
-    // Combine paths and original file names to create the zip file
     for (const file of results) {
-      archive.file(file.diskPath, {
+      archive.append(file.buffer, {
         name: file.zipPath,
       });
     }
@@ -488,19 +478,22 @@ const uploadFile = [
     // Create the file in the database
     try {
       const filename = crypto.randomUUID();
+      const storagePath =
+        process.env.NODE_ENV === "test" ? `Test/${filename}` : filename;
+
       const { error } = await supabase.storage
         .from("User Files")
-        .upload(filename, req.file.buffer, {
-            contentType: req.file.mimetype
+        .upload(storagePath, req.file.buffer, {
+          contentType: req.file.mimetype,
         });
 
       if (error) {
-          return next(error);
+        return next(error);
       }
       const fileData = {
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
-        filename: filename,
+        filename: storagePath,
         size: req.file.size,
         folderId: req.currentFolder.id,
         userId: req.user.id,

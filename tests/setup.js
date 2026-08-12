@@ -4,6 +4,7 @@ import path from "path";
 
 import "../config/env.js";
 import { prisma } from "../lib/prisma.js";
+import { supabase } from "../config/supabase.js";
 
 beforeAll(async () => {
   await prisma.share.deleteMany();
@@ -13,10 +14,23 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  const uploadDir = path.resolve("uploads/test");
+  const { data: files, error } = await supabase.storage
+    .from("User Files")
+    .list("Test");
 
-  const files = await fs.readdir(uploadDir);
+  if (error) {
+    throw error;
+  }
 
-  await Promise.all(files.map((file) => fs.unlink(path.join(uploadDir, file))));
+  if (files.length > 0) {
+    const paths = files.map((file) => `Test/${file.name}`);
+
+    const { error } = await supabase.storage.from("User Files").remove(paths);
+
+    if (error) {
+      throw error;
+    }
+  }
+
   await prisma.$disconnect();
 });

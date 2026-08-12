@@ -3,6 +3,7 @@ import path from "path";
 import { body, validationResult, matchedData } from "express-validator";
 import { ZipArchive } from "archiver";
 
+import { supabase } from "../config/supabase.js";
 import * as sharedQueries from "../db/sharedQueries.js";
 import { getFolder } from "../db/browserQueries.js";
 import {
@@ -14,7 +15,6 @@ import {
   formatFileSize,
 } from "../lib/browserUtils.js";
 import { register } from "module";
-import { DbNull } from "../generated/prisma/runtime/client.js";
 
 const uploadFolder =
   process.env.NODE_ENV === "test" ? "uploads/test" : "uploads";
@@ -185,9 +185,9 @@ const downloadSharedFolder = async (req, res, next) => {
     res.attachment(`${req.sharedTargetFolder.name}.zip`);
     archive.pipe(res);
 
-    // Get all files and their paths and name them their original filenames
+    // Add each file to the archive using its buffer
     for (const file of results) {
-      archive.file(file.diskPath, {
+      archive.append(file.buffer, {
         name: file.zipPath,
       });
     }
@@ -217,7 +217,6 @@ const getSharedFile = async (req, res, next) => {
   try {
     if (req.sharedFolder) {
       const sharedRootId = req.sharedRootId;
-      console.log(sharedRootId);
       const parentId = file.rootShare ? null : file.folderId;
       const [contents, breadcrumbs] = await Promise.all([
         getFolderContents(req.sharedFolder.id),
@@ -303,14 +302,28 @@ const unshareFile = async (req, res, next) => {
 
 // Download a shared file
 const downloadSharedFile = async (req, res, next) => {
-  // Name the file its original filename and send it to the user
-  const filePath = path.resolve(uploadFolder, req.sharedTargetFile.filename);
+  try {
+    console.log("Storage path:", req.sharedTargetFile.filename);
+    const { data, error } = await supabase.storage
+      .from("User Files")
+      .download(req.sharedTargetFile.filename);
 
-  res.download(filePath, req.sharedTargetFile.originalname, (err) => {
-    if (err) {
-      next(err);
+    if (error) {
+      return next(error);
     }
-  });
+
+    const buffer = Buffer.from(await data.arrayBuffer());
+
+    res.setHeader("Content-Type", req.sharedTargetFile.mimetype);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${req.sharedTargetFile.originalname}"`
+    );
+
+    res.send(buffer);
+  } catch (err) {
+    next(err);
+  }
 };
 
 export {

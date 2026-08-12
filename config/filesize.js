@@ -1,0 +1,4 @@
+const MAX_FILE_SIZE = 100 * 1024; // 100 KB
+const MAX_USER_STORAGE = 500 * 1024; // 500 KB
+
+export { MAX_FILE_SIZE, MAX_USER_STORAGE };
